@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found — Direct Off Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/investor.css">
+  <script>
+  (function() {
+    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  </script>
+  <style>
+    html, body {
+      height: 100%;
+    }
+
+    .notfound-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Theme toggle — top right corner */
+    .notfound-theme-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      z-index: 100;
+    }
+
+    .notfound-theme-btn:hover {
+      background: var(--surface-2);
+    }
+
+    /* Brand */
+    .notfound-brand {
+      margin-bottom: 48px;
+    }
+
+    .notfound-logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+      display: block;
+      margin-bottom: 4px;
+      text-decoration: none;
+    }
+
+    .notfound-logo-sub {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* 404 number */
+    .notfound-number {
+      font-size: 120px;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 16px;
+      /* subtle text shadow for depth */
+      text-shadow: 0 4px 32px rgba(201,168,76,0.25);
+    }
+
+    @media (max-width: 480px) {
+      .notfound-number {
+        font-size: 80px;
+      }
+    }
+
+    /* Heading & description */
+    .notfound-heading {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .notfound-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 380px;
+      margin: 0 auto 40px;
+    }
+
+    /* Buttons */
+    .notfound-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: #0f1a2e;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--gold);
+      border: 1.5px solid var(--gold);
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(201,168,76,0.1);
+    }
+
+    /* Decorative divider */
+    .notfound-divider {
+      width: 48px;
+      height: 2px;
+      background: var(--border);
+      margin: 0 auto 32px;
+      border-radius: 2px;
+    }
+
+    /* Copyright */
+    .notfound-footer {
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 0 24px;
+    }
+
+    /* Background decoration — subtle navy orb */
+    .notfound-bg-orb {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .notfound-page > * {
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/favicon-32.png">
+</head>
+<body>
+  <div class="notfound-bg-orb"></div>
+
+  <!-- Theme Toggle -->
+  <button class="notfound-theme-btn theme-toggle" onclick="Portal.toggleTheme()" title="Toggle theme" aria-label="Toggle light/dark mode"></button>
+
+  <div class="notfound-page">
+
+    <!-- Brand -->
+    <div class="notfound-brand">
+      <a href="/homepage.html" class="notfound-logo">DIRECT OFF MARKET</a>
+      <div class="notfound-logo-sub">Investor Portal</div>
+    </div>
+
+    <!-- 404 -->
+    <div class="notfound-number">404</div>
+
+    <h1 class="notfound-heading">Page Not Found</h1>
+    <p class="notfound-desc">The page you're looking for doesn't exist or has been moved.</p>
+
+    <div class="notfound-divider"></div>
+
+    <!-- Actions -->
+    <div class="notfound-actions">
+      <a href="/homepage.html" class="btn-primary">Go to Homepage</a>
+      <a href="/marketplace.html" class="btn-secondary">Browse Marketplace</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="notfound-footer">
+      &copy; 2026 Direct Off Market, LLC. All rights reserved.
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/investor-auth.js"></script>
+  <div id="portalToast"></div>
+  <script>
+    // Portal.initTheme() is called automatically by investor-auth.js
+    // updateThemeBtn() runs on load to set correct icon for the theme toggle
+  </script>
+</body>
+</html>

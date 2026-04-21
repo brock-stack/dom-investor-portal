@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace | Direct Off Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/investor.css">
+  <script>
+  (function() {
+    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  </script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css' rel='stylesheet'>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js'></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg, #0f1a2e); color: var(--text, #e2e8f0); }
+
+    :root {
+      --bg: #0f1a2e;
+      --navy: #1a2744;
+      --gold: #c9a84c;
+      --surface: #1a2744;
+      --surface-2: #243257;
+      --border: #2d4070;
+      --text: #e2e8f0;
+      --text-muted: #8a9bbf;
+      --green: #22c55e;
+      --red: #ef4444;
+      --orange: #f97316;
+    }
+
+    [data-theme="light"] {
+      --bg: #f1f5f9;
+      --navy: #1a2744;
+      --surface: #ffffff;
+      --surface-2: #e8eef6;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    .investor-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 100;
+      gap: 16px;
+    }
+
+    .marketplace-layout {
+      display: flex;
+      height: calc(100vh - 70px);
+      margin-top: 70px;
+    }
+
+    .marketplace-map {
+      flex: 1;
+      position: relative;
+      min-width: 0;
+      background: #0f1a2e;
+    }
+
+    .marketplace-panel {
+      width: 480px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .filter-pill:hover { border-color: #4fc3f7; color: var(--text); }
+    .filter-pill.active { background: #4fc3f7; border-color: #4fc3f7; color: #1a2744; font-weight: 700; }
+
+    .panel-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #listingCount {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .view-toggle { display: flex; gap: 4px; }
+    .view-btn {
+      width: 30px; height: 30px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .view-btn:hover { border-color: #4fc3f7; color: #4fc3f7; }
+    .view-btn.active { background: var(--surface-2); border-color: #4fc3f7; color: #4fc3f7; }
+
+    .listings-panel {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* List cards */
+    .deal-card {
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .deal-card:hover { background: var(--surface-2); }
+    .list-card:hover { background: var(--surface-2); border-left: 3px solid #4fc3f7; }
+
+    .list-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+
+    .card-photo-sm {
+      width: 140px;
+      height: 110px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      background: var(--surface-2);
+      padding: 0;
+    }
+    .card-photo-sm img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .card-content { flex: 1; min-width: 0; }
+    .card-location { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-specs { font-size: 11px; color: var(--text-muted); margin: 1px 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-price { font-size: 17px; font-weight: 800; color: #1a2744; }
+    .card-arrow { color: var(--text-muted); font-size: 16px; }
+
+    /* Tile view */
+    .deal-card:not(.list-card) {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .deal-card:not(.list-card):hover { border-color: #1a2744; box-shadow: 0 4px 20px rgba(79,195,247,0.18); background: var(--surface-2); }
+
+    .card-photo {
+      position: relative;
+      overflow: hidden;
+      background: var(--surface-2);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
+    .badge-pending { background: #f97316; color: #fff; font-weight: 700; }
+    .badge-coming-soon { background: #8b5cf6; color: #fff; font-weight: 700; }
+    .badge-sold { background: #64748b; color: #fff; font-weight: 700; }
+
+    /* Map controls */
+    .map-controls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 10;
+      display: flex;
+      gap: 4px;
+      background: #1a2744;
+      border-radius: 8px;
+      padding: 4px;
+      border: 1px solid rgba(79,195,247,0.2);
+      backdrop-filter: blur(8px);
+    }
+
+    .map-style-btn {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid rgba(79,195,247,0.25);
+      background: rgba(26,39,68,0.9);
+      color: #4fc3f7;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+.map-style-btn:hover { background: rgba(79,195,247,0.12) !important; border-color: #4fc3f7 !important; color: #4fc3f7 !important; }
+    .map-style-btn.active { background: #4fc3f7; color: #1a2744; border-color: #4fc3f7; font-weight: 700; }
+
+    .map-legend {
+      position: absolute;
+      bottom: 40px;
+      left: 12px;
+      z-index: 10;
+      background: #1a2744;
+      border: 1px solid rgba(79,195,247,0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: #4fc3f7;
+      font-weight: 600;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+    .map-legend div { display: flex; align-items: center; gap: 6px; }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid white;
+      flex-shrink: 0;
+    }
+    .legend-dot.orange { background: #4fc3f7; }
+    .legend-dot.red { background: #ef4444; }
+    .legend-dot.purple { background: #8b5cf6; }
+
+    .map-reset-btn, .map-flood-btn {
+      position: absolute;
+      z-index: 10;
+      border: 1px solid rgba(79,195,247,0.25);
+      background: #1a2744;
+      color: #4fc3f7;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      backdrop-filter: blur(8px);
+      transition: all 0.15s;
+    }
+    .map-reset-btn:hover, .map-flood-btn:hover { background: rgba(79,195,247,0.15); border-color: #4fc3f7; }
+    .map-reset-btn { }
+    .map-flood-btn { }
+
+
+    /* Mapbox NavigationControl - match site style */
+    .mapboxgl-ctrl-group {
+      background: #1a2744 !important;
+      border: 1px solid rgba(79,195,247,0.2) !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+      backdrop-filter: blur(8px) !important;
+      overflow: hidden;
+    }
+    .mapboxgl-ctrl-group button {
+      background-color: transparent !important;
+      border: none !important;
+      border-bottom: 1px solid rgba(79,195,247,0.15) !important;
+      width: 30px !important;
+      height: 30px !important;
+    }
+    .mapboxgl-ctrl-group button:last-child { border-bottom: none !important; }
+    .mapboxgl-ctrl-group button:hover { background: rgba(79,195,247,0.15) !important; }
+    .mapboxgl-ctrl-icon { filter: brightness(0) saturate(100%) invert(72%) sepia(47%) saturate(450%) hue-rotate(165deg) brightness(105%) contrast(93%) !important; }
+
+    /* Mapbox popup */
+    .mapboxgl-popup-content {
+      background: var(--navy) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 10px !important;
+      padding: 14px 16px !important;
+      color: var(--text) !important;
+      font-family: 'Inter', sans-serif !important;
+      min-width: 180px;
+    }
+    .mapboxgl-popup-tip { border-top-color: white !important; }
+    .mapboxgl-popup-content { background: #ffffff !important; border-radius: 10px !important; padding: 0 !important; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important; min-width: 240px !important; }
+    .map-popup { padding: 0; color: #1a2744; font-family: 'Inter', sans-serif; }
+    .map-popup .popup-address { font-weight: 600; font-size: 14px; color: #1a2744; margin-bottom: 2px; }
+    .map-popup .popup-city { font-size: 14px; font-weight: 600; color: #1a2744; margin-bottom: 6px; }
+    .map-popup .popup-specs { font-size: 12px; color: #4a5a80; margin-bottom: 10px; }
+.map-popup .popup-price { font-size: 17px; font-weight: 800; color: #1a2744; }
+    .map-popup .popup-price-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; }
+.map-popup .popup-arv { font-size: 17px; font-weight: 800; color: #2d6a8f; }
+    .map-popup .popup-arv-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; white-space: nowrap; }
+.map-popup .popup-link { display: block; background: #1a2744; color: #4fc3f7; font-size: 13px; font-weight: 700; text-align: center; padding: 10px; text-decoration: none; transition: background 0.15s; }
+.map-popup .popup-link:hover { background: #243560; }
+    .popup-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; }
+    .popup-status-published { background: #22c55e; color: #fff; }
+    .popup-status-pending { background: #f97316; color: #fff; }
+    .popup-status-coming_soon { background: #8b5cf6; color: #fff; }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--text-muted);
+      font-size: 14px;
+      gap: 12px;
+      text-align: center;
+      padding: 24px;
+    }
+    .empty-icon { font-size: 40px; }
+
+    /* Scrollbar */
+    .listings-panel::-webkit-scrollbar { width: 4px; }
+    .listings-panel::-webkit-scrollbar-track { background: transparent; }
+    .listings-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Toast */
+    #portalToast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/favicon-32.png">
+</head>
+<body>
+  <nav id="investorNav" class="investor-nav">
+    <a href="/homepage.html" class="nav-brand">
+      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:44px;width:auto;max-width:160px;object-fit:contain;">
+    </a>
+    <div class="nav-right" id="navRight">
+      <button class="theme-toggle" onclick="Portal.toggleTheme()"></button>
+    </div>
+  </nav>
+
+  <div class="marketplace-layout">
+    <div class="marketplace-map" id="mapContainer">
+      <div class="map-controls">
+        <button class="map-style-btn active" data-style="custom">Map</button>
+        <button class="map-style-btn" data-style="satellite-streets-v12">Satellite</button>
+        <button class="map-style-btn" data-style="dark-v11">Dark</button>
+        <button class="map-style-btn" data-style="light-v11">Mono</button>
+      </div>
+      <div class="map-legend">
+        <div><span class="legend-dot orange"></span> Listing</div>
+        <div><span class="legend-dot red"></span> Sold Comp</div>
+        <div><span class="legend-dot purple"></span> Rental Comp</div>
+      </div>
+      <div style="position:absolute;bottom:12px;right:12px;z-index:10;display:flex;flex-direction:column;gap:4px;background:rgba(26,39,68,0.92);border:1px solid rgba(79,195,247,0.2);border-radius:8px;padding:4px;backdrop-filter:blur(8px);">
+        <button id="floodToggleBtn" class="map-style-btn" style="white-space:nowrap;">&#128167; Flood Zones</button>
+        <button id="resetMapBtn" class="map-style-btn" style="white-space:nowrap;">Reset Map</button>
+      </div>
+    </div>
+
+    <div class="marketplace-panel">
+      <div class="panel-header">
+        <div class="filter-bar">
+          <button class="filter-pill active" data-status="all">All</button>
+          <button class="filter-pill" data-status="published">Available</button>
+          <button class="filter-pill" data-status="pending">Pending</button>
+          <button class="filter-pill" data-status="coming_soon">Coming Soon</button>
+        </div>
+        <div class="panel-title-row">
+          <span id="listingCount">Loading...</span>
+          <div class="view-toggle">
+            <button id="listViewBtn" class="view-btn active" title="List view">&#8801;</button>
+            <button id="tileViewBtn" class="view-btn" title="Tile view">&#8862;</button>
+          </div>
+        </div>
+      </div>
+      <div id="listingsPanel" class="listings-panel"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/investor-auth.js"></script>
+  <div id="portalToast"></div>
+  <script>
+    const MAPBOX_TOKEN = 'pk.eyJ1IjoiYnJvY2tjaGFpbjgiLCJhIjoiY21oY3dnY3FkMWFiNzJpcHJieG5vY3d2eiJ9.PJS9hRncxWG2z-85E_QCbg';
+    const CUSTOM_STYLE = 'mapbox://styles/brockchain8/cmho8hego005r01s5868kaoci';
+    const STYLE_MAP = {
+      'custom': CUSTOM_STYLE,
+      'satellite-streets-v12': 'mapbox://styles/mapbox/satellite-streets-v12',
+      'dark-v11': 'mapbox://styles/mapbox/dark-v11',
+      'light-v11': 'mapbox://styles/mapbox/light-v11'
+    };
+
+    let map, allListings = [], markers = {}, currentFilter = 'all', currentView = 'list', floodVisible = false;
+
+    async function init() {
+      const session = await Portal.requireAuth();
+      if (!session) return;
+
+      const _navProfile = await Portal.getProfile(session.user.id);
+      const _navFirstName = _navProfile ? (_navProfile.first_name || '') : '';
+      document.getElementById('navRight').innerHTML =
+        '<a href="/marketplace.html" class="nav-link active">Marketplace</a>' +
+        '<a href="/dashboard.html" class="nav-link">Dashboard</a>' +
+        (_navFirstName ? '<span style="color:var(--text-muted);font-size:13px">' + _navFirstName + '</span>' : '') +
+        '<button onclick="Portal.logout()" class="btn-secondary btn-sm">Sign Out</button>' +
+        '<button class="theme-toggle" onclick="Portal.toggleTheme()"></button>';
+      Portal.updateThemeBtn();
+
+      // Wait for layout to render before init map
+      await new Promise(function(resolve) { requestAnimationFrame(function() { requestAnimationFrame(resolve); }); });
+
+      var mapContainer = document.getElementById('mapContainer');
+      var webglOk = (function() {
+        try {
+          var canvas = document.createElement('canvas');
+          return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+        } catch(e) { return false; }
+      })();
+
+      if (webglOk) { try {
+        mapboxgl.accessToken = MAPBOX_TOKEN;
+        map = new mapboxgl.Map({
+        container: 'mapContainer',
+        style: CUSTOM_STYLE,
+        center: [-81.5, 27.8],
+        zoom: 7
+      });
+      map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+      } catch(webglErr) {
+        console.warn('WebGL not available:', webglErr.message);
+        if (mapContainer) mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.4);font-size:14px;">Map unavailable</div>';
+      } } else {
+        if (mapContainer) mapContainer.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.4);font-size:14px;">Map requires hardware acceleration</div>';
+      }
+
+      // Load listings in next tick, completely isolated from map errors
+      setTimeout(function() { loadListings(); }, 0);
+
+      if (map) {
+        map.on('load', function() {
+          map.resize();
+          allListings.forEach(function(l) { addMarker(l); });
+        });
+      }
+
+      // Style buttons
+      document.querySelectorAll('.map-style-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.map-style-btn').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          var styleKey = btn.dataset.style;
+          map.setStyle(STYLE_MAP[styleKey] || CUSTOM_STYLE);
+          map.once('styledata', function() {
+            allListings.forEach(function(l) { addMarker(l); });
+            if (floodVisible) toggleFloodLayer(true);
+          });
+        });
+      });
+
+      // Filter pills
+      document.querySelectorAll('.filter-pill').forEach(function(pill) {
+        pill.addEventListener('click', function() {
+          document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+          pill.classList.add('active');
+          currentFilter = pill.dataset.status;
+          renderListings();
+          updateMarkers();
+        });
+      });
+
+      // View toggle
+      document.getElementById('listViewBtn').addEventListener('click', function() {
+        currentView = 'list';
+        document.getElementById('listViewBtn').classList.add('active');
+        document.getElementById('tileViewBtn').classList.remove('active');
+        renderListings();
+      });
+      document.getElementById('tileViewBtn').addEventListener('click', function() {
+        currentView = 'tile';
+        document.getElementById('tileViewBtn').classList.add('active');
+        document.getElementById('listViewBtn').classList.remove('active');
+        renderListings();
+      });
+
+      // Reset map
+      var resetBtn = document.getElementById('resetMapBtn'); if (resetBtn) resetBtn.addEventListener('click', function() {
+        fitToMarkers();
+      });
+
+      // Flood toggle
+      var floodBtn = document.getElementById('floodToggleBtn'); if (floodBtn) floodBtn.addEventListener('click', function() {
+        floodVisible = !floodVisible;
+        toggleFloodLayer(floodVisible);
+        document.getElementById('floodToggleBtn').textContent = '\u{1F4A7} Flood Zones: ' + (floodVisible ? 'ON' : 'OFF');
+      });
+    }
+
+    async function loadListings() {
+      try {
+        var result = await Portal.supabase
+          .from('portal_listings')
+          .select('id, asking_price, status, notes, featured, open_house_date, listing_id, property_id, listings (id, stage, list_price, property_id, properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)), properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)')
+          // Portal supports both: listing_id-linked (preferred) and property_id-only (fallback)
+          .in('status', ['published', 'pending', 'coming_soon']);
+
+        if (result.error) throw result.error;
+        allListings = result.data || [];
+
+        if (allListings.length > 0) {
+          var listingIds = allListings.map(function(l) { return l.listing_id; }).filter(Boolean);
+          if (listingIds.length > 0) {
+            var photosResult = await Portal.supabase
+              .from('listing_photos')
+              .select('listing_id, url, is_primary')
+              .in('listing_id', listingIds)
+              .eq('is_primary', true);
+
+            var photoMap = {};
+            ((photosResult.data) || []).forEach(function(p) { photoMap[p.listing_id] = p.url; });
+            allListings.forEach(function(l) { l._photo = photoMap[l.listing_id] || null; });
+          }
+        }
+
+        allListings.forEach(function(l) { addMarker(l); });
+        renderListings();
+        fitToMarkers();
+      } catch(e) {
+        if (e.message && e.message.includes('does not exist')) {
+          showEmpty('No listings available yet. Check back soon!');
+        } else {
+          showEmpty('Unable to load listings. Please refresh.');
+        }
+      }
+    }
+
+    function addMarker(listing) {
+      var p = (listing.listings && listing.listings.properties) || listing.properties || {};
+      if (!p.lat || !p.lng) return;
+
+      if (markers[listing.id]) {
+        markers[listing.id].remove();
+      }
+
+      var el = document.createElement('div');
+      el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#4fc3f7;border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
+      el.dataset.id = listing.id;
+
+      var popup = new mapboxgl.Popup({ offset: 25, closeButton: true })
+        .setHTML(
+          '<div class="map-popup">' +
+            (listing._photo ? '<div style="position:relative;"><img src="' + listing._photo + '" alt="property" style="width:100%;height:140px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">' + '<span class="popup-status popup-status-' + (listing.status||'published') + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(listing.status) + '</span></div>' : '') +
+            '<div style="padding:12px 14px 0;">' +
+              '<div class="popup-address">' + (p.address || '') + '</div>' +
+              '<div class="popup-city">' + [p.city, p.state].filter(Boolean).join(', ') + '</div>' +
+              '<div class="popup-specs">' + [slugToLabel(p.property_type), p.bedrooms ? p.bedrooms + ' Bd' : null, p.bathrooms ? p.bathrooms + ' Ba' : null, p.sqft ? p.sqft.toLocaleString() + ' sqft' : null].filter(Boolean).join(' &middot; ') + '</div>' +
+              '<div style="display:flex;gap:20px;align-items:flex-end;margin-bottom:12px;">' +
+                '<div><div class="popup-price-label">List Price</div><div class="popup-price">' + Portal.fc(listing.asking_price) + '</div></div>' +
+                (p.estimated_arv ? '<div><div class="popup-arv-label">ARV</div><div class="popup-arv">' + Portal.fc(p.estimated_arv) + '</div></div>' : '') +
+              '</div>' +
+            '</div>' +
+            '<a href="/deal.html?id=' + listing.id + '" class="popup-link">View Deal &rarr;</a>' +
+          '</div>'   );
+
+      var marker = new mapboxgl.Marker(el)
+        .setLngLat([p.lng, p.lat])
+        .setPopup(popup)
+        .addTo(map);
+
+      markers[listing.id] = marker;
+    }
+
+    function slugToLabel(slug) {
+      var m = { single_family: 'Single Family', multi_family: 'Multi Family', condo: 'Condo', townhouse: 'Townhouse', land: 'Land', commercial: 'Commercial', mobile_home: 'Mobile Home' };
+      return m[slug] || slug || 'SFR';
+    }
+
+    function getStatusLabel(status) {
+      var m = { published: 'Available', pending: 'Pending', coming_soon: 'Coming Soon' };
+      return m[status] || status;
+    }
+
+    function getBadgeClass(status) {
+      var m = { published: 'badge-available', pending: 'badge-pending', coming_soon: 'badge-coming-soon' };
+      return m[status] || '';
+    }
+
+    function renderListings() {
+      var panel = document.getElementById('listingsPanel');
+      var filtered = currentFilter === 'all' ? allListings : allListings.filter(function(l) { return l.status === currentFilter; });
+
+      document.getElementById('listingCount').textContent = filtered.length + ' listing' + (filtered.length !== 1 ? 's' : '');
+
+      if (filtered.length === 0) {
+        panel.innerHTML = '<div class="empty-state"><div class="empty-icon">&#127968;</div><p>No listings match this filter.</p></div>';
+        panel.style.cssText = '';
+        return;
+      }
+
+      if (currentView === 'list') {
+        panel.style.cssText = '';
+        panel.innerHTML = filtered.map(function(l) {
+          var p = (l.listings && l.listings.properties) || l.properties || {};
+          var street = p.address || '';
+          var cityState = [p.city, p.state].filter(Boolean).join(', ') || 'Florida';
+          var specsRow1 = [slugToLabel(p.property_type), p.year_built ? 'Built ' + p.year_built : null].filter(Boolean).join(' &middot; ');
+          var specsRow2 = [p.bedrooms ? p.bedrooms + ' Bd' : null, p.bathrooms ? p.bathrooms + ' Ba' : null, p.sqft ? p.sqft.toLocaleString() + ' sqft' : null].filter(Boolean).join(' &middot; ');
+          var arv = p.estimated_arv ? Portal.fc(p.estimated_arv) : null;
+          var photo = l._photo
+            ? '<img src="' + l._photo + '" alt="property" onerror="this.style.display=\'none\'">'
+            : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:24px;">&#127968;</div>';
+          var addressHtml = street
+            ? '<div style="font-size:13px;font-weight:600;color:var(--text);">' + street + '</div><div style="font-size:13px;font-weight:600;color:var(--text);">' + cityState + '</div>'
+            : '<div style="font-size:13px;font-weight:600;color:var(--text);">' + cityState + '</div>';
+          return '<div class="deal-card list-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)">' +
+            '<div class="card-photo-sm">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:4px;left:4px;font-size:9px;">' + getStatusLabel(l.status) + '</span></div>' +
+            '<div class="card-content">' +
+              addressHtml +
+              (specsRow1 ? '<div class="card-specs">' + specsRow1 + '</div>' : '') +
+              (specsRow2 ? '<div class="card-specs">' + specsRow2 + '</div>' : '') +
+              '<div style="display:flex;gap:20px;align-items:flex-end;margin-top:6px;">' +
+                '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div class="card-price">' + Portal.fc(l.asking_price) + '</div></div>' +
+                (arv ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:14px;font-weight:700;color:#2d6a8f;">' + arv + '</div></div>' : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="card-arrow">&rarr;</div>' +
+          '</div>';
+        }).join('');
+      } else {
+        panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;overflow-y:auto;align-content:start;';
+        panel.innerHTML = filtered.map(function(l) {
+          var p = (l.listings && l.listings.properties) || l.properties || {};
+          var loc = [p.city, p.state].filter(Boolean).join(', ') || 'Florida';
+          var tileSpecsRow1 = [slugToLabel(p.property_type), p.year_built ? 'Built ' + p.year_built : null].filter(Boolean).join(' &middot; ');
+          var tileSpecsRow2 = [p.bedrooms ? p.bedrooms + ' Bd' : null, p.bathrooms ? p.bathrooms + ' Ba' : null, p.sqft ? p.sqft.toLocaleString() + ' sqft' : null].filter(Boolean).join(' &middot; ');
+          var photo = l._photo
+            ? '<img src="' + l._photo + '" alt="property" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'
+            : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" alt="DOM" style="height:28px;opacity:0.15;"></div>';
+          var addressHtml = p.address
+            ? '<div style="font-size:13px;font-weight:600;color:var(--text);">' + p.address + '</div><div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>'
+            : '<div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>';
+          var arvHtml = p.estimated_arv
+            ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:14px;font-weight:700;color:#2d6a8f;">' + Portal.fc(p.estimated_arv) + '</div></div>'
+            : '';
+          return '<div class="deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;">' +
+            '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status) + '</span></div>' +
+            '<div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">' +
+              addressHtml +
+              (tileSpecsRow1 ? '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow1 + '</div>' : '') +
+              (tileSpecsRow2 ? '<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow2 + '</div>' : '') +
+              '<div style="display:flex;gap:14px;align-items:flex-end;margin-top:8px;">' +
+                '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div style="font-size:16px;font-weight:800;color:#1a2744;">' + Portal.fc(l.asking_price) + '</div></div>' +
+                arvHtml +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    function updateMarkers() {
+      allListings.forEach(function(l) {
+        var marker = markers[l.id];
+        if (!marker) return;
+        var el = marker.getElement();
+        var show = currentFilter === 'all' || l.status === currentFilter;
+        el.style.display = show ? 'block' : 'none';
+      });
+    }
+
+    function highlightMarker(id, on) {
+      var marker = markers[id];
+      if (!marker) return;
+      var el = marker.getElement();
+      el.style.width = on ? '22px' : '16px';
+      el.style.height = on ? '22px' : '16px';
+      el.style.zIndex = on ? '10' : '';
+    }
+
+    function fitToMarkers() {
+      var points = allListings
+        .filter(function(l) { return ((l.listings && l.listings.properties) || l.properties) && (((l.listings && l.listings.properties) || l.properties).lat) && (((l.listings && l.listings.properties) || l.properties) || {}).lng; })
+        .map(function(l) { return [(((l.listings && l.listings.properties) || l.properties) || {}).lng, (((l.listings && l.listings.properties) || l.properties) || {}).lat]; });
+      if (points.length === 0) return;
+      if (points.length === 1) {
+        map.flyTo({ center: points[0], zoom: 14 });
+        return;
+      }
+      if (!map) return;
+      var bounds = points.reduce(function(b, p) { return b.extend(p); }, new mapboxgl.LngLatBounds(points[0], points[0]));
+      map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
+    }
+
+    function toggleFloodLayer(show) {
+      try {
+        if (map.getLayer('fema-flood-layer')) {
+          map.setLayoutProperty('fema-flood-layer', 'visibility', show ? 'visible' : 'none');
+        }
+      } catch(e) {}
+    }
+
+    function showEmpty(msg) {
+      document.getElementById('listingsPanel').innerHTML = '<div class="empty-state"><div class="empty-icon">&#127968;</div><p>' + msg + '</p></div>';
+      document.getElementById('listingCount').textContent = '0 listings';
+    }
+
+    init();
+  </script>
+</body>
+</html>

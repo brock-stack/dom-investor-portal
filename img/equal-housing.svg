@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" fill="white">
+  <!-- House outline -->
+  <path d="M20 28 L35 14 L50 28 L50 45 L20 45 Z" fill="none" stroke="white" stroke-width="2.5"/>
+  <!-- Door -->
+  <rect x="31" y="33" width="8" height="12" fill="white"/>
+  <!-- Equal sign -->
+  <rect x="60" y="25" width="25" height="3.5" rx="1.75" fill="white"/>
+  <rect x="60" y="33" width="25" height="3.5" rx="1.75" fill="white"/>
+  <!-- Text -->
+  <text x="60" y="49" font-family="Arial, sans-serif" font-size="8" font-weight="600" fill="white">EQUAL HOUSING</text>
+  <text x="60" y="57" font-family="Arial, sans-serif" font-size="7" fill="rgba(255,255,255,0.7)">OPPORTUNITY</text>
+</svg>

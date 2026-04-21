@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investor Dashboard — Direct Off Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/investor.css">
+  <script>
+  (function() {
+    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  </script>
+  <style>
+    /* ── Page Header ── */
+    .dashboard-header {
+      margin-top: 64px;
+      padding: 28px 32px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .dashboard-header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .dashboard-user-info {
+      text-align: right;
+    }
+
+    .dashboard-user-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .dashboard-user-email {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Tab Bar ── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tab-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    /* ── Tab Content ── */
+    .tab-content {
+      display: none;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ── Section headings ── */
+    .section-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .section-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* ── Buy Box Form ── */
+    .buybox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .buybox-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+    }
+
+    .form-section.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 7px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+    }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    select.form-input {
+      cursor: pointer;
+    }
+
+    /* Checkbox groups */
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .checkbox-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .checkbox-pill input[type="checkbox"] {
+      display: none;
+    }
+
+    .checkbox-pill:has(input:checked) {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.1);
+      color: var(--text);
+    }
+
+    /* Radio Groups */
+    .radio-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 9px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+
+    .radio-option input[type="radio"] {
+      accent-color: var(--gold);
+    }
+
+    .radio-option:has(input:checked) {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.08);
+      color: var(--text);
+    }
+
+    /* Save button row */
+    .buybox-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .save-status {
+      font-size: 13px;
+      color: var(--green);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .save-status.visible {
+      opacity: 1;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: #0f1a2e;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Coming Soon Placeholder ── */
+    .coming-soon-box {
+      text-align: center;
+      padding: 80px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .coming-soon-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .coming-soon-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .coming-soon-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Offers Table ── */
+    .offers-table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .offers-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .offers-table th {
+      background: var(--surface-2);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .offers-table td {
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .offers-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .offers-table tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .offers-table a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .offers-table a:hover {
+      text-decoration: underline;
+    }
+
+    .badge-offer-review {
+      background: rgba(245,158,11,0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245,158,11,0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-offer-accepted {
+      background: rgba(34,197,94,0.15);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .empty-state-inline {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .empty-state-inline a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .tab-content {
+        padding: 24px 16px;
+      }
+
+      .dashboard-header {
+        padding: 20px 16px 0;
+      }
+
+      .buybox-grid {
+        gap: 14px;
+      }
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/favicon-32.png">
+</head>
+<body>
+  <nav id="investorNav" class="investor-nav">
+    <a href="/homepage.html" class="nav-brand">
+      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:44px;width:auto;max-width:160px;object-fit:contain;">
+    </a>
+    <div class="nav-right" id="navRight">
+      <button class="theme-toggle" onclick="Portal.toggleTheme()"></button>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="dashboard-header-inner">
+      <div class="dashboard-header-top">
+        <h1 class="dashboard-title">Investor Dashboard</h1>
+        <div class="dashboard-user-info">
+          <div class="dashboard-user-name" id="headerName">&nbsp;</div>
+          <div class="dashboard-user-email" id="headerEmail">&nbsp;</div>
+        </div>
+      </div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="tab-btn" data-tab="favorites">Favorites</button>
+        <button class="tab-btn" data-tab="offers">Offers</button>
+        <button class="tab-btn" data-tab="proformas">Pro Formas</button>
+        <button class="tab-btn" data-tab="transactions">Transactions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD TAB ── -->
+  <div class="tab-content active" id="tabDashboard">
+    <h2 class="section-heading">Your Buy Box</h2>
+    <p class="section-sub">Tell us what you're looking for and we'll notify you when matching deals hit the market.</p>
+
+    <form class="buybox-grid" id="buyboxForm" autocomplete="off">
+
+      <!-- Property Types -->
+      <div class="form-section">
+        <div class="form-section-title">Property Types</div>
+        <div class="checkbox-group">
+          <label class="checkbox-pill"><input type="checkbox" name="prop_types" value="SFR"> SFR</label>
+          <label class="checkbox-pill"><input type="checkbox" name="prop_types" value="Multi-Family"> Multi-Family</label>
+          <label class="checkbox-pill"><input type="checkbox" name="prop_types" value="Mobile Home"> Mobile Home</label>
+          <label class="checkbox-pill"><input type="checkbox" name="prop_types" value="Vacant Land"> Vacant Land</label>
+          <label class="checkbox-pill"><input type="checkbox" name="prop_types" value="Commercial"> Commercial</label>
+        </div>
+      </div>
+
+      <!-- Target Markets -->
+      <div class="form-section">
+        <div class="form-section-title">Target Markets</div>
+        <div class="form-group">
+          <label class="form-label" for="targetMarkets">Markets of Interest</label>
+          <input type="text" class="form-input" id="targetMarkets" placeholder="e.g. Sarasota, Manatee, Charlotte">
+        </div>
+      </div>
+
+      <!-- Bedrooms & Bathrooms -->
+      <div class="form-section">
+        <div class="form-section-title">Size Minimums</div>
+        <div class="form-group">
+          <label class="form-label" for="minBedrooms">Min Bedrooms</label>
+          <select class="form-input" id="minBedrooms">
+            <option value="">Any</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="minBathrooms">Min Bathrooms</label>
+          <select class="form-input" id="minBathrooms">
+            <option value="">Any</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Price Range -->
+      <div class="form-section">
+        <div class="form-section-title">Price Range</div>
+        <div class="form-group">
+          <label class="form-label" for="maxPurchasePrice">Max Purchase Price</label>
+          <input type="number" class="form-input" id="maxPurchasePrice" placeholder="$" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="minArv">Min ARV</label>
+          <input type="number" class="form-input" id="minArv" placeholder="$" min="0">
+        </div>
+      </div>
+
+      <!-- Investment Strategy -->
+      <div class="form-section">
+        <div class="form-section-title">Investment Strategy</div>
+        <div class="checkbox-group">
+          <label class="checkbox-pill"><input type="checkbox" name="strategies" value="Fix & Flip"> Fix &amp; Flip</label>
+          <label class="checkbox-pill"><input type="checkbox" name="strategies" value="Buy & Hold"> Buy &amp; Hold</label>
+          <label class="checkbox-pill"><input type="checkbox" name="strategies" value="Wholesale"> Wholesale</label>
+          <label class="checkbox-pill"><input type="checkbox" name="strategies" value="New Construction"> New Construction</label>
+        </div>
+      </div>
+
+      <!-- Cash & Returns -->
+      <div class="form-section">
+        <div class="form-section-title">Financial Criteria</div>
+        <div class="form-group">
+          <label class="form-label">Cash Buyer?</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="cashBuyer" value="yes"> Yes
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="cashBuyer" value="no"> No — Financing
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="minCoc">Min Cash-on-Cash Return (%)</label>
+          <input type="number" class="form-input" id="minCoc" placeholder="e.g. 8" min="0" max="100" step="0.5">
+        </div>
+      </div>
+
+      <!-- Notes (full width) -->
+      <div class="form-section full-width">
+        <div class="form-section-title">Additional Notes</div>
+        <div class="form-group">
+          <label class="form-label" for="buyboxNotes">Anything else we should know?</label>
+          <textarea class="form-input" id="buyboxNotes" rows="2" placeholder="Specific criteria, deal breakers, preferred neighborhoods..."></textarea>
+        </div>
+      </div>
+
+      <!-- Save Actions (full width) -->
+      <div class="buybox-actions">
+        <button type="button" class="btn-primary" id="saveBuyboxBtn">Save Buy Box</button>
+        <span class="save-status" id="saveStatus">✓ Saved</span>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ── FAVORITES TAB ── -->
+  <div class="tab-content" id="tabFavorites">
+    <h2 class="section-heading">Favorites</h2>
+    <p class="section-sub">Save your favorite listings for quick access.</p>
+    <div class="coming-soon-box">
+      <div class="coming-soon-icon">⭐</div>
+      <div class="coming-soon-title">Coming Soon</div>
+      <p class="coming-soon-desc">Save your favorite listings for quick access. This feature is coming soon.</p>
+    </div>
+  </div>
+
+  <!-- ── OFFERS TAB ── -->
+  <div class="tab-content" id="tabOffers">
+    <h2 class="section-heading">Your Offers</h2>
+    <p class="section-sub">Offers you've submitted through the portal.</p>
+    <div id="offersContainer">
+      <div class="empty-state-inline">Loading offers...</div>
+    </div>
+  </div>
+
+  <!-- ── PRO FORMAS TAB ── -->
+  <div class="tab-content" id="tabProformas">
+    <h2 class="section-heading">Pro Formas</h2>
+    <p class="section-sub">Access your saved pro formas here.</p>
+    <div class="coming-soon-box">
+      <div class="coming-soon-icon">📊</div>
+      <div class="coming-soon-title">Coming Soon</div>
+      <p class="coming-soon-desc">Access your saved pro formas here. This feature is coming soon.</p>
+    </div>
+  </div>
+
+  <!-- ── TRANSACTIONS TAB ── -->
+  <div class="tab-content" id="tabTransactions">
+    <h2 class="section-heading">Transactions</h2>
+    <p class="section-sub">Your transaction history across all closed deals.</p>
+    <div class="coming-soon-box">
+      <div class="coming-soon-icon">🤝</div>
+      <div class="coming-soon-title">Coming Soon</div>
+      <p class="coming-soon-desc">Your transaction history will appear here once deals close.</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/investor-auth.js"></script>
+  <div id="portalToast"></div>
+  <script>
+  (async function() {
+    const session = await Portal.requireAuth();
+    if (!session) return;
+
+    const _navProfile = await Portal.getProfile(session.user.id);
+    const _navFirstName = _navProfile ? (_navProfile.first_name || '') : '';
+    document.getElementById('navRight').innerHTML =
+      '<a href="/marketplace.html" class="nav-link">Marketplace</a>' +
+      '<a href="/dashboard.html" class="nav-link active">Dashboard</a>' +
+      (_navFirstName ? '<span style="color:var(--text-muted);font-size:13px">' + _navFirstName + '</span>' : '') +
+      '<button onclick="Portal.logout()" class="btn-secondary btn-sm">Sign Out</button>' +
+      '<button class="theme-toggle" onclick="Portal.toggleTheme()"></button>';
+    Portal.updateThemeBtn();
+
+    // Load profile
+    const profile = await Portal.getProfile(session.user.id);
+    if (profile) {
+      document.getElementById('headerName').textContent =
+        [profile.first_name, profile.last_name].filter(Boolean).join(' ') || 'Investor';
+      document.getElementById('headerEmail').textContent = profile.email || session.user.email;
+    } else {
+      document.getElementById('headerName').textContent = session.user.email.split('@')[0];
+      document.getElementById('headerEmail').textContent = session.user.email;
+    }
+
+    // ── Tab Switching ──────────────────────────────────────────
+
+    const tabMap = {
+      dashboard: 'tabDashboard',
+      favorites: 'tabFavorites',
+      offers: 'tabOffers',
+      proformas: 'tabProformas',
+      transactions: 'tabTransactions'
+    };
+
+    let offersLoaded = false;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        this.classList.add('active');
+        const tabId = tabMap[this.dataset.tab];
+        if (tabId) document.getElementById(tabId).classList.add('active');
+
+        // Lazy-load offers on first visit to tab
+        if (this.dataset.tab === 'offers' && !offersLoaded) {
+          loadOffers();
+          offersLoaded = true;
+        }
+      });
+    });
+
+    // ── Buy Box: Load ──────────────────────────────────────────
+
+    if (profile && profile.custom_fields && profile.custom_fields.buy_box) {
+      const bb = profile.custom_fields.buy_box;
+
+      // Property types
+      if (bb.prop_types && Array.isArray(bb.prop_types)) {
+        document.querySelectorAll('input[name="prop_types"]').forEach(cb => {
+          cb.checked = bb.prop_types.includes(cb.value);
+        });
+      }
+
+      if (bb.target_markets) document.getElementById('targetMarkets').value = bb.target_markets;
+      if (bb.min_bedrooms) document.getElementById('minBedrooms').value = bb.min_bedrooms;
+      if (bb.min_bathrooms) document.getElementById('minBathrooms').value = bb.min_bathrooms;
+      if (bb.max_purchase_price) document.getElementById('maxPurchasePrice').value = bb.max_purchase_price;
+      if (bb.min_arv) document.getElementById('minArv').value = bb.min_arv;
+
+      // Strategies
+      if (bb.strategies && Array.isArray(bb.strategies)) {
+        document.querySelectorAll('input[name="strategies"]').forEach(cb => {
+          cb.checked = bb.strategies.includes(cb.value);
+        });
+      }
+
+      // Cash buyer
+      if (bb.cash_buyer) {
+        const radio = document.querySelector('input[name="cashBuyer"][value="' + bb.cash_buyer + '"]');
+        if (radio) radio.checked = true;
+      }
+
+      if (bb.min_coc) document.getElementById('minCoc').value = bb.min_coc;
+      if (bb.notes) document.getElementById('buyboxNotes').value = bb.notes;
+    }
+
+    // ── Buy Box: Save ──────────────────────────────────────────
+
+    document.getElementById('saveBuyboxBtn').addEventListener('click', async function() {
+      if (!profile) {
+        Portal.toast('Could not find your profile. Please try again.', 'error');
+        return;
+      }
+
+      const btn = this;
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      const propTypes = Array.from(document.querySelectorAll('input[name="prop_types"]:checked')).map(cb => cb.value);
+      const strategies = Array.from(document.querySelectorAll('input[name="strategies"]:checked')).map(cb => cb.value);
+      const cashBuyerEl = document.querySelector('input[name="cashBuyer"]:checked');
+
+      const buyBox = {
+        prop_types: propTypes,
+        target_markets: document.getElementById('targetMarkets').value.trim(),
+        min_bedrooms: document.getElementById('minBedrooms').value || null,
+        min_bathrooms: document.getElementById('minBathrooms').value || null,
+        max_purchase_price: parseFloat(document.getElementById('maxPurchasePrice').value) || null,
+        min_arv: parseFloat(document.getElementById('minArv').value) || null,
+        strategies: strategies,
+        cash_buyer: cashBuyerEl ? cashBuyerEl.value : null,
+        min_coc: parseFloat(document.getElementById('minCoc').value) || null,
+        notes: document.getElementById('buyboxNotes').value.trim(),
+        updated_at: new Date().toISOString()
+      };
+
+      // Merge with existing custom_fields
+      const existingCustomFields = (profile.custom_fields) || {};
+      const updatedCustomFields = Object.assign({}, existingCustomFields, { buy_box: buyBox });
+
+      try {
+        const { error } = await Portal.supabase
+          .from('contacts')
+          .update({ custom_fields: updatedCustomFields })
+          .eq('id', profile.id);
+
+        if (error) throw error;
+
+        // Update local profile reference
+        profile.custom_fields = updatedCustomFields;
+
+        const statusEl = document.getElementById('saveStatus');
+        statusEl.classList.add('visible');
+        setTimeout(() => statusEl.classList.remove('visible'), 3000);
+
+        Portal.toast('Buy box saved!', 'success');
+      } catch (err) {
+        console.error('Buy box save error:', err);
+        Portal.toast('Failed to save buy box. Please try again.', 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Save Buy Box';
+    });
+
+    // ── Offers: Load ──────────────────────────────────────────
+
+    async function loadOffers() {
+      const container = document.getElementById('offersContainer');
+      container.innerHTML = '<div class="empty-state-inline">Loading offers...</div>';
+
+      try {
+        const { data: offers, error } = await Portal.supabase
+          .from('investor_interest')
+          .select(`
+            id,
+            listing_id,
+            offer_price,
+            created_at,
+            status,
+            portal_listings (
+              id,
+              properties (
+                address,
+                city,
+                state
+              )
+            )
+          `)
+          .eq('investor_user_id', session.user.id)
+          .eq('interest_type', 'offer')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!offers || offers.length === 0) {
+          container.innerHTML = '<div class="empty-state-inline">No offers submitted yet. <a href="/marketplace.html">Browse the marketplace</a> to find deals.</div>';
+          return;
+        }
+
+        let rows = '';
+        offers.forEach(offer => {
+          const pl = offer.portal_listings || {};
+          const prop = pl.properties || {};
+          const addrParts = [prop.address, prop.city, prop.state].filter(Boolean);
+          const addressDisplay = addrParts.join(', ') || '—';
+          const dealLink = '/deal.html?id=' + (offer.listing_id || '');
+
+          const submittedDate = offer.created_at
+            ? new Date(offer.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : '—';
+
+          const statusLabel = offer.status || 'Under Review';
+          const statusCls = statusLabel.toLowerCase().includes('accept') ? 'badge-offer-accepted' : 'badge-offer-review';
+
+          rows += '<tr>' +
+            '<td><a href="' + dealLink + '">' + addressDisplay + '</a></td>' +
+            '<td>' + Portal.fc(offer.offer_price) + '</td>' +
+            '<td>' + submittedDate + '</td>' +
+            '<td><span class="' + statusCls + '">' + statusLabel + '</span></td>' +
+            '</tr>';
+        });
+
+        container.innerHTML =
+          '<div class="offers-table-wrap"><table class="offers-table">' +
+          '<thead><tr><th>Property</th><th>Offer Price</th><th>Submitted</th><th>Status</th></tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+          '</table></div>';
+
+      } catch (err) {
+        console.error('Load offers error:', err);
+        container.innerHTML = '<div class="empty-state-inline">Could not load offers. Please refresh and try again.</div>';
+      }
+    }
+
+  })();
+  </script>
+</body>
+</html>
