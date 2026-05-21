@@ -137,23 +137,41 @@
       transition: all 0.15s;
       white-space: nowrap;
     }
-    .header-btn-secondary {
-      background: transparent;
-      color: rgba(255,255,255,0.85);
-      border-color: rgba(255,255,255,0.4);
+    .header-btn-favorite {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
     }
-    .header-btn-secondary:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.7);
+    .header-btn-favorite:hover {
+      background: #dc2626;
+      border-color: #dc2626;
     }
-    .header-btn-primary {
-      background: #4fc3f7;
+    .header-btn-share {
+      background: #22c55e;
+      color: #ffffff;
+      border-color: #22c55e;
+    }
+    .header-btn-share:hover {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+    .header-btn-offer {
+      background: #7c3aed;
+      color: #ffffff;
+      border-color: #7c3aed;
+    }
+    .header-btn-offer:hover {
+      background: #6d28d9;
+      border-color: #6d28d9;
+    }
+    .header-btn-interest {
+      background: #ffffff;
       color: #1a2744;
-      border-color: #4fc3f7;
+      border-color: var(--border);
     }
-    .header-btn-primary:hover {
-      background: #38b6f0;
-      border-color: #38b6f0;
+    .header-btn-interest:hover {
+      background: #f1f5f9;
+      border-color: var(--border);
     }
 
     /* ---- Hero gallery: single full-width photo ---- */
@@ -576,10 +594,10 @@
         <span id="dealStatus"></span>
       </div>
       <div class="deal-actions">
-        <button class="header-btn header-btn-secondary" id="heartBtn" onclick="toggleFavorite()">&#9825; Favorites</button>
-        <button class="header-btn header-btn-secondary" onclick="shareDeal()">&#8679; Share</button>
-        <button class="header-btn header-btn-primary" onclick="goToOffer()">Make an Offer</button>
-        <button class="header-btn header-btn-primary" onclick="scrollToInterest()">Express Interest</button>
+        <button class="header-btn header-btn-favorite" id="heartBtn" onclick="toggleFavorite()">&#9825; Favorites</button>
+        <button class="header-btn header-btn-share" onclick="shareDeal()">&#8679; Share</button>
+        <button class="header-btn header-btn-offer" onclick="goToOffer()">Make an Offer</button>
+        <button class="header-btn header-btn-interest" onclick="scrollToInterest()">Express Interest</button>
       </div>
     </div>
   </div>
