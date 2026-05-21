@@ -575,6 +575,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <nav id="investorNav" class="investor-nav">
@@ -1367,8 +1369,39 @@
       }
     }
 
-    function downloadPDF() {
-      Portal.toast('PDF download coming soon.', 'info');
+    async function downloadPDF() {
+      if (!window.html2canvas || !window.jspdf) {
+        Portal.toast('PDF generator not loaded. Please refresh.', 'error');
+        return;
+      }
+      Portal.toast('Generating PDF...', 'info');
+
+      var pfArea = document.getElementById('tab-proforma');
+      if (!pfArea) { Portal.toast('Could not find pro forma section.', 'error'); return; }
+
+      try {
+        var canvas = await html2canvas(pfArea, { scale: 2, backgroundColor: '#ffffff' });
+        var imgData = canvas.toDataURL('image/png');
+        var { jsPDF } = window.jspdf;
+        var pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+        var pdfWidth = pdf.internal.pageSize.getWidth();
+        var pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        pdf.setFontSize(16);
+        pdf.text('Direct Off Market — Pro Forma', 40, 36);
+        pdf.setFontSize(11);
+        var addr = (document.getElementById('dealAddress') || {}).textContent || '';
+        pdf.text(addr, 40, 54);
+
+        pdf.addImage(imgData, 'PNG', 40, 72, pdfWidth - 80, Math.min(pdfHeight, 680));
+
+        var slug = (addr || 'property').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        var today = new Date().toISOString().slice(0, 10);
+        pdf.save('proforma-' + slug + '-' + today + '.pdf');
+      } catch (e) {
+        console.error('PDF generation error:', e);
+        Portal.toast('Could not generate PDF. Please try again.', 'error');
+      }
     }
 
     function renderPropertyDetails() {

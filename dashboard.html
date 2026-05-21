@@ -435,6 +435,8 @@
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <nav id="investorNav" class="investor-nav">
@@ -1005,6 +1007,7 @@
             (proformaSubtab === 'archive'
               ? '<button class="icon-btn" title="Restore" onclick="event.stopPropagation();toggleArchive(\'' + s.id + '\', false)" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;margin-left:8px;">&#8634;</button>'
               : '<button class="icon-btn" title="Archive" onclick="event.stopPropagation();toggleArchive(\'' + s.id + '\', true)" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;margin-left:8px;">&#128230;</button>') +
+            '<button class="icon-btn" title="Download PDF" onclick="event.stopPropagation();downloadProformaPDF(\'' + s.id + '\')" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;margin-left:4px;">&#128196;</button>' +
           '</div>';
         }).join('');
 
@@ -1028,9 +1031,81 @@
       loadProformas();
     }
 
+    async function downloadProformaPDF(savedId) {
+      if (!window.jspdf) {
+        Portal.toast('PDF generator not loaded. Please refresh.', 'error');
+        return;
+      }
+      Portal.toast('Generating PDF...', 'info');
+
+      try {
+        const { data: row } = await Portal.supabase
+          .from('investor_saved_proformas')
+          .select('id, listing_id, property_id, name, inputs, updated_at')
+          .eq('id', savedId)
+          .single();
+        if (!row) throw new Error('Pro forma not found');
+
+        const { data: pl } = await Portal.supabase
+          .from('portal_listings')
+          .select('properties(address, city, state)')
+          .eq('listing_id', row.listing_id)
+          .maybeSingle();
+        const addr = pl && pl.properties
+          ? [pl.properties.address, pl.properties.city, pl.properties.state].filter(Boolean).join(', ')
+          : 'Property';
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+        pdf.setFontSize(16);
+        pdf.text('Direct Off Market — Pro Forma', 40, 40);
+        pdf.setFontSize(11);
+        pdf.text(addr, 40, 58);
+        pdf.text('Scenario: ' + (row.name || 'My Scenario'), 40, 74);
+        pdf.text('Saved: ' + new Date(row.updated_at).toLocaleDateString(), 40, 88);
+
+        pdf.setFontSize(13);
+        pdf.text('Inputs', 40, 120);
+        pdf.setFontSize(10);
+        const inputs = row.inputs || {};
+        let y = 140;
+        const labelMap = {
+          pf_purchase: 'Purchase Price',
+          pf_rehab: 'Rehab Budget',
+          pf_closing: 'Closing Costs',
+          pf_arv: 'After Repair Value',
+          pf_down_pct: 'Down Payment %',
+          pf_rate: 'Interest Rate %',
+          pf_term: 'Loan Term (years)',
+          pf_rent: 'Monthly Gross Rent',
+          pf_vacancy: 'Vacancy Rate %',
+          pf_opex: 'Monthly Operating Expenses',
+          pf_hold: 'Holding Period (years)',
+        };
+        Object.keys(labelMap).forEach(function(k) {
+          const label = labelMap[k];
+          const val = inputs[k] !== undefined && inputs[k] !== '' ? inputs[k] : '\u2014';
+          pdf.text(label + ':', 50, y);
+          pdf.text(String(val), 240, y);
+          y += 16;
+        });
+
+        pdf.setFontSize(9);
+        pdf.text('Generated ' + new Date().toLocaleString(), 40, 760);
+
+        const slug = (addr || 'property').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+        const today = new Date().toISOString().slice(0, 10);
+        pdf.save('proforma-' + slug + '-' + today + '.pdf');
+      } catch (e) {
+        console.error('Dashboard PDF generation error:', e);
+        Portal.toast('Could not generate PDF. Please try again.', 'error');
+      }
+    }
+
     // Expose IIFE-scoped functions to global scope so inline onclick handlers can call them.
     window.switchProformaSubtab = switchProformaSubtab;
     window.toggleArchive = toggleArchive;
+    window.downloadProformaPDF = downloadProformaPDF;
 
   })();
   </script>
