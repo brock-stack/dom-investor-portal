@@ -835,6 +835,20 @@
       galleryPhotos = photos;
       galleryIdx = 0;
 
+      // Single-photo case: main photo fills full gallery, side grid hidden.
+      var galleryRoot = document.getElementById('dealGallery');
+      if (galleryRoot) {
+        if (photos.length === 1) {
+          galleryRoot.style.gridTemplateColumns = '1fr';
+          var sideEl0 = document.getElementById('gallerySideGrid');
+          if (sideEl0) sideEl0.style.display = 'none';
+        } else {
+          galleryRoot.style.gridTemplateColumns = ''; // revert to CSS default (60% 40%)
+          var sideEl1 = document.getElementById('gallerySideGrid');
+          if (sideEl1) sideEl1.style.display = '';
+        }
+      }
+
       // Main photo
       var mainEl = document.getElementById('galleryMainPhoto');
       if (mainEl) {
