@@ -86,6 +86,23 @@ window.Portal = {
     window.location.href = '/homepage.html';
   },
 
+  async getPortalUserId(authUserId) {
+    if (!authUserId) return null;
+    const { data, error } = await _sb.from('portal_users')
+      .select('id')
+      .eq('user_id', authUserId)
+      .maybeSingle();
+    if (error) {
+      console.error('getPortalUserId error:', error);
+      return null;
+    }
+    if (!data) {
+      console.warn('No portal_users row for auth user', authUserId);
+      return null;
+    }
+    return data.id;
+  },
+
   toast(msg, type) {
     type = type || 'info';
     let t = document.getElementById('portalToast');

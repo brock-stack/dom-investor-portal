@@ -593,7 +593,7 @@
     <div class="deal-header-top">
       <a href="/marketplace.html" class="deal-back">&larr; Back to Marketplace</a>
       <div style="display:flex;gap:8px;">
-        <button class="btn-ghost btn-sm" onclick="Portal.toast('Favorites coming soon.','info')">&#9825; Favorites</button>
+        <button class="btn-ghost btn-sm" id="heartBtn" onclick="toggleFavorite()">&#9825; Favorites</button>
         <button class="btn-ghost btn-sm" onclick="shareDeal()">&#8679; Share</button>
       </div>
     </div>
@@ -1024,6 +1024,7 @@
       renderProForma();
       renderPropertyDetails();
       loadPhotos();
+      initFavorite(session.user.id);
     }
 
     function renderHeader() {
@@ -1178,15 +1179,20 @@
       var sidebar = document.getElementById('dealCTAs');
       if (!sidebar) return;
 
-      var result = await Portal.supabase
-        .from('investor_interest')
-        .select('id, created_at, interest_type')
-        .eq('listing_id', listingId)
-        .eq('investor_user_id', userId)
-        .maybeSingle();
-
-      var interest = result.data;
-      var interestDate = interest ? new Date(interest.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : null;
+      var portalUserId = await Portal.getPortalUserId(userId);
+      var interest = null;
+      var interestDate = null;
+      if (portalUserId) {
+        var { data: idata } = await Portal.supabase
+          .from('investor_offers')
+          .select('id, submitted_at')
+          .eq('listing_id', listingId)
+          .eq('user_id', portalUserId)
+          .eq('status', 'interested')
+          .maybeSingle();
+        interest = idata;
+        interestDate = interest ? new Date(interest.submitted_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : null;
+      }
 
       sidebar.innerHTML =
         '<div class="interest-card" id="interestCard">' +
@@ -1205,19 +1211,68 @@
     }
 
     async function submitInterest(userId) {
-      var result = await Portal.supabase.from('investor_interest').insert({
+      var portalUserId = await Portal.getPortalUserId(userId);
+      if (!portalUserId) {
+        Portal.toast('Unable to submit interest. Please try again.', 'error');
+        return;
+      }
+      var session = await Portal.getSession();
+      var { error } = await Portal.supabase.from('investor_offers').insert({
         listing_id: listingId,
-        investor_user_id: userId,
-        interest_type: 'interested',
+        user_id: portalUserId,
+        property_id: listing.property_id,
+        offer_amount: null,
+        status: 'interested',
+        contact_email: session ? session.user.email : null,
         notes: null
       });
-      if (result.error) {
+      if (error) {
         Portal.toast('Unable to submit interest. Please try again.', 'error');
         return;
       }
       Portal.toast('Interest submitted! Our team will be in touch.', 'success');
       var now = new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
       document.getElementById('interestCard').innerHTML = '<h3>Express Interest</h3><div class="interest-noted" style="margin-top:12px;">&#10003; Interest noted ' + now + '</div>';
+    }
+
+    var isFavorited = false;
+    var _dealPortalUserId = null;
+
+    async function initFavorite(authUserId) {
+      _dealPortalUserId = await Portal.getPortalUserId(authUserId);
+      if (!_dealPortalUserId) return;
+      var { data } = await Portal.supabase.from('investor_saved_deals')
+        .select('id').eq('user_id', _dealPortalUserId).eq('listing_id', listingId).maybeSingle();
+      isFavorited = !!data;
+      _updateHeartBtn();
+    }
+
+    function _updateHeartBtn() {
+      var btn = document.getElementById('heartBtn');
+      if (btn) btn.innerHTML = (isFavorited ? '&#9829;' : '&#9825;') + ' Favorites';
+    }
+
+    async function toggleFavorite() {
+      if (!_dealPortalUserId) {
+        var session = await Portal.getSession();
+        if (session) _dealPortalUserId = await Portal.getPortalUserId(session.user.id);
+      }
+      if (!_dealPortalUserId) {
+        Portal.toast('Sign up to save favorites', 'info');
+        return;
+      }
+      if (!isFavorited) {
+        var { error } = await Portal.supabase.from('investor_saved_deals').upsert({
+          user_id: _dealPortalUserId,
+          listing_id: listingId,
+          property_id: listing.property_id
+        }, { onConflict: 'user_id,listing_id' });
+        if (!error) { isFavorited = true; _updateHeartBtn(); Portal.toast('Saved to favorites', 'success'); }
+      } else {
+        var { error } = await Portal.supabase.from('investor_saved_deals')
+          .delete().eq('user_id', _dealPortalUserId).eq('listing_id', listingId);
+        if (!error) { isFavorited = false; _updateHeartBtn(); Portal.toast('Removed from favorites', 'info'); }
+      }
     }
 
     function scrollToInterest() {
@@ -1336,13 +1391,18 @@
         inputs[el.id] = el.value;
       });
 
-      var result = await Portal.supabase.from('investor_interest').upsert({
-        listing_id: listingId,
-        investor_user_id: session.user.id,
-        interest_type: 'pro_forma_saved',
-        notes: JSON.stringify(inputs),
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'listing_id,investor_user_id' });
+      var portalUserId = await Portal.getPortalUserId(session.user.id);
+      if (!portalUserId) {
+        Portal.toast('Could not save pro forma. Please try again.', 'error');
+        return;
+      }
+      var result = await Portal.supabase.from('investor_saved_proformas').upsert({
+        user_id: portalUserId,
+        listing_id: listing.listing_id,
+        property_id: listing.property_id,
+        name: 'My Scenario',
+        inputs: inputs,
+      }, { onConflict: 'user_id,listing_id' });
 
       if (result.error) {
         Portal.toast('Could not save pro forma. ' + result.error.message, 'error');

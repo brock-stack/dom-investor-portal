@@ -586,10 +586,8 @@
   <div class="tab-content" id="tabFavorites">
     <h2 class="section-heading">Favorites</h2>
     <p class="section-sub">Save your favorite listings for quick access.</p>
-    <div class="coming-soon-box">
-      <div class="coming-soon-icon">⭐</div>
-      <div class="coming-soon-title">Coming Soon</div>
-      <p class="coming-soon-desc">Save your favorite listings for quick access. This feature is coming soon.</p>
+    <div id="favoritesContainer">
+      <div class="empty-state-inline">Loading favorites...</div>
     </div>
   </div>
 
@@ -664,6 +662,7 @@
     };
 
     let offersLoaded = false;
+    let favoritesLoaded = false;
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -679,93 +678,78 @@
           loadOffers();
           offersLoaded = true;
         }
+        if (this.dataset.tab === 'favorites' && !favoritesLoaded) {
+          loadFavorites();
+          favoritesLoaded = true;
+        }
       });
     });
 
     // ── Buy Box: Load ──────────────────────────────────────────
 
-    if (profile && profile.custom_fields && profile.custom_fields.buy_box) {
-      const bb = profile.custom_fields.buy_box;
+    const portalUserId = await Portal.getPortalUserId(session.user.id);
 
-      // Property types
-      if (bb.prop_types && Array.isArray(bb.prop_types)) {
-        document.querySelectorAll('input[name="prop_types"]').forEach(cb => {
-          cb.checked = bb.prop_types.includes(cb.value);
-        });
+    if (portalUserId) {
+      const { data: bb } = await Portal.supabase.from('investor_buy_box')
+        .select('*').eq('user_id', portalUserId).maybeSingle();
+
+      if (bb) {
+        if (bb.markets && Array.isArray(bb.markets)) {
+          document.getElementById('targetMarkets').value = bb.markets.join(', ');
+        }
+        if (bb.property_types && Array.isArray(bb.property_types)) {
+          document.querySelectorAll('input[name="prop_types"]').forEach(cb => {
+            cb.checked = bb.property_types.includes(cb.value);
+          });
+        }
+        if (bb.strategy && Array.isArray(bb.strategy)) {
+          document.querySelectorAll('input[name="strategies"]').forEach(cb => {
+            cb.checked = bb.strategy.includes(cb.value);
+          });
+        }
+        if (bb.max_price) document.getElementById('maxPurchasePrice').value = bb.max_price;
+        if (bb.min_arv) document.getElementById('minArv').value = bb.min_arv;
+        if (bb.min_cash_on_cash) document.getElementById('minCoc').value = bb.min_cash_on_cash;
+        if (bb.notes) document.getElementById('buyboxNotes').value = bb.notes;
       }
-
-      if (bb.target_markets) document.getElementById('targetMarkets').value = bb.target_markets;
-      if (bb.min_bedrooms) document.getElementById('minBedrooms').value = bb.min_bedrooms;
-      if (bb.min_bathrooms) document.getElementById('minBathrooms').value = bb.min_bathrooms;
-      if (bb.max_purchase_price) document.getElementById('maxPurchasePrice').value = bb.max_purchase_price;
-      if (bb.min_arv) document.getElementById('minArv').value = bb.min_arv;
-
-      // Strategies
-      if (bb.strategies && Array.isArray(bb.strategies)) {
-        document.querySelectorAll('input[name="strategies"]').forEach(cb => {
-          cb.checked = bb.strategies.includes(cb.value);
-        });
-      }
-
-      // Cash buyer
-      if (bb.cash_buyer) {
-        const radio = document.querySelector('input[name="cashBuyer"][value="' + bb.cash_buyer + '"]');
-        if (radio) radio.checked = true;
-      }
-
-      if (bb.min_coc) document.getElementById('minCoc').value = bb.min_coc;
-      if (bb.notes) document.getElementById('buyboxNotes').value = bb.notes;
     }
 
     // ── Buy Box: Save ──────────────────────────────────────────
 
     document.getElementById('saveBuyboxBtn').addEventListener('click', async function() {
-      if (!profile) {
-        Portal.toast('Could not find your profile. Please try again.', 'error');
-        return;
-      }
-
       const btn = this;
       btn.disabled = true;
       btn.textContent = 'Saving...';
 
-      const propTypes = Array.from(document.querySelectorAll('input[name="prop_types"]:checked')).map(cb => cb.value);
-      const strategies = Array.from(document.querySelectorAll('input[name="strategies"]:checked')).map(cb => cb.value);
-      const cashBuyerEl = document.querySelector('input[name="cashBuyer"]:checked');
+      if (!portalUserId) {
+        Portal.toast('Could not find your investor profile. Please refresh.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Save Buy Box';
+        return;
+      }
 
-      const buyBox = {
-        prop_types: propTypes,
-        target_markets: document.getElementById('targetMarkets').value.trim(),
-        min_bedrooms: document.getElementById('minBedrooms').value || null,
-        min_bathrooms: document.getElementById('minBathrooms').value || null,
-        max_purchase_price: parseFloat(document.getElementById('maxPurchasePrice').value) || null,
-        min_arv: parseFloat(document.getElementById('minArv').value) || null,
-        strategies: strategies,
-        cash_buyer: cashBuyerEl ? cashBuyerEl.value : null,
-        min_coc: parseFloat(document.getElementById('minCoc').value) || null,
-        notes: document.getElementById('buyboxNotes').value.trim(),
-        updated_at: new Date().toISOString()
-      };
-
-      // Merge with existing custom_fields
-      const existingCustomFields = (profile.custom_fields) || {};
-      const updatedCustomFields = Object.assign({}, existingCustomFields, { buy_box: buyBox });
+      const marketsInput = document.getElementById('targetMarkets').value.trim();
+      const targetMarketsArray = marketsInput ? marketsInput.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const propertyTypesArray = Array.from(document.querySelectorAll('input[name="prop_types"]:checked')).map(cb => cb.value);
+      const strategiesArray = Array.from(document.querySelectorAll('input[name="strategies"]:checked')).map(cb => cb.value);
 
       try {
-        const { error } = await Portal.supabase
-          .from('contacts')
-          .update({ custom_fields: updatedCustomFields })
-          .eq('id', profile.id);
+        const { error } = await Portal.supabase.from('investor_buy_box').upsert({
+          user_id: portalUserId,
+          markets: targetMarketsArray,
+          property_types: propertyTypesArray,
+          strategy: strategiesArray,
+          max_price: parseFloat(document.getElementById('maxPurchasePrice').value) || null,
+          min_arv: parseFloat(document.getElementById('minArv').value) || null,
+          min_cash_on_cash: parseFloat(document.getElementById('minCoc').value) || null,
+          notes: document.getElementById('buyboxNotes').value.trim(),
+        }, { onConflict: 'user_id' });
 
         if (error) throw error;
-
-        // Update local profile reference
-        profile.custom_fields = updatedCustomFields;
 
         const statusEl = document.getElementById('saveStatus');
         statusEl.classList.add('visible');
         setTimeout(() => statusEl.classList.remove('visible'), 3000);
-
         Portal.toast('Buy box saved!', 'success');
       } catch (err) {
         console.error('Buy box save error:', err);
@@ -783,26 +767,17 @@
       container.innerHTML = '<div class="empty-state-inline">Loading offers...</div>';
 
       try {
+        if (!portalUserId) {
+          container.innerHTML = '<div class="empty-state-inline">Could not load offers. Please refresh.</div>';
+          return;
+        }
+
         const { data: offers, error } = await Portal.supabase
-          .from('investor_interest')
-          .select(`
-            id,
-            listing_id,
-            offer_price,
-            created_at,
-            status,
-            portal_listings (
-              id,
-              properties (
-                address,
-                city,
-                state
-              )
-            )
-          `)
-          .eq('investor_user_id', session.user.id)
-          .eq('interest_type', 'offer')
-          .order('created_at', { ascending: false });
+          .from('investor_offers')
+          .select('id, listing_id, offer_amount, status, submitted_at')
+          .eq('user_id', portalUserId)
+          .neq('status', 'interested')
+          .order('submitted_at', { ascending: false });
 
         if (error) throw error;
 
@@ -811,16 +786,24 @@
           return;
         }
 
+        const listingIds = [...new Set(offers.map(o => o.listing_id).filter(Boolean))];
+        const { data: plRows } = await Portal.supabase
+          .from('portal_listings')
+          .select('id, properties(address, city, state)')
+          .in('id', listingIds);
+        const plMap = {};
+        (plRows || []).forEach(pl => { plMap[pl.id] = pl; });
+
         let rows = '';
         offers.forEach(offer => {
-          const pl = offer.portal_listings || {};
+          const pl = plMap[offer.listing_id] || {};
           const prop = pl.properties || {};
           const addrParts = [prop.address, prop.city, prop.state].filter(Boolean);
           const addressDisplay = addrParts.join(', ') || '—';
           const dealLink = '/deal.html?id=' + (offer.listing_id || '');
 
-          const submittedDate = offer.created_at
-            ? new Date(offer.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          const submittedDate = offer.submitted_at
+            ? new Date(offer.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
             : '—';
 
           const statusLabel = offer.status || 'Under Review';
@@ -828,7 +811,7 @@
 
           rows += '<tr>' +
             '<td><a href="' + dealLink + '">' + addressDisplay + '</a></td>' +
-            '<td>' + Portal.fc(offer.offer_price) + '</td>' +
+            '<td>' + Portal.fc(offer.offer_amount) + '</td>' +
             '<td>' + submittedDate + '</td>' +
             '<td><span class="' + statusCls + '">' + statusLabel + '</span></td>' +
             '</tr>';
@@ -836,13 +819,84 @@
 
         container.innerHTML =
           '<div class="offers-table-wrap"><table class="offers-table">' +
-          '<thead><tr><th>Property</th><th>Offer Price</th><th>Submitted</th><th>Status</th></tr></thead>' +
+          '<thead><tr><th>Property</th><th>Offer Amount</th><th>Submitted</th><th>Status</th></tr></thead>' +
           '<tbody>' + rows + '</tbody>' +
           '</table></div>';
 
       } catch (err) {
         console.error('Load offers error:', err);
         container.innerHTML = '<div class="empty-state-inline">Could not load offers. Please refresh and try again.</div>';
+      }
+    }
+
+    async function loadFavorites() {
+      const container = document.getElementById('favoritesContainer');
+      if (!container) return;
+
+      try {
+        if (!portalUserId) {
+          container.innerHTML = '<div class="empty-state-inline">Could not load favorites. Please refresh.</div>';
+          return;
+        }
+
+        const { data: saved, error } = await Portal.supabase
+          .from('investor_saved_deals')
+          .select('id, listing_id, saved_at, notes')
+          .eq('user_id', portalUserId)
+          .order('saved_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!saved || saved.length === 0) {
+          container.innerHTML = '<div class="empty-state-inline">No favorites yet. Browse the marketplace and tap ♥ on a deal.</div>';
+          return;
+        }
+
+        const listingIds = saved.map(s => s.listing_id).filter(Boolean);
+        const { data: plRows } = await Portal.supabase
+          .from('portal_listings')
+          .select('id, listing_id, asking_price, property_id, properties(address, city, state, property_type, bedrooms, bathrooms, sqft, estimated_arv)')
+          .in('id', listingIds);
+        const plMap = {};
+        (plRows || []).forEach(pl => { plMap[pl.id] = pl; });
+
+        const listingFKIds = (plRows || []).map(pl => pl.listing_id).filter(Boolean);
+        let photoMap = {};
+        if (listingFKIds.length > 0) {
+          const { data: photos } = await Portal.supabase
+            .from('listing_photos')
+            .select('listing_id, url')
+            .in('listing_id', listingFKIds)
+            .eq('is_primary', true);
+          (photos || []).forEach(p => { photoMap[p.listing_id] = p.url; });
+        }
+
+        container.innerHTML = saved.map(function(s) {
+          const pl = plMap[s.listing_id] || {};
+          const prop = pl.properties || {};
+          const photoUrl = photoMap[pl.listing_id] || null;
+          const photoHtml = photoUrl
+            ? '<img src="' + photoUrl + '" alt="property" style="width:100%;height:140px;object-fit:cover;" onerror="this.style.display=\'none\'">'
+            : '<div style="width:100%;height:140px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:32px;">&#127968;</div>';
+          const loc = [prop.city, prop.state].filter(Boolean).join(', ') || 'Florida';
+          const specs = [prop.bedrooms ? prop.bedrooms + ' Bd' : null, prop.bathrooms ? prop.bathrooms + ' Ba' : null, prop.sqft ? prop.sqft.toLocaleString() + ' sqft' : null].filter(Boolean).join(' · ');
+          const price = pl.asking_price ? '$' + Number(pl.asking_price).toLocaleString('en-US', {maximumFractionDigits:0}) : 'Price TBD';
+          const arv = prop.estimated_arv ? ' · ARV $' + Number(prop.estimated_arv).toLocaleString('en-US', {maximumFractionDigits:0}) : '';
+          return '<div class="deal-card list-card" onclick="window.location=\'/deal.html?id=' + s.listing_id + '\'" style="cursor:pointer;margin-bottom:8px;">' +
+            '<div class="card-photo-sm">' + photoHtml + '</div>' +
+            '<div class="card-content">' +
+              '<div style="font-size:13px;font-weight:600;color:var(--text);">' + (prop.address || loc) + '</div>' +
+              '<div style="font-size:13px;color:var(--text-muted);">' + loc + '</div>' +
+              (specs ? '<div class="card-specs">' + specs + '</div>' : '') +
+              '<div class="card-price" style="margin-top:4px;">' + price + '<span style="font-size:12px;font-weight:500;color:var(--text-muted);">' + arv + '</span></div>' +
+            '</div>' +
+            '<div class="card-arrow">&rarr;</div>' +
+          '</div>';
+        }).join('');
+
+      } catch (err) {
+        console.error('Load favorites error:', err);
+        container.innerHTML = '<div class="empty-state-inline">Could not load favorites. Please refresh.</div>';
       }
     }
 

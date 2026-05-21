@@ -922,25 +922,34 @@
       submitBtn.textContent = 'Submitting...';
 
       try {
+        const portalUserId = await Portal.getPortalUserId(session.user.id);
+        if (!portalUserId) {
+          throw new Error('Could not find your investor profile. Please contact support.');
+        }
         const { error } = await Portal.supabase
-          .from('investor_interest')
+          .from('investor_offers')
           .insert({
+            user_id: portalUserId,
             listing_id: listingId,
-            investor_user_id: session.user.id,
-            interest_type: 'offer',
-            offer_price: offerPrice,
+            property_id: listing ? (listing.properties ? listing.properties.id : null) : null,
+            offer_amount: offerPrice,
+            financing_type: useFinancing ? 'financed' : 'cash',
+            contact_email: profile ? (profile.email || session.user.email) : session.user.email,
+            contact_phone: profile ? (profile.phone || null) : null,
+            inspection_period_days: 10,
+            closing_timeline_days: 30,
             notes: JSON.stringify({
               deed_name: deedName,
               has_pof: hasPof,
-              financing: useFinancing,
               pm_interest: pmInterest,
               has_agent: hasAgent,
               agent_name: agentName,
               agent_email: agentEmail,
               agent_phone: agentPhone,
               brokerage: brokerage,
-              additional_notes: notes
-            })
+              additional_notes: notes,
+            }),
+            status: 'submitted',
           });
 
         // TODO: Auto-create agent contact in contacts table when has_agent='yes'

@@ -406,6 +406,7 @@
           <button class="filter-pill" data-status="published">Available</button>
           <button class="filter-pill" data-status="pending">Pending</button>
           <button class="filter-pill" data-status="coming_soon">Coming Soon</button>
+          <button class="filter-pill" data-status="favorites">Favorites</button>
         </div>
         <div class="panel-title-row">
           <span id="listingCount">Loading...</span>
@@ -432,7 +433,7 @@
       'light-v11': 'mapbox://styles/mapbox/light-v11'
     };
 
-    let map, allListings = [], markers = {}, currentFilter = 'all', currentView = 'list', floodVisible = false;
+    let map, allListings = [], markers = {}, currentFilter = 'all', currentView = 'list', floodVisible = false, favListingIds = [];
 
     async function init() {
       const session = await Portal.requireAuth();
@@ -502,7 +503,20 @@
 
       // Filter pills
       document.querySelectorAll('.filter-pill').forEach(function(pill) {
-        pill.addEventListener('click', function() {
+        pill.addEventListener('click', async function() {
+          if (pill.dataset.status === 'favorites') {
+            var mktSession = await Portal.getSession();
+            var mktPortalUserId = mktSession ? await Portal.getPortalUserId(mktSession.user.id) : null;
+            if (!mktPortalUserId) {
+              Portal.toast('Sign in to see your favorites', 'info');
+              return;
+            }
+            var { data: favRows } = await Portal.supabase
+              .from('investor_saved_deals')
+              .select('listing_id')
+              .eq('user_id', mktPortalUserId);
+            favListingIds = (favRows || []).map(function(r) { return r.listing_id; });
+          }
           document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
           pill.classList.add('active');
           currentFilter = pill.dataset.status;
@@ -629,12 +643,17 @@
 
     function renderListings() {
       var panel = document.getElementById('listingsPanel');
-      var filtered = currentFilter === 'all' ? allListings : allListings.filter(function(l) { return l.status === currentFilter; });
+      var filtered;
+      if (currentFilter === 'favorites') {
+        filtered = allListings.filter(function(l) { return favListingIds.indexOf(l.id) !== -1; });
+      } else {
+        filtered = currentFilter === 'all' ? allListings : allListings.filter(function(l) { return l.status === currentFilter; });
+      }
 
       document.getElementById('listingCount').textContent = filtered.length + ' listing' + (filtered.length !== 1 ? 's' : '');
 
       if (filtered.length === 0) {
-        panel.innerHTML = '<div class="empty-state"><div class="empty-icon">&#127968;</div><p>No listings match this filter.</p></div>';
+        panel.innerHTML = '<div class="empty-state"><div class="empty-icon">&#127968;</div><p>' + (currentFilter === 'favorites' ? 'No favorites yet. Browse the marketplace and tap ♥ on a deal.' : 'No listings match this filter.') + '</p></div>';
         panel.style.cssText = '';
         return;
       }
@@ -705,7 +724,12 @@
         var marker = markers[l.id];
         if (!marker) return;
         var el = marker.getElement();
-        var show = currentFilter === 'all' || l.status === currentFilter;
+        var show;
+        if (currentFilter === 'favorites') {
+          show = favListingIds.indexOf(l.id) !== -1;
+        } else {
+          show = currentFilter === 'all' || l.status === currentFilter;
+        }
         el.style.display = show ? 'block' : 'none';
       });
     }
