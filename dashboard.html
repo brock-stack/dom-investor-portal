@@ -1028,6 +1028,10 @@
       loadProformas();
     }
 
+    // Expose IIFE-scoped functions to global scope so inline onclick handlers can call them.
+    window.switchProformaSubtab = switchProformaSubtab;
+    window.toggleArchive = toggleArchive;
+
   })();
   </script>
 </body>
