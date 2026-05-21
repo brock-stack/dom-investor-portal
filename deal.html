@@ -69,18 +69,16 @@
       border-bottom: 1px solid var(--border);
       padding: 10px 32px;
     }
-    .deal-header-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .deal-header-bottom {
+    .deal-header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+      flex-wrap: nowrap;
     }
+    .deal-header-row > .deal-back { flex-shrink: 0; }
+    .deal-header-row > .deal-header-addr-row { flex: 1; min-width: 0; }
+    .deal-header-row > .deal-actions { flex-shrink: 0; }
     .deal-header-addr-row {
       display: flex;
       align-items: center;
@@ -128,20 +126,35 @@
     .btn-ghost:hover { background: rgba(255,255,255,0.15); }
     .btn-sm { padding: 6px 14px; font-size: 13px; }
 
-    /* Header primary CTA: white fill, dark text */
-    .btn-header-cta {
-      background: #ffffff;
-      color: #1a1e38;
-      font-weight: 700;
-      padding: 7px 18px;
+    .header-btn {
+      padding: 7px 16px;
       border-radius: 7px;
       font-size: 13px;
+      font-weight: 600;
       font-family: 'Inter', sans-serif;
       cursor: pointer;
-      border: none;
-      transition: background 0.15s;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
     }
-    .btn-header-cta:hover { background: #e2e8f0; }
+    .header-btn-secondary {
+      background: transparent;
+      color: rgba(255,255,255,0.85);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .header-btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.7);
+    }
+    .header-btn-primary {
+      background: #4fc3f7;
+      color: #1a2744;
+      border-color: #4fc3f7;
+    }
+    .header-btn-primary:hover {
+      background: #38b6f0;
+      border-color: #38b6f0;
+    }
 
     /* ---- Gallery split layout ---- */
     .deal-gallery {
@@ -574,7 +587,7 @@
     @media (max-width: 768px) {
       .deal-gallery { grid-template-columns: 1fr; }
       .gallery-side-grid { display: none; }
-      .deal-header-bottom { flex-wrap: wrap; }
+      .deal-header-row { flex-wrap: wrap; }
     }
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
@@ -591,23 +604,19 @@
     </div>
   </nav>
 
-  <!-- Sticky deal header: 2-row layout -->
+  <!-- Sticky deal header: single-row layout -->
   <div class="deal-header" id="dealHeader" style="margin-top:64px;">
-    <div class="deal-header-top">
+    <div class="deal-header-row">
       <a href="/marketplace.html" class="deal-back">&larr; Back to Marketplace</a>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-ghost btn-sm" id="heartBtn" onclick="toggleFavorite()">&#9825; Favorites</button>
-        <button class="btn-ghost btn-sm" onclick="shareDeal()">&#8679; Share</button>
-      </div>
-    </div>
-    <div class="deal-header-bottom">
       <div class="deal-header-addr-row">
         <span class="deal-address" id="dealAddress">Loading...</span>
         <span id="dealStatus"></span>
       </div>
       <div class="deal-actions">
-        <button class="btn-header-cta" onclick="goToOffer()">Make an Offer</button>
-        <button class="btn-header-cta" onclick="scrollToInterest()">Express Interest</button>
+        <button class="header-btn header-btn-secondary" id="heartBtn" onclick="toggleFavorite()">&#9825; Favorites</button>
+        <button class="header-btn header-btn-secondary" onclick="shareDeal()">&#8679; Share</button>
+        <button class="header-btn header-btn-primary" onclick="goToOffer()">Make an Offer</button>
+        <button class="header-btn header-btn-primary" onclick="scrollToInterest()">Express Interest</button>
       </div>
     </div>
   </div>
