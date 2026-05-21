@@ -681,7 +681,7 @@
               (specsRow2 ? '<div class="card-specs">' + specsRow2 + '</div>' : '') +
               '<div style="display:flex;gap:20px;align-items:flex-end;margin-top:6px;">' +
                 '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div class="card-price">' + Portal.fc(l.asking_price) + '</div></div>' +
-                (arv ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:14px;font-weight:700;color:#2d6a8f;">' + arv + '</div></div>' : '') +
+                (arv ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:17px;font-weight:800;color:#4fc3f7;">' + arv + '</div></div>' : '') +
               '</div>' +
             '</div>' +
             '<div class="card-arrow">&rarr;</div>' +
@@ -701,7 +701,7 @@
             ? '<div style="font-size:13px;font-weight:600;color:var(--text);">' + p.address + '</div><div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>'
             : '<div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>';
           var arvHtml = p.estimated_arv
-            ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:14px;font-weight:700;color:#2d6a8f;">' + Portal.fc(p.estimated_arv) + '</div></div>'
+            ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:16px;font-weight:800;color:#4fc3f7;">' + Portal.fc(p.estimated_arv) + '</div></div>'
             : '';
           return '<div class="deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;">' +
             '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status) + '</span></div>' +
