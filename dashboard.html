@@ -604,6 +604,10 @@
   <div class="tab-content" id="tabProformas">
     <h2 class="section-heading">Pro Formas</h2>
     <p class="section-sub">Your saved investment scenarios.</p>
+    <div class="proforma-subtabs" style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="proforma-subtab active" data-subtab="active" onclick="switchProformaSubtab('active')" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">Active</button>
+      <button class="proforma-subtab" data-subtab="archive" onclick="switchProformaSubtab('archive')" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;">Archive</button>
+    </div>
     <div id="proformasContainer">
       <div class="empty-state-inline">Loading pro formas...</div>
     </div>
@@ -662,6 +666,25 @@
     let offersLoaded = false;
     let favoritesLoaded = false;
     let proformasLoaded = false;
+    let proformaSubtab = 'active';
+
+    function switchProformaSubtab(which) {
+      proformaSubtab = which;
+      document.querySelectorAll('.proforma-subtab').forEach(b => {
+        if (b.dataset.subtab === which) {
+          b.classList.add('active');
+          b.style.background = 'var(--surface)';
+          b.style.color = 'var(--text)';
+          b.style.fontWeight = '600';
+        } else {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = 'var(--text-muted)';
+          b.style.fontWeight = '500';
+        }
+      });
+      loadProformas();
+    }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -917,12 +940,16 @@
           .from('investor_saved_proformas')
           .select('id, listing_id, property_id, name, inputs, created_at, updated_at')
           .eq('user_id', portalUserId)
+          .eq('archived', proformaSubtab === 'archive')
           .order('updated_at', { ascending: false });
 
         if (error) throw error;
 
         if (!saved || saved.length === 0) {
-          container.innerHTML = '<div class="empty-state-inline">No saved pro formas yet. Browse the marketplace, open a deal, fill the Pro Forma tab and tap Save.</div>';
+          const emptyMsg = proformaSubtab === 'archive'
+            ? 'No archived pro formas. Items you archive will appear here.'
+            : 'No saved pro formas yet. Browse the marketplace, open a deal, fill the Pro Forma tab and tap Save.';
+          container.innerHTML = '<div class="empty-state-inline">' + emptyMsg + '</div>';
           return;
         }
 
@@ -975,6 +1002,9 @@
               '<div><div style="color:var(--text-muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">ARV</div><div style="color:#4fc3f7;font-weight:700;">' + fmtCurr(arv) + '</div></div>' +
               '<div><div style="color:var(--text-muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Equity</div><div style="color:#22c55e;font-weight:700;">' + fmtCurr(equity) + '</div></div>' +
             '</div>' +
+            (proformaSubtab === 'archive'
+              ? '<button class="icon-btn" title="Restore" onclick="event.stopPropagation();toggleArchive(\'' + s.id + '\', false)" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;margin-left:8px;">&#8634;</button>'
+              : '<button class="icon-btn" title="Archive" onclick="event.stopPropagation();toggleArchive(\'' + s.id + '\', true)" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:14px;flex-shrink:0;margin-left:8px;">&#128230;</button>') +
           '</div>';
         }).join('');
 
@@ -982,6 +1012,20 @@
         console.error('Load proformas error:', err);
         container.innerHTML = '<div class="empty-state-inline">Could not load pro formas. Please refresh.</div>';
       }
+    }
+
+    async function toggleArchive(id, archived) {
+      const { error } = await Portal.supabase
+        .from('investor_saved_proformas')
+        .update({ archived: archived, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) {
+        Portal.toast('Could not update. Please try again.', 'error');
+        return;
+      }
+      Portal.toast(archived ? 'Moved to archive' : 'Restored', 'success');
+      loadProformas();
     }
 
   })();
