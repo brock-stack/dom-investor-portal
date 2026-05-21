@@ -231,15 +231,16 @@
   <script>
   (async function() {
 
-    // Redirect if already logged in
+    // If a Supabase session already exists, sign out so this page can register a new account.
+    // Solves CRM/portal session bleed for admin testers.
     try {
-      var session = await Portal.getSession();
-      if (session) {
-        window.location.href = '/marketplace.html';
-        return;
+      var { data: { session: existingSession } } = await Portal.supabase.auth.getSession();
+      if (existingSession) {
+        await Portal.supabase.auth.signOut();
+        Portal.toast('Signed out previous session — ready to create a new account.', 'info');
       }
     } catch (e) {
-      // Continue
+      console.warn('Pre-signup signout failed:', e);
     }
 
     // Set today's date in the signature field
@@ -355,26 +356,57 @@
         if (authResult.error) {
           var errMsg = authResult.error.message || '';
           var errCode = authResult.error.code || '';
-          if (
-            errMsg.toLowerCase().includes('already registered') ||
+          var isAlreadyRegistered = errMsg.toLowerCase().includes('already registered') ||
             errMsg.toLowerCase().includes('already exists') ||
-            errCode === 'user_already_exists'
-          ) {
-            p2Error.innerHTML = 'That email is already registered. <a href="/login.html" style="color:var(--gold);">Sign in instead &rarr;</a>';
-          } else {
+            errCode === 'user_already_exists';
+
+          if (!isAlreadyRegistered) {
             p2Error.textContent = errMsg || 'Registration failed. Please try again.';
+            p2Error.classList.add('visible');
+            btn.textContent = 'I Agree & Get Instant Access';
+            btn.disabled = false;
+            return;
           }
+
+          // Self-heal: try to sign in with the supplied password. If it works, the user
+          // had a previous failed signup. Backfill any missing portal_users + contacts rows.
+          var signInResult = await Portal.supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.password
+          });
+
+          if (signInResult.error) {
+            // Wrong password (or any other sign-in error) — this really is an existing account they don't own.
+            p2Error.innerHTML = 'That email is already registered. <a href="/login.html" style="color:var(--gold);">Sign in instead &rarr;</a>';
+            p2Error.classList.add('visible');
+            btn.textContent = 'I Agree & Get Instant Access';
+            btn.disabled = false;
+            return;
+          }
+
+          // Sign-in worked. Fall through to backfill blocks below.
+          authResult = signInResult;
+        }
+
+        var userId = authResult.data && authResult.data.user ? authResult.data.user.id : null;
+
+        if (!userId) {
+          p2Error.textContent = 'Account created but no user id returned. Please contact support.';
           p2Error.classList.add('visible');
           btn.textContent = 'I Agree & Get Instant Access';
           btn.disabled = false;
           return;
         }
 
-        var userId = authResult.data && authResult.data.user ? authResult.data.user.id : null;
-
         // 1b. Create portal_users row (must precede contacts insert)
-        var portalUserId = userId; // fallback
-        if (userId) {
+        var portalUserId = null;
+
+        // Existence check: idempotent for self-heal path
+        var { data: existingPu } = await Portal.supabase.from('portal_users')
+          .select('id').eq('user_id', userId).maybeSingle();
+        if (existingPu) {
+          portalUserId = existingPu.id;
+        } else {
           try {
             var { data: pu, error: puErr } = await Portal.supabase.from('portal_users').insert({
               user_id: userId,
@@ -386,25 +418,35 @@
               est_liquidity: formData.liquidity || null,
             }).select('id').single();
             if (puErr) {
-              // TODO: fix signup gap — portal_users insert failed, contacts will use auth.users.id as fallback
-              console.warn('portal_users insert failed:', puErr);
-            } else {
-              portalUserId = pu.id;
+              console.error('portal_users insert failed:', puErr);
+              p2Error.textContent = 'Account partially created — investor profile could not be set up. Contact support and reference: ' + userId.slice(0, 8);
+              p2Error.classList.add('visible');
+              btn.textContent = 'I Agree & Get Instant Access';
+              btn.disabled = false;
+              return;
             }
+            portalUserId = pu.id;
           } catch (puCatchErr) {
-            console.warn('portal_users insert threw:', puCatchErr);
+            console.error('portal_users insert threw:', puCatchErr);
+            p2Error.textContent = 'Account partially created — please contact support.';
+            p2Error.classList.add('visible');
+            btn.textContent = 'I Agree & Get Instant Access';
+            btn.disabled = false;
+            return;
           }
         }
 
-        // 2. Insert contact record (non-blocking — don't fail signup if this errors)
-        if (userId) {
+        // 2. Insert contact record
+        var { data: existingContact } = await Portal.supabase.from('contacts')
+          .select('id').eq('portal_user_id', portalUserId).maybeSingle();
+        if (!existingContact) {
           try {
-            await Portal.supabase.from('contacts').insert({
+            var { error: contactErr } = await Portal.supabase.from('contacts').insert({
               first_name:        formData.firstName,
               last_name:         formData.lastName,
               email:             formData.email,
               phone:             formData.phone || null,
-              contact_type:      '["buyer"]',
+              contact_type:      ['buyer'],
               has_portal_access: true,
               portal_email:      formData.email,
               portal_user_id:    portalUserId,
@@ -415,9 +457,21 @@
                 terms_version:       'DOM-v1.0-2026'
               }
             });
-          } catch (contactErr) {
-            // Contact insert failure does not block signup
-            console.warn('Contact insert failed:', contactErr);
+            if (contactErr) {
+              console.error('contacts insert failed:', contactErr);
+              p2Error.textContent = 'Account created but contact record failed. Please contact support and reference: ' + userId.slice(0, 8);
+              p2Error.classList.add('visible');
+              btn.textContent = 'I Agree & Get Instant Access';
+              btn.disabled = false;
+              return;
+            }
+          } catch (contactCatchErr) {
+            console.error('contacts insert threw:', contactCatchErr);
+            p2Error.textContent = 'Account partially created. Please contact support.';
+            p2Error.classList.add('visible');
+            btn.textContent = 'I Agree & Get Instant Access';
+            btn.disabled = false;
+            return;
           }
         }
 
