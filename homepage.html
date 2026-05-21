@@ -502,13 +502,12 @@
         try {
           var { data: photos } = await Portal.supabase
             .from('listing_photos')
-            .select('storage_path')
+            .select('url')
             .eq('listing_id', lid)
-            .order('sort_order', { ascending: true })
+            .eq('is_primary', true)
             .limit(1);
           if (photos && photos.length > 0) {
-            var { data: urlData } = Portal.supabase.storage.from('listing-photos').getPublicUrl(photos[0].storage_path);
-            photoUrl = urlData && urlData.publicUrl;
+            photoUrl = photos[0].url;
           }
         } catch(e) {}
         var imgHtml = photoUrl
@@ -529,7 +528,7 @@
     try {
       const { data, error } = await Portal.supabase
         .from('portal_listings')
-        .select('id, listing_id, asking_price, arv, status, notes, property_id, properties(city, state, property_type, bedrooms, bathrooms)')
+        .select('id, listing_id, asking_price, status, notes, property_id, properties(city, state, property_type, bedrooms, bathrooms, estimated_arv)')
         .eq('status', 'published')
         .eq('featured', true)
         .limit(3);
@@ -565,8 +564,8 @@
         var price = l.asking_price
           ? '$' + Number(l.asking_price).toLocaleString('en-US', { maximumFractionDigits: 0 })
           : 'Price TBD';
-        var arvHtml = l.arv
-          ? '<span style="font-size:12px;font-weight:500;color:var(--text-muted);margin-left:8px;">ARV: $' + Number(l.arv).toLocaleString('en-US', { maximumFractionDigits: 0 }) + '</span>'
+        var arvHtml = (l.properties && l.properties.estimated_arv)
+          ? '<span style="font-size:12px;font-weight:500;color:var(--text-muted);margin-left:8px;">ARV: $' + Number(l.properties.estimated_arv).toLocaleString('en-US', { maximumFractionDigits: 0 }) + '</span>'
           : '';
         var photoHtml = l._photo
           ? '<img src="' + l._photo + '" alt="' + loc + '" style="width:100%;height:100%;object-fit:cover;">'
@@ -608,31 +607,9 @@
         '</div>' +
       '</div>';
     }
-    try {
-      var { data, error } = await Portal.supabase
-        .from('portal_listings')
-        .select('id, asking_price, closed_at, properties(city, state, property_type, bedrooms, bathrooms)')
-        .eq('status', 'sold')
-        .order('closed_at', { ascending: false })
-        .limit(3);
-      if (error || !data || data.length === 0) {
-        grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
-        return;
-      }
-      grid.innerHTML = data.map(function(l) {
-        var p = l.properties || {};
-        var city = p.city || 'Florida';
-        var state = p.state || 'FL';
-        var type = p.property_type || 'SFR';
-        var beds = p.bedrooms || '—';
-        var baths = p.bathrooms || '—';
-        var price = l.asking_price || 0;
-        var closedLabel = l.closed_at ? new Date(l.closed_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
-        return closingCard(city, state, type, beds, baths, price, closedLabel);
-      }).join('');
-    } catch(e) {
-      grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
-    }
+    // TODO v0.4.x — wire closed-deal data source
+    if (false) { /* disabled: portal_listings has no closed_at column */ }
+    grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
   }
 
   // FAQ accordion
@@ -660,7 +637,7 @@
     e.preventDefault();
     var email = document.getElementById('newsletterEmail').value.trim();
     if (!email) return;
-    Portal.supabase.from('newsletter_signups').insert([{ email: email, source: 'homepage_footer' }]).then(function(){}).catch(function(){});
+    Portal.supabase.from('newsletter_subscribers').insert([{ email: email }]).then(function(){}).catch(function(){});
     e.target.innerHTML = '<p style="color:#22c55e;font-weight:600;font-size:15px;">&#10003; You\'re on the list. We\'ll send you new deal alerts.</p>';
   }
 
