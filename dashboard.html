@@ -943,6 +943,7 @@
           .select('id, listing_id, property_id, name, inputs, created_at, updated_at')
           .eq('user_id', portalUserId)
           .eq('archived', proformaSubtab === 'archive')
+          .order('sort_order', { ascending: true, nullsFirst: false })
           .order('updated_at', { ascending: false });
 
         if (error) throw error;
@@ -992,7 +993,9 @@
             ? new Date(s.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
             : '';
 
-          return '<div class="proforma-pill" onclick="window.location=\'/proforma.html?id=' + s.id + '\'" style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;" onmouseenter="this.style.borderColor=\'#4fc3f7\'" onmouseleave="this.style.borderColor=\'var(--border)\'">' +
+          const isDraggable = proformaSubtab === 'active';
+          return '<div class="proforma-pill" data-id="' + s.id + '"' + (isDraggable ? ' draggable="true"' : '') + ' onclick="window.location=\'/proforma.html?id=' + s.id + '\'" style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:' + (isDraggable ? 'grab' : 'pointer') + ';transition:border-color 0.15s;" onmouseenter="this.style.borderColor=\'#4fc3f7\'" onmouseleave="this.style.borderColor=\'var(--border)\'">' +
+            (isDraggable ? '<span title="Drag to reorder" style="font-size:14px;color:var(--text-muted);flex-shrink:0;padding-right:2px;cursor:grab;">&#8942;&#8942;</span>' : '') +
             photoHtml +
             '<div style="flex:1;min-width:0;">' +
               '<div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + addr + '</div>' +
@@ -1011,9 +1014,53 @@
           '</div>';
         }).join('');
 
+        if (proformaSubtab === 'active') wireDragHandlers();
+
       } catch (err) {
         console.error('Load proformas error:', err);
         container.innerHTML = '<div class="empty-state-inline">Could not load pro formas. Please refresh.</div>';
+      }
+    }
+
+    let draggedId = null;
+
+    function wireDragHandlers() {
+      const cards = document.querySelectorAll('#proformasContainer .proforma-pill');
+      cards.forEach(card => {
+        card.addEventListener('dragstart', function(e) {
+          draggedId = this.dataset.id;
+          this.style.opacity = '0.4';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', function() {
+          this.style.opacity = '';
+          draggedId = null;
+        });
+        card.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+        });
+        card.addEventListener('drop', function(e) {
+          e.preventDefault();
+          if (!draggedId || draggedId === this.dataset.id) return;
+          const dragged = document.querySelector('[data-id="' + draggedId + '"]');
+          const target = this;
+          target.parentNode.insertBefore(dragged, target);
+          persistOrder();
+        });
+      });
+    }
+
+    async function persistOrder() {
+      const cards = document.querySelectorAll('#proformasContainer .proforma-pill');
+      const updates = [];
+      cards.forEach((card, idx) => {
+        updates.push({ id: card.dataset.id, sort_order: idx });
+      });
+      for (const u of updates) {
+        await Portal.supabase.from('investor_saved_proformas')
+          .update({ sort_order: u.sort_order })
+          .eq('id', u.id);
       }
     }
 
@@ -1106,6 +1153,7 @@
     window.switchProformaSubtab = switchProformaSubtab;
     window.toggleArchive = toggleArchive;
     window.downloadProformaPDF = downloadProformaPDF;
+    window.persistOrder = persistOrder;
 
   })();
   </script>
