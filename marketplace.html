@@ -175,7 +175,7 @@
     .card-content { flex: 1; min-width: 0; }
     .card-location { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .card-specs { font-size: 11px; color: var(--text-muted); margin: 1px 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-price { font-size: 17px; font-weight: 800; color: #1a2744; }
+    .card-price { font-size: 17px; font-weight: 800; color: var(--text); }
     .card-arrow { color: var(--text-muted); font-size: 16px; }
 
     /* Tile view */
@@ -691,7 +691,7 @@
               (tileSpecsRow1 ? '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow1 + '</div>' : '') +
               (tileSpecsRow2 ? '<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow2 + '</div>' : '') +
               '<div style="display:flex;gap:14px;align-items:flex-end;margin-top:8px;">' +
-                '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div style="font-size:16px;font-weight:800;color:#1a2744;">' + Portal.fc(l.asking_price) + '</div></div>' +
+                '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div style="font-size:16px;font-weight:800;color:var(--text);">' + Portal.fc(l.asking_price) + '</div></div>' +
                 arvHtml +
               '</div>' +
             '</div>' +
