@@ -1352,13 +1352,13 @@
         Portal.toast('Could not save pro forma. Please try again.', 'error');
         return;
       }
-      var result = await Portal.supabase.from('investor_saved_proformas').upsert({
+      var result = await Portal.supabase.from('investor_saved_proformas').insert({
         user_id: portalUserId,
         listing_id: listing.listing_id,
         property_id: listing.property_id,
-        name: 'My Scenario',
+        name: 'Scenario ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
         inputs: inputs,
-      }, { onConflict: 'user_id,listing_id' });
+      });
 
       if (result.error) {
         Portal.toast('Could not save pro forma. ' + result.error.message, 'error');

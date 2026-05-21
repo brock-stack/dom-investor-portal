@@ -603,11 +603,9 @@
   <!-- ── PRO FORMAS TAB ── -->
   <div class="tab-content" id="tabProformas">
     <h2 class="section-heading">Pro Formas</h2>
-    <p class="section-sub">Access your saved pro formas here.</p>
-    <div class="coming-soon-box">
-      <div class="coming-soon-icon">📊</div>
-      <div class="coming-soon-title">Coming Soon</div>
-      <p class="coming-soon-desc">Access your saved pro formas here. This feature is coming soon.</p>
+    <p class="section-sub">Your saved investment scenarios.</p>
+    <div id="proformasContainer">
+      <div class="empty-state-inline">Loading pro formas...</div>
     </div>
   </div>
 
@@ -663,6 +661,7 @@
 
     let offersLoaded = false;
     let favoritesLoaded = false;
+    let proformasLoaded = false;
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -681,6 +680,10 @@
         if (this.dataset.tab === 'favorites' && !favoritesLoaded) {
           loadFavorites();
           favoritesLoaded = true;
+        }
+        if (this.dataset.tab === 'proformas' && !proformasLoaded) {
+          loadProformas();
+          proformasLoaded = true;
         }
       });
     });
@@ -897,6 +900,87 @@
       } catch (err) {
         console.error('Load favorites error:', err);
         container.innerHTML = '<div class="empty-state-inline">Could not load favorites. Please refresh.</div>';
+      }
+    }
+
+    async function loadProformas() {
+      const container = document.getElementById('proformasContainer');
+      if (!container) return;
+
+      try {
+        if (!portalUserId) {
+          container.innerHTML = '<div class="empty-state-inline">Could not load pro formas. Please refresh.</div>';
+          return;
+        }
+
+        const { data: saved, error } = await Portal.supabase
+          .from('investor_saved_proformas')
+          .select('id, listing_id, property_id, name, inputs, created_at, updated_at')
+          .eq('user_id', portalUserId)
+          .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!saved || saved.length === 0) {
+          container.innerHTML = '<div class="empty-state-inline">No saved pro formas yet. Browse the marketplace, open a deal, fill the Pro Forma tab and tap Save.</div>';
+          return;
+        }
+
+        // saved.listing_id is canonical listings.id — look up portal_listings by listing_id
+        const crmListingIds = [...new Set(saved.map(s => s.listing_id).filter(Boolean))];
+        const { data: plRows } = await Portal.supabase
+          .from('portal_listings')
+          .select('id, listing_id, asking_price, properties(address, city, state, estimated_arv)')
+          .in('listing_id', crmListingIds);
+        const plMap = {};
+        (plRows || []).forEach(pl => { plMap[pl.listing_id] = pl; });
+
+        const { data: photos } = await Portal.supabase
+          .from('listing_photos')
+          .select('listing_id, url')
+          .in('listing_id', crmListingIds)
+          .eq('is_primary', true);
+        const photoMap = {};
+        (photos || []).forEach(p => { photoMap[p.listing_id] = p.url; });
+
+        container.innerHTML = saved.map(function(s) {
+          const pl = plMap[s.listing_id] || {};
+          const prop = pl.properties || {};
+          const photoUrl = photoMap[s.listing_id] || null;
+
+          const photoHtml = photoUrl
+            ? '<img src="' + photoUrl + '" alt="property" style="width:96px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;">'
+            : '<div style="width:96px;height:64px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:24px;border-radius:6px;flex-shrink:0;">&#127968;</div>';
+
+          const addr = [prop.address, prop.city, prop.state].filter(Boolean).join(', ') || 'Florida property';
+          const inputs = s.inputs || {};
+          const purchase = Number(inputs.pf_purchase) || 0;
+          const arv = Number(inputs.pf_arv) || prop.estimated_arv || 0;
+          const equity = (arv && purchase) ? (arv - purchase) : 0;
+
+          const fmtCurr = function(n) { return n ? '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }) : '\u2014'; };
+          const savedDate = s.updated_at
+            ? new Date(s.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : '';
+
+          return '<div class="proforma-pill" onclick="window.location=\'/proforma.html?id=' + s.id + '\'" style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;" onmouseenter="this.style.borderColor=\'#4fc3f7\'" onmouseleave="this.style.borderColor=\'var(--border)\'">' +
+            photoHtml +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + addr + '</div>' +
+              '<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">' + (s.name || 'Scenario') + '</div>' +
+              '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Saved ' + savedDate + '</div>' +
+            '</div>' +
+            '<div style="display:flex;gap:18px;flex-shrink:0;font-size:12px;">' +
+              '<div><div style="color:var(--text-muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Purchase</div><div style="color:var(--text);font-weight:700;">' + fmtCurr(purchase) + '</div></div>' +
+              '<div><div style="color:var(--text-muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">ARV</div><div style="color:#4fc3f7;font-weight:700;">' + fmtCurr(arv) + '</div></div>' +
+              '<div><div style="color:var(--text-muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Equity</div><div style="color:#22c55e;font-weight:700;">' + fmtCurr(equity) + '</div></div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+      } catch (err) {
+        console.error('Load proformas error:', err);
+        container.innerHTML = '<div class="empty-state-inline">Could not load pro formas. Please refresh.</div>';
       }
     }
 

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Forma — Direct Off Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/investor.css">
+  <script>
+  (function() {
+    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  </script>
+  <style>
+    .deal-header {
+      position: sticky;
+      top: 64px;
+      z-index: 50;
+      background: var(--navy);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 32px;
+    }
+    .deal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: nowrap;
+    }
+    .deal-header-row > .deal-back { flex-shrink: 0; }
+    .deal-header-row > .deal-header-addr-row { flex: 1; min-width: 0; }
+    .deal-header-row > .deal-actions { flex-shrink: 0; }
+    .deal-header-addr-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .deal-back {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    .deal-back:hover { color: rgba(255,255,255,0.7); }
+    .deal-address {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .deal-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .header-btn {
+      padding: 7px 16px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .header-btn-offer {
+      background: #7c3aed;
+      color: #ffffff;
+      border-color: #7c3aed;
+    }
+    .header-btn-offer:hover { background: #6d28d9; border-color: #6d28d9; }
+
+    /* Hero gallery — letterboxed (v0.3.7 + v0.3.9) */
+    .deal-gallery {
+      width: 100%;
+      max-width: 1100px;
+      aspect-ratio: 3 / 2;
+      margin: 14px auto;
+      overflow: hidden;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: default;
+      position: relative;
+    }
+    .deal-gallery img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Body */
+    .deal-body { padding: 32px; max-width: 1200px; margin: 0 auto; }
+
+    /* Pro forma */
+    .pro-forma-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .pro-forma-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+    .pro-forma-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+    .pro-forma-input[readonly] { cursor: default; }
+    .pro-forma-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .pro-forma-row:last-child { border-bottom: none; }
+    .pro-forma-label { font-size: 13px; color: #64748b; }
+    .pro-forma-value { font-size: 14px; font-weight: 600; }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+
+    @media (max-width: 768px) {
+      .deal-header { padding: 10px 16px; }
+      .deal-header-row { flex-wrap: wrap; }
+      .deal-body { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="investor-nav" id="investorNav"></nav>
+
+  <!-- Header -->
+  <div class="deal-header" id="dealHeader" style="margin-top:64px;">
+    <div class="deal-header-row">
+      <a href="/dashboard.html#proformas" class="deal-back">&larr; Back to Pro Formas</a>
+      <div class="deal-header-addr-row">
+        <span class="deal-address" id="proformaAddress">Loading...</span>
+        <span id="proformaScenarioLabel" style="font-size:13px;color:rgba(255,255,255,0.6);margin-left:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;"></span>
+      </div>
+      <div class="deal-actions">
+        <button class="header-btn header-btn-offer" onclick="downloadPDF()">Download PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero photo -->
+  <div class="deal-gallery" id="proformaGallery" style="display:none;">
+    <img id="proformaHeroImg" src="" alt="Property photo">
+  </div>
+
+  <!-- Pro Forma content -->
+  <div class="deal-body">
+    <div id="proformaError" style="display:none;padding:40px;text-align:center;color:var(--text-muted);font-size:15px;"></div>
+    <div id="proformaContent">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <!-- Left: Readonly inputs -->
+        <div id="proformaInputs"></div>
+        <!-- Right: Calculated outputs -->
+        <div id="proformaOutputs"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="portalToast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/investor-auth.js"></script>
+  <script>
+  (async function() {
+    const session = await Portal.requireAuth();
+    if (!session) return;
+    Portal.renderNav();
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var savedId = urlParams.get('id');
+
+    function showError(html) {
+      document.getElementById('proformaError').style.display = 'block';
+      document.getElementById('proformaError').innerHTML = html;
+      document.getElementById('proformaContent').style.display = 'none';
+    }
+
+    if (!savedId) {
+      showError('No pro forma id provided. <a href="/dashboard.html#proformas" style="color:#4fc3f7;">Back to Pro Formas &rarr;</a>');
+      return;
+    }
+
+    var portalUserId = await Portal.getPortalUserId(session.user.id);
+
+    // Fetch saved row
+    var { data: row, error } = await Portal.supabase
+      .from('investor_saved_proformas')
+      .select('id, user_id, listing_id, property_id, name, inputs, created_at, updated_at')
+      .eq('id', savedId)
+      .maybeSingle();
+
+    if (error || !row) {
+      showError('Pro forma not found. <a href="/dashboard.html#proformas" style="color:#4fc3f7;">Back to Pro Formas &rarr;</a>');
+      return;
+    }
+
+    if (row.user_id !== portalUserId) {
+      showError('This pro forma isn\'t yours. <a href="/dashboard.html#proformas" style="color:#4fc3f7;">Back to Pro Formas &rarr;</a>');
+      return;
+    }
+
+    // Fetch portal listing + property
+    var { data: pl } = await Portal.supabase
+      .from('portal_listings')
+      .select('id, listing_id, asking_price, properties(*)')
+      .eq('listing_id', row.listing_id)
+      .maybeSingle();
+
+    var prop = (pl && pl.properties) || {};
+    var addr = [prop.address, prop.city, prop.state].filter(Boolean).join(', ') || 'Property';
+    document.getElementById('proformaAddress').textContent = addr;
+    document.title = addr + ' — Pro Forma | Direct Off Market';
+
+    var scenarioLabel = row.name || '';
+    var savedDateStr = row.updated_at
+      ? ' · Saved ' + new Date(row.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : '';
+    document.getElementById('proformaScenarioLabel').textContent = scenarioLabel + savedDateStr;
+
+    // Photo
+    if (pl) {
+      var { data: photos } = await Portal.supabase
+        .from('listing_photos')
+        .select('url')
+        .eq('listing_id', row.listing_id)
+        .eq('is_primary', true)
+        .limit(1);
+      if (photos && photos.length > 0) {
+        document.getElementById('proformaHeroImg').src = photos[0].url;
+        document.getElementById('proformaGallery').style.display = '';
+      }
+    }
+
+    // Render read-only pro forma UI
+    renderProformaUI(row.inputs || {});
+    calcProForma();
+  })();
+
+  function iv(inputs, key, defaultVal) {
+    var v = inputs[key];
+    return (v !== undefined && v !== '') ? v : defaultVal;
+  }
+
+  function renderProformaUI(inputs) {
+    var d = {
+      pf_purchase: iv(inputs, 'pf_purchase', ''),
+      pf_rehab:    iv(inputs, 'pf_rehab', ''),
+      pf_closing:  iv(inputs, 'pf_closing', ''),
+      pf_arv:      iv(inputs, 'pf_arv', ''),
+      pf_down_pct: iv(inputs, 'pf_down_pct', '20'),
+      pf_rate:     iv(inputs, 'pf_rate', '7.5'),
+      pf_term:     iv(inputs, 'pf_term', '30'),
+      pf_rent:     iv(inputs, 'pf_rent', ''),
+      pf_vacancy:  iv(inputs, 'pf_vacancy', '5'),
+      pf_opex:     iv(inputs, 'pf_opex', ''),
+      pf_hold:     iv(inputs, 'pf_hold', '5'),
+    };
+
+    function inp(id, label, placeholder) {
+      return '<div class="form-group"><label class="form-label">' + label + '</label>' +
+        '<input type="number" class="pro-forma-input" id="' + id + '" placeholder="' + placeholder + '" value="' + (d[id] || '') + '" readonly>' +
+        '</div>';
+    }
+
+    document.getElementById('proformaInputs').innerHTML =
+      '<div class="pro-forma-section">' +
+        '<div class="pro-forma-section-title">Acquisition</div>' +
+        inp('pf_purchase', 'Purchase Price', '0') +
+        inp('pf_rehab', 'Rehab Budget', '0') +
+        inp('pf_closing', 'Closing Costs', '0') +
+        inp('pf_arv', 'After Repair Value (ARV)', '0') +
+      '</div>' +
+      '<div class="pro-forma-section">' +
+        '<div class="pro-forma-section-title">Financing</div>' +
+        inp('pf_down_pct', 'Down Payment %', '20') +
+        inp('pf_rate', 'Interest Rate %', '7.5') +
+        inp('pf_term', 'Loan Term (years)', '30') +
+      '</div>' +
+      '<div class="pro-forma-section">' +
+        '<div class="pro-forma-section-title">Income &amp; Expenses</div>' +
+        inp('pf_rent', 'Monthly Gross Rent', '0') +
+        inp('pf_vacancy', 'Vacancy Rate %', '5') +
+        inp('pf_opex', 'Monthly Operating Expenses', '0') +
+        inp('pf_hold', 'Holding Period (years)', '5') +
+      '</div>';
+
+    document.getElementById('proformaOutputs').innerHTML =
+      '<div class="pro-forma-section">' +
+        '<div class="pro-forma-section-title">Calculated Results</div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Total Investment</span><span class="pro-forma-value" id="r_totalInv">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Loan Amount</span><span class="pro-forma-value" id="r_loan">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Monthly Mortgage</span><span class="pro-forma-value" id="r_mortgage">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Effective Monthly Rent</span><span class="pro-forma-value" id="r_effRent">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Monthly Cash Flow</span><span class="pro-forma-value" id="r_mcf">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Annual Cash Flow</span><span class="pro-forma-value" id="r_acf">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Cap Rate</span><span class="pro-forma-value" id="r_cap">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Cash-on-Cash Return</span><span class="pro-forma-value" id="r_coc">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Day 1 Equity</span><span class="pro-forma-value" id="r_equity">&mdash;</span></div>' +
+      '</div>' +
+      '<div class="pro-forma-section">' +
+        '<div class="pro-forma-section-title" id="exitSectionTitle">Returns at Exit</div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Total Cash Flow</span><span class="pro-forma-value" id="r_totalCF">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Total Return</span><span class="pro-forma-value" id="r_totalReturn">&mdash;</span></div>' +
+        '<div class="pro-forma-row"><span class="pro-forma-label">Annualized ROI</span><span class="pro-forma-value" id="r_roi">&mdash;</span></div>' +
+      '</div>';
+  }
+
+  function calcProForma() {
+    function v(id) { return parseFloat(document.getElementById(id) && document.getElementById(id).value) || 0; }
+
+    var purchase = v('pf_purchase');
+    var rehab = v('pf_rehab');
+    var closing = v('pf_closing');
+    var arv = v('pf_arv');
+    var downPct = v('pf_down_pct') / 100;
+    var rate = v('pf_rate') / 100 / 12;
+    var term = v('pf_term') * 12;
+    var rent = v('pf_rent');
+    var vacancyPct = v('pf_vacancy') / 100;
+    var opex = v('pf_opex');
+    var hold = v('pf_hold');
+
+    var totalInv = purchase + rehab + closing;
+    var downAmt = purchase * downPct;
+    var loan = purchase - downAmt;
+
+    var mortgage = 0;
+    if (rate > 0 && term > 0 && loan > 0) {
+      mortgage = loan * (rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+    }
+
+    var effRent = rent * (1 - vacancyPct);
+    var monthlyCF = effRent - opex - mortgage;
+    var annualCF = monthlyCF * 12;
+
+    var noi = (effRent - opex) * 12;
+    var capRate = purchase > 0 ? (noi / purchase * 100) : 0;
+
+    var cashInvested = downAmt + rehab + closing;
+    var coc = cashInvested > 0 ? (annualCF / cashInvested * 100) : 0;
+    var equity = arv - purchase;
+
+    var totalCF = annualCF * hold;
+    var totalReturn = totalCF + equity;
+    var annRoi = cashInvested > 0 ? ((totalReturn / cashInvested) / hold * 100) : 0;
+
+    function fmt(n) { return Portal.fc(n); }
+    function pct(n) { return isFinite(n) ? n.toFixed(1) + '%' : '\u2014'; }
+    function cfClass(n) { return n >= 0 ? 'positive' : 'negative'; }
+
+    var exitTitle = document.getElementById('exitSectionTitle');
+    if (exitTitle) {
+      exitTitle.textContent = 'Returns at Exit (' + (hold || 5) + ' yr' + (hold !== 1 ? 's' : '') + ')';
+    }
+
+    document.getElementById('r_totalInv').textContent = fmt(totalInv);
+    document.getElementById('r_loan').textContent = fmt(loan);
+    document.getElementById('r_mortgage').textContent = fmt(Math.round(mortgage));
+    document.getElementById('r_effRent').textContent = fmt(Math.round(effRent));
+    document.getElementById('r_mcf').innerHTML = '<span class="' + cfClass(monthlyCF) + '">' + fmt(Math.round(monthlyCF)) + '</span>';
+    document.getElementById('r_acf').innerHTML = '<span class="' + cfClass(annualCF) + '">' + fmt(Math.round(annualCF)) + '</span>';
+    document.getElementById('r_cap').textContent = pct(capRate);
+    document.getElementById('r_coc').textContent = pct(coc);
+    document.getElementById('r_equity').innerHTML = '<span class="' + (equity >= 0 ? 'positive' : 'negative') + '">' + fmt(equity) + '</span>';
+    document.getElementById('r_totalCF').innerHTML = '<span class="' + cfClass(totalCF) + '">' + fmt(Math.round(totalCF)) + '</span>';
+    document.getElementById('r_totalReturn').innerHTML = '<span class="' + cfClass(totalReturn) + '">' + fmt(Math.round(totalReturn)) + '</span>';
+    document.getElementById('r_roi').textContent = pct(annRoi);
+  }
+
+  function downloadPDF() {
+    Portal.toast('PDF generation coming in v0.4.2', 'info');
+  }
+  </script>
+</body>
+</html>
