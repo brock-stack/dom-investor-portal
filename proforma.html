@@ -3,399 +3,243 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pro Forma — Direct Off Market</title>
+  <title>Pro Forma Calculator | Direct Off Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/investor.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
   <script>
-  (function() {
-    var t = localStorage.getItem('dom_portal_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', t);
-  })();
+    (function() {
+      var t = localStorage.getItem('dom_portal_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
   </script>
   <style>
-    .deal-header {
-      position: sticky;
-      top: 64px;
-      z-index: 50;
-      background: var(--navy);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 32px;
-    }
-    .deal-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: nowrap;
-    }
-    .deal-header-row > .deal-back { flex-shrink: 0; }
-    .deal-header-row > .deal-header-addr-row { flex: 1; min-width: 0; }
-    .deal-header-row > .deal-actions { flex-shrink: 0; }
-    .deal-header-addr-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-      min-width: 0;
-    }
-    .deal-back {
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      white-space: nowrap;
-      transition: color 0.15s;
-    }
-    .deal-back:hover { color: rgba(255,255,255,0.7); }
-    .deal-address {
-      font-size: 22px;
-      font-weight: 700;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .deal-actions { display: flex; gap: 8px; flex-shrink: 0; }
-    .header-btn {
-      padding: 7px 16px;
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-    .header-btn-offer {
-      background: #7c3aed;
-      color: #ffffff;
-      border-color: #7c3aed;
-    }
-    .header-btn-offer:hover { background: #6d28d9; border-color: #6d28d9; }
-
-    /* Hero gallery — letterboxed (v0.3.7 + v0.3.9) */
-    .deal-gallery {
-      width: 100%;
-      max-width: 1100px;
-      aspect-ratio: 3 / 2;
-      margin: 14px auto;
-      overflow: hidden;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      cursor: default;
-      position: relative;
-    }
-    .deal-gallery img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    /* Body */
-    .deal-body { padding: 32px; max-width: 1200px; margin: 0 auto; }
-
-    /* Pro forma */
-    .pro-forma-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .pro-forma-section-title {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-    .form-group { margin-bottom: 12px; }
-    .form-label { display: block; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
-    .pro-forma-input {
-      width: 100%;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 7px 10px;
-      color: var(--text);
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      outline: none;
-    }
-    .pro-forma-input[readonly] { cursor: default; }
-    .pro-forma-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .pro-forma-row:last-child { border-bottom: none; }
-    .pro-forma-label { font-size: 13px; color: #64748b; }
-    .pro-forma-value { font-size: 14px; font-weight: 600; }
-    .positive { color: var(--green); }
-    .negative { color: var(--red); }
-
-    @media (max-width: 768px) {
-      .deal-header { padding: 10px 16px; }
-      .deal-header-row { flex-wrap: wrap; }
-      .deal-body { padding: 16px; }
-    }
+    .pf-page { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
+    .pf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .pf-title { font-size: 24px; font-weight: 800; color: var(--text); }
+    .pf-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+    .pf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .pf-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .pf-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 16px; }
+    .pf-field { margin-bottom: 14px; }
+    .pf-label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 5px; }
+    .pf-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 14px; box-sizing: border-box; font-family: inherit; }
+    .pf-input:focus { outline: none; border-color: #4fc3f7; }
+    .pf-results { background: linear-gradient(135deg, #0f1b33, #1a2744); border-radius: 14px; padding: 24px; margin-top: 20px; }
+    .pf-results-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+    .pf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .pf-kpi { text-align: center; }
+    .pf-kpi-value { font-size: 26px; font-weight: 900; color: #4fc3f7; }
+    .pf-kpi-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+    .pf-kpi.negative .pf-kpi-value { color: #ef4444; }
+    .pf-save-btn { background: #4fc3f7; color: #1a2744; border: none; border-radius: 10px; padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity .15s; }
+    .pf-save-btn:hover { opacity: .88; }
+    .pf-back { font-size: 13px; color: #4fc3f7; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+    @media (max-width: 680px) { .pf-grid { grid-template-columns: 1fr; } .pf-kpi-grid { grid-template-columns: repeat(2,1fr); } }
   </style>
 </head>
 <body>
-  <nav class="investor-nav" id="investorNav"></nav>
+  <!-- Nav -->
+  <nav style="position:fixed;top:0;left:0;right:0;height:56px;background:#1a1e38;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100;border-bottom:1px solid rgba(255,255,255,0.07);">
+    <a href='/homepage' style='display:flex;align-items:center;gap:8px;text-decoration:none;'>
+      <img src="/img/dom-logo-white.png" alt="DOM" style="height:28px;">
+    </a>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <a href='/dashboard' style='font-size:13px;color:rgba(255,255,255,0.7);text-decoration:none;'>Dashboard</a>
+      <a href='/marketplace' style='font-size:13px;color:rgba(255,255,255,0.7);text-decoration:none;'>Marketplace</a>
+      <button onclick="Portal.toggleTheme()" class="theme-toggle" style="background:rgba(255,255,255,0.08);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;color:#fff;font-size:16px;"></button>
+    </div>
+  </nav>
 
-  <!-- Header -->
-  <div class="deal-header" id="dealHeader" style="margin-top:64px;">
-    <div class="deal-header-row">
-      <a href="/dashboard.html#proformas" class="deal-back">&larr; Back to Pro Formas</a>
-      <div class="deal-header-addr-row">
-        <span class="deal-address" id="proformaAddress">Loading...</span>
-        <span id="proformaScenarioLabel" style="font-size:13px;color:rgba(255,255,255,0.6);margin-left:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;"></span>
+  <div style="margin-top:72px;">
+    <div class="pf-page">
+      <div class="pf-header">
+        <div>
+          <a class='pf-back' href='/dashboard'>&#8592; Dashboard</a>
+          <div class="pf-title" style="margin-top:8px;">Pro Forma Calculator</div>
+          <div class="pf-subtitle">Build your own investment analysis. Adjust inputs to see projections.</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input id="pfName" type="text" placeholder="Analysis name..." style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:13px;width:180px;font-family:inherit;">
+          <button class="pf-save-btn" onclick="savePf()">Save Analysis</button>
+        </div>
       </div>
-      <div class="deal-actions">
-        <button class="header-btn header-btn-offer" onclick="downloadPDF()">Download PDF</button>
+
+      <div class="pf-grid">
+        <!-- Purchase & Financing -->
+        <div class="pf-card">
+          <div class="pf-card-title">Purchase &amp; Financing</div>
+          <div class="pf-field"><label class="pf-label">Purchase Price</label><input class="pf-input" id="pfPurchase" type="text" placeholder="$250,000" oninput="fmtCur(this);calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Down Payment %</label><input class="pf-input" id="pfDown" type="number" placeholder="20" value="20" min="0" max="100" oninput="calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Interest Rate %</label><input class="pf-input" id="pfRate" type="number" placeholder="7.5" value="7.5" step="0.1" oninput="calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Loan Term (years)</label><input class="pf-input" id="pfTerm" type="number" placeholder="30" value="30" oninput="calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Closing Costs</label><input class="pf-input" id="pfClosing" type="text" placeholder="$5,000" oninput="fmtCur(this);calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Rehab / Repairs</label><input class="pf-input" id="pfRehab" type="text" placeholder="$0" oninput="fmtCur(this);calcPf()"></div>
+        </div>
+        <!-- Income & Expenses -->
+        <div class="pf-card">
+          <div class="pf-card-title">Income &amp; Expenses</div>
+          <div class="pf-field"><label class="pf-label">Monthly Rent</label><input class="pf-input" id="pfRent" type="text" placeholder="$1,800" oninput="fmtCur(this);calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Vacancy Rate %</label><input class="pf-input" id="pfVacancy" type="number" placeholder="5" value="5" min="0" max="100" oninput="calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Property Tax / yr</label><input class="pf-input" id="pfTax" type="text" placeholder="$2,400" oninput="fmtCur(this);calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Insurance / yr</label><input class="pf-input" id="pfInsurance" type="text" placeholder="$1,200" oninput="fmtCur(this);calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Maintenance / yr</label><input class="pf-input" id="pfMaint" type="text" placeholder="$1,500" oninput="fmtCur(this);calcPf()"></div>
+          <div class="pf-field"><label class="pf-label">Property Mgmt %</label><input class="pf-input" id="pfMgmt" type="number" placeholder="8" value="8" min="0" max="100" oninput="calcPf()"></div>
+        </div>
+      </div>
+
+      <!-- ARV (optional) -->
+      <div class="pf-card" style="margin-top:16px;display:flex;gap:20px;align-items:center;padding:16px 20px;">
+        <div style="flex:1"><label class="pf-label">After Repair Value (ARV)</label><input class="pf-input" id="pfArv" type="text" placeholder="$320,000" oninput="fmtCur(this);calcPf()"></div>
+        <div style="flex:1"><label class="pf-label">Holding Period (months)</label><input class="pf-input" id="pfHold" type="number" placeholder="12" value="12" oninput="calcPf()"></div>
+        <div style="flex:1"><label class="pf-label">Selling Costs %</label><input class="pf-input" id="pfSellCost" type="number" placeholder="6" value="6" oninput="calcPf()"></div>
+      </div>
+
+      <!-- Results -->
+      <div class="pf-results" id="pfResults">
+        <div class="pf-results-title">Projected Returns</div>
+        <div class="pf-kpi-grid">
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfCapRate">—</div><div class="pf-kpi-label">Cap Rate</div></div>
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfCoc">—</div><div class="pf-kpi-label">Cash-on-Cash</div></div>
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfNoi">—</div><div class="pf-kpi-label">Annual NOI</div></div>
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfCashFlow">—</div><div class="pf-kpi-label">Monthly Cash Flow</div></div>
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfTotalCash">—</div><div class="pf-kpi-label">Total Cash In</div></div>
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfMortgage">—</div><div class="pf-kpi-label">Monthly P&amp;I</div></div>
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfGrossYield">—</div><div class="pf-kpi-label">Gross Yield</div></div>
+          <div class="pf-kpi"><div class="pf-kpi-value" id="pfFlipProfit">—</div><div class="pf-kpi-label">Flip Profit</div></div>
+        </div>
+      </div>
+
+      <!-- Saved analyses -->
+      <div style="margin-top:28px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Saved Analyses</div>
+        <div id="savedPfList"><div style="font-size:13px;color:var(--text-muted);">Loading...</div></div>
       </div>
     </div>
   </div>
 
-  <!-- Hero photo -->
-  <div class="deal-gallery" id="proformaGallery" style="display:none;">
-    <img id="proformaHeroImg" src="" alt="Property photo">
-  </div>
-
-  <!-- Pro Forma content -->
-  <div class="deal-body">
-    <div id="proformaError" style="display:none;padding:40px;text-align:center;color:var(--text-muted);font-size:15px;"></div>
-    <div id="proformaContent">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-        <!-- Left: Readonly inputs -->
-        <div id="proformaInputs"></div>
-        <!-- Right: Calculated outputs -->
-        <div id="proformaOutputs"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="portalToast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/js/investor-auth.js"></script>
   <script>
-  (async function() {
-    const session = await Portal.requireAuth();
-    if (!session) return;
-    Portal.renderNav();
+    Portal.requireAuth().then(function(s){ if(s) Portal.renderNav(); });
+    Portal.initTheme();
 
-    var urlParams = new URLSearchParams(window.location.search);
-    var savedId = urlParams.get('id');
-
-    function showError(html) {
-      document.getElementById('proformaError').style.display = 'block';
-      document.getElementById('proformaError').innerHTML = html;
-      document.getElementById('proformaContent').style.display = 'none';
+    function fmtCur(el) {
+      var v = el.value.replace(/[^\d]/g,'');
+      el.value = v ? '$' + parseInt(v).toLocaleString() : '';
     }
-
-    if (!savedId) {
-      showError('No pro forma id provided. <a href="/dashboard.html#proformas" style="color:#4fc3f7;">Back to Pro Formas &rarr;</a>');
-      return;
+    function parseCur(id) {
+      return parseFloat((document.getElementById(id).value||'0').replace(/[^0-9.]/g,'')) || 0;
     }
+    function pct(id) { return (parseFloat(document.getElementById(id).value)||0)/100; }
+    function fc(n) { return n < 0 ? '-$'+Math.abs(Math.round(n)).toLocaleString() : '$'+Math.round(n).toLocaleString(); }
+    function fcp(n) { return (n*100).toFixed(1)+'%'; }
 
-    var portalUserId = await Portal.getPortalUserId(session.user.id);
+    function calcPf() {
+      var purchase = parseCur('pfPurchase');
+      var downPct = pct('pfDown');
+      var rate = pct('pfRate') / 12;
+      var term = (parseInt(document.getElementById('pfTerm').value)||30) * 12;
+      var closing = parseCur('pfClosing');
+      var rehab = parseCur('pfRehab');
+      var rent = parseCur('pfRent');
+      var vacancyPct = pct('pfVacancy');
+      var tax = parseCur('pfTax');
+      var insurance = parseCur('pfInsurance');
+      var maint = parseCur('pfMaint');
+      var mgmtPct = pct('pfMgmt');
+      var arv = parseCur('pfArv');
+      var sellCostPct = pct('pfSellCost');
 
-    // Fetch saved row
-    var { data: row, error } = await Portal.supabase
-      .from('investor_saved_proformas')
-      .select('id, user_id, listing_id, property_id, name, inputs, created_at, updated_at')
-      .eq('id', savedId)
-      .maybeSingle();
-
-    if (error || !row) {
-      showError('Pro forma not found. <a href="/dashboard.html#proformas" style="color:#4fc3f7;">Back to Pro Formas &rarr;</a>');
-      return;
-    }
-
-    if (row.user_id !== portalUserId) {
-      showError('This pro forma isn\'t yours. <a href="/dashboard.html#proformas" style="color:#4fc3f7;">Back to Pro Formas &rarr;</a>');
-      return;
-    }
-
-    // Fetch portal listing + property
-    var { data: pl } = await Portal.supabase
-      .from('portal_listings')
-      .select('id, listing_id, asking_price, properties(*)')
-      .eq('listing_id', row.listing_id)
-      .maybeSingle();
-
-    var prop = (pl && pl.properties) || {};
-    var addr = [prop.address, prop.city, prop.state].filter(Boolean).join(', ') || 'Property';
-    document.getElementById('proformaAddress').textContent = addr;
-    document.title = addr + ' — Pro Forma | Direct Off Market';
-
-    var scenarioLabel = row.name || '';
-    var savedDateStr = row.updated_at
-      ? ' · Saved ' + new Date(row.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-      : '';
-    document.getElementById('proformaScenarioLabel').textContent = scenarioLabel + savedDateStr;
-
-    // Photo
-    if (pl) {
-      var { data: photos } = await Portal.supabase
-        .from('listing_photos')
-        .select('url')
-        .eq('listing_id', row.listing_id)
-        .eq('is_primary', true)
-        .limit(1);
-      if (photos && photos.length > 0) {
-        document.getElementById('proformaHeroImg').src = photos[0].url;
-        document.getElementById('proformaGallery').style.display = '';
+      if (!purchase) {
+        ['pfCapRate','pfCoc','pfNoi','pfCashFlow','pfTotalCash','pfMortgage','pfGrossYield','pfFlipProfit'].forEach(function(id){ var el=document.getElementById(id); if(el){el.textContent='—'; el.closest('.pf-kpi').classList.remove('negative');} });
+        return;
       }
+
+      var loan = purchase * (1 - downPct);
+      var downAmt = purchase * downPct;
+      var totalCash = downAmt + closing + rehab;
+      var mortgage = rate > 0 && term > 0 ? loan * (rate * Math.pow(1+rate,term)) / (Math.pow(1+rate,term)-1) : (loan/term);
+
+      var effRent = rent * (1 - vacancyPct);
+      var grossIncome = effRent * 12;
+      var mgmtAmt = grossIncome * mgmtPct;
+      var opEx = tax + insurance + maint + mgmtAmt;
+      var noi = grossIncome - opEx;
+      var annualDS = mortgage * 12;
+      var annualCF = noi - annualDS;
+      var monthlyCF = annualCF / 12;
+      var capRate = purchase > 0 ? noi / purchase : 0;
+      var coc = totalCash > 0 ? annualCF / totalCash : 0;
+      var grossYield = purchase > 0 ? grossIncome / purchase : 0;
+      var flipProfit = arv > 0 ? (arv * (1 - sellCostPct)) - purchase - rehab - closing : null;
+
+      var set = function(id, val) {
+        var el = document.getElementById(id); if (!el) return;
+        el.textContent = val;
+        el.closest('.pf-kpi').classList.toggle('negative', parseFloat(val) < 0 || (typeof val === 'string' && val.startsWith('-')));
+      };
+      set('pfCapRate', fcp(capRate));
+      set('pfCoc', fcp(coc));
+      set('pfNoi', fc(noi));
+      set('pfCashFlow', fc(monthlyCF));
+      set('pfTotalCash', fc(totalCash));
+      set('pfMortgage', fc(mortgage));
+      set('pfGrossYield', fcp(grossYield));
+      set('pfFlipProfit', flipProfit !== null ? fc(flipProfit) : '—');
     }
 
-    // Render read-only pro forma UI
-    renderProformaUI(row.inputs || {});
-    calcProForma();
-  })();
-
-  function iv(inputs, key, defaultVal) {
-    var v = inputs[key];
-    return (v !== undefined && v !== '') ? v : defaultVal;
-  }
-
-  function renderProformaUI(inputs) {
-    var d = {
-      pf_purchase: iv(inputs, 'pf_purchase', ''),
-      pf_rehab:    iv(inputs, 'pf_rehab', ''),
-      pf_closing:  iv(inputs, 'pf_closing', ''),
-      pf_arv:      iv(inputs, 'pf_arv', ''),
-      pf_down_pct: iv(inputs, 'pf_down_pct', '20'),
-      pf_rate:     iv(inputs, 'pf_rate', '7.5'),
-      pf_term:     iv(inputs, 'pf_term', '30'),
-      pf_rent:     iv(inputs, 'pf_rent', ''),
-      pf_vacancy:  iv(inputs, 'pf_vacancy', '5'),
-      pf_opex:     iv(inputs, 'pf_opex', ''),
-      pf_hold:     iv(inputs, 'pf_hold', '5'),
-    };
-
-    function inp(id, label, placeholder) {
-      return '<div class="form-group"><label class="form-label">' + label + '</label>' +
-        '<input type="number" class="pro-forma-input" id="' + id + '" placeholder="' + placeholder + '" value="' + (d[id] || '') + '" readonly>' +
-        '</div>';
+    async function savePf() {
+      var session = await Portal.getSession();
+      if (!session) { Portal.toast('Sign in to save', 'error'); return; }
+      var name = document.getElementById('pfName').value.trim() || 'Untitled Analysis';
+      var inputs = {};
+      ['pfPurchase','pfDown','pfRate','pfTerm','pfClosing','pfRehab','pfRent','pfVacancy','pfTax','pfInsurance','pfMaint','pfMgmt','pfArv','pfHold','pfSellCost'].forEach(function(id){
+        inputs[id] = document.getElementById(id).value;
+      });
+      var outputs = {};
+      ['pfCapRate','pfCoc','pfNoi','pfCashFlow','pfTotalCash','pfMortgage','pfGrossYield','pfFlipProfit'].forEach(function(id){
+        outputs[id] = document.getElementById(id).textContent;
+      });
+      var pu = await Portal.supabase.from('portal_users').select('id').eq('user_id',session.user.id).maybeSingle();
+      if (!pu.data) { Portal.toast('Profile not found', 'error'); return; }
+      var res = await Portal.supabase.from('investor_saved_proformas').insert([{user_id:pu.data.id, name, inputs: JSON.stringify(inputs), outputs: JSON.stringify(outputs)}]);
+      if (res.error) { Portal.toast('Error saving: '+res.error.message,'error'); return; }
+      Portal.toast('Saved: '+name, 'success');
+      loadSavedPf();
     }
 
-    document.getElementById('proformaInputs').innerHTML =
-      '<div class="pro-forma-section">' +
-        '<div class="pro-forma-section-title">Acquisition</div>' +
-        inp('pf_purchase', 'Purchase Price', '0') +
-        inp('pf_rehab', 'Rehab Budget', '0') +
-        inp('pf_closing', 'Closing Costs', '0') +
-        inp('pf_arv', 'After Repair Value (ARV)', '0') +
-      '</div>' +
-      '<div class="pro-forma-section">' +
-        '<div class="pro-forma-section-title">Financing</div>' +
-        inp('pf_down_pct', 'Down Payment %', '20') +
-        inp('pf_rate', 'Interest Rate %', '7.5') +
-        inp('pf_term', 'Loan Term (years)', '30') +
-      '</div>' +
-      '<div class="pro-forma-section">' +
-        '<div class="pro-forma-section-title">Income &amp; Expenses</div>' +
-        inp('pf_rent', 'Monthly Gross Rent', '0') +
-        inp('pf_vacancy', 'Vacancy Rate %', '5') +
-        inp('pf_opex', 'Monthly Operating Expenses', '0') +
-        inp('pf_hold', 'Holding Period (years)', '5') +
-      '</div>';
-
-    document.getElementById('proformaOutputs').innerHTML =
-      '<div class="pro-forma-section">' +
-        '<div class="pro-forma-section-title">Calculated Results</div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Total Investment</span><span class="pro-forma-value" id="r_totalInv">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Loan Amount</span><span class="pro-forma-value" id="r_loan">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Monthly Mortgage</span><span class="pro-forma-value" id="r_mortgage">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Effective Monthly Rent</span><span class="pro-forma-value" id="r_effRent">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Monthly Cash Flow</span><span class="pro-forma-value" id="r_mcf">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Annual Cash Flow</span><span class="pro-forma-value" id="r_acf">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Cap Rate</span><span class="pro-forma-value" id="r_cap">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Cash-on-Cash Return</span><span class="pro-forma-value" id="r_coc">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Day 1 Equity</span><span class="pro-forma-value" id="r_equity">&mdash;</span></div>' +
-      '</div>' +
-      '<div class="pro-forma-section">' +
-        '<div class="pro-forma-section-title" id="exitSectionTitle">Returns at Exit</div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Total Cash Flow</span><span class="pro-forma-value" id="r_totalCF">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Total Return</span><span class="pro-forma-value" id="r_totalReturn">&mdash;</span></div>' +
-        '<div class="pro-forma-row"><span class="pro-forma-label">Annualized ROI</span><span class="pro-forma-value" id="r_roi">&mdash;</span></div>' +
-      '</div>';
-  }
-
-  function calcProForma() {
-    function v(id) { return parseFloat(document.getElementById(id) && document.getElementById(id).value) || 0; }
-
-    var purchase = v('pf_purchase');
-    var rehab = v('pf_rehab');
-    var closing = v('pf_closing');
-    var arv = v('pf_arv');
-    var downPct = v('pf_down_pct') / 100;
-    var rate = v('pf_rate') / 100 / 12;
-    var term = v('pf_term') * 12;
-    var rent = v('pf_rent');
-    var vacancyPct = v('pf_vacancy') / 100;
-    var opex = v('pf_opex');
-    var hold = v('pf_hold');
-
-    var totalInv = purchase + rehab + closing;
-    var downAmt = purchase * downPct;
-    var loan = purchase - downAmt;
-
-    var mortgage = 0;
-    if (rate > 0 && term > 0 && loan > 0) {
-      mortgage = loan * (rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+    async function loadSavedPf() {
+      var session = await Portal.getSession();
+      if (!session) return;
+      var pu = await Portal.supabase.from('portal_users').select('id').eq('user_id',session.user.id).maybeSingle();
+      if (!pu.data) return;
+      var res = await Portal.supabase.from('investor_saved_proformas').select('id,name,created_at,outputs').eq('user_id',pu.data.id).order('created_at',{ascending:false}).limit(10);
+      var list = document.getElementById('savedPfList');
+      if (!res.data || !res.data.length) { list.innerHTML = '<div style="font-size:13px;color:var(--text-muted);">No saved analyses yet.</div>'; return; }
+      list.innerHTML = '<div style="display:flex;flex-direction:column;gap:8px;">' + res.data.map(function(pf) {
+        var out = {}; try { out = JSON.parse(pf.outputs||'{}'); } catch(e){}
+        return '<div style="background:var(--surface-2);border-radius:10px;border:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">'
+          + '<div><div style="font-size:13px;font-weight:700;color:var(--text);">'+pf.name+'</div>'
+          + '<div style="font-size:11px;color:var(--text-muted);">'+new Date(pf.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</div></div>'
+          + '<div style="display:flex;gap:14px;">'
+          + (out.pfCapRate?'<div style="text-align:center;"><div style="font-size:14px;font-weight:800;color:#4fc3f7;">'+out.pfCapRate+'</div><div style="font-size:10px;color:var(--text-muted);">Cap Rate</div></div>':'')
+          + (out.pfCoc?'<div style="text-align:center;"><div style="font-size:14px;font-weight:800;color:#4fc3f7;">'+out.pfCoc+'</div><div style="font-size:10px;color:var(--text-muted);">CoC</div></div>':'')
+          + '</div>'
+          + '<button onclick="deletePf(\''+pf.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:16px;padding:4px;">&#128465;</button>'
+          + '</div>';
+      }).join('') + '</div>';
     }
 
-    var effRent = rent * (1 - vacancyPct);
-    var monthlyCF = effRent - opex - mortgage;
-    var annualCF = monthlyCF * 12;
-
-    var noi = (effRent - opex) * 12;
-    var capRate = purchase > 0 ? (noi / purchase * 100) : 0;
-
-    var cashInvested = downAmt + rehab + closing;
-    var coc = cashInvested > 0 ? (annualCF / cashInvested * 100) : 0;
-    var equity = arv - purchase;
-
-    var totalCF = annualCF * hold;
-    var totalReturn = totalCF + equity;
-    var annRoi = cashInvested > 0 ? ((totalReturn / cashInvested) / hold * 100) : 0;
-
-    function fmt(n) { return Portal.fc(n); }
-    function pct(n) { return isFinite(n) ? n.toFixed(1) + '%' : '\u2014'; }
-    function cfClass(n) { return n >= 0 ? 'positive' : 'negative'; }
-
-    var exitTitle = document.getElementById('exitSectionTitle');
-    if (exitTitle) {
-      exitTitle.textContent = 'Returns at Exit (' + (hold || 5) + ' yr' + (hold !== 1 ? 's' : '') + ')';
+    async function deletePf(id) {
+      if (!confirm('Delete this analysis?')) return;
+      await Portal.supabase.from('investor_saved_proformas').delete().eq('id',id);
+      loadSavedPf();
     }
 
-    document.getElementById('r_totalInv').textContent = fmt(totalInv);
-    document.getElementById('r_loan').textContent = fmt(loan);
-    document.getElementById('r_mortgage').textContent = fmt(Math.round(mortgage));
-    document.getElementById('r_effRent').textContent = fmt(Math.round(effRent));
-    document.getElementById('r_mcf').innerHTML = '<span class="' + cfClass(monthlyCF) + '">' + fmt(Math.round(monthlyCF)) + '</span>';
-    document.getElementById('r_acf').innerHTML = '<span class="' + cfClass(annualCF) + '">' + fmt(Math.round(annualCF)) + '</span>';
-    document.getElementById('r_cap').textContent = pct(capRate);
-    document.getElementById('r_coc').textContent = pct(coc);
-    document.getElementById('r_equity').innerHTML = '<span class="' + (equity >= 0 ? 'positive' : 'negative') + '">' + fmt(equity) + '</span>';
-    document.getElementById('r_totalCF').innerHTML = '<span class="' + cfClass(totalCF) + '">' + fmt(Math.round(totalCF)) + '</span>';
-    document.getElementById('r_totalReturn').innerHTML = '<span class="' + cfClass(totalReturn) + '">' + fmt(Math.round(totalReturn)) + '</span>';
-    document.getElementById('r_roi').textContent = pct(annRoi);
-  }
-
-  function downloadPDF() {
-    Portal.toast('PDF generation coming in v0.4.2', 'info');
-  }
+    loadSavedPf();
+    calcPf();
   </script>
 </body>
 </html>
