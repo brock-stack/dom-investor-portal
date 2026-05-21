@@ -985,13 +985,13 @@
       // Load listing data
       var result = await Portal.supabase
         .from('portal_listings')
-        .select('id, listing_id, asking_price, status, notes, open_house_date, offer_deadline, property_id, estimated_arv, estimated_repairs, estimated_cap_rate, estimated_rent, published_at, name, properties (*)')
+        .select('id, listing_id, asking_price, status, notes, open_house_date, offer_deadline, property_id, published_at, properties (*)')
         .eq('id', listingId)
         .maybeSingle();
 
       if (result.error) {
         console.error('Supabase error:', result.error);
-        Portal.toast('Error loading listing: ' + result.error.message, 'error');
+        Portal.toast('Sorry, this deal could not be loaded. Please refresh or contact us.', 'error');
         setTimeout(function() { window.location.href = '/marketplace.html'; }, 2500);
         return;
       }
@@ -1073,7 +1073,7 @@
       var metaEl = document.getElementById('dealMeta');
 
       if (titleEl) {
-        titleEl.textContent = listing.name || (property.property_type ? slugLabel(property.property_type) + ' in ' + (property.city || '') : 'Investment Property');
+        titleEl.textContent = (property.property_type ? slugLabel(property.property_type) + ' in ' + (property.city || '') : 'Investment Property');
       }
 
       var mainDesc = listing.notes || property.description || 'Off-market investment opportunity sourced and verified by the Direct Off Market team.';
@@ -1092,11 +1092,11 @@
       // Section 2: Financial Snapshot
       var financialEl = document.getElementById('financialGrid');
       if (financialEl) {
-        var arv = listing.estimated_arv;
+        var arv = property.estimated_arv;
         var price = listing.asking_price;
         var equity = (arv && price) ? arv - price : null;
-        var capRate = listing.estimated_cap_rate || null;
-        var monthlyRent = listing.estimated_rent || property.estimated_rent || null;
+        var capRate = property.estimated_cap_rate || null;
+        var monthlyRent = property.estimated_rent || null;
 
         financialEl.innerHTML =
           '<div class="financial-row"><span class="financial-label">Asking Price</span><span class="financial-value accent">' + (Portal.fc(price) || '&mdash;') + '</span></div>' +
@@ -1218,9 +1218,9 @@
     function renderProForma() {
       proFormaDefaults = {
         purchase: listing.asking_price || 0,
-        rehab: listing.estimated_repairs || 0,
+        rehab: property.estimated_repairs_flip || property.estimated_repairs_wholesale || 0,
         closing: Math.round((listing.asking_price || 0) * 0.03),
-        arv: listing.estimated_arv || 0,
+        arv: property.estimated_arv || 0,
         down_pct: 20,
         rate: 7.5,
         term: 30,
