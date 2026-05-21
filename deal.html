@@ -156,61 +156,25 @@
       border-color: #38b6f0;
     }
 
-    /* ---- Gallery split layout ---- */
+    /* ---- Hero gallery: single full-width photo ---- */
     .deal-gallery {
-      display: grid;
-      grid-template-columns: 60% 40%;
-      gap: 4px;
-      height: 360px;
+      width: 100%;
+      height: 440px;
       overflow: hidden;
       background: var(--surface-2);
-    }
-    .gallery-main-photo {
-      position: relative;
-      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       cursor: pointer;
-      background: var(--surface-2);
+      position: relative;
     }
-    .gallery-main-photo img {
+    .deal-gallery img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.2s;
+      display: block;
     }
-    .gallery-main-photo:hover img { transform: scale(1.02); }
-    .gallery-side-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 4px;
-      height: 100%;
-    }
-    .gallery-thumb {
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      background: var(--surface-2);
-      width: 100%;
-      height: 100%;
-    }
-    .gallery-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.2s;
-    }
-    .gallery-thumb:hover img { transform: scale(1.04); }
-    .gallery-more-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 18px;
-      font-weight: 800;
-    }
+    .deal-gallery:hover img { transform: scale(1.01); }
 
     /* Gallery modal */
     .gallery-modal {
@@ -585,8 +549,7 @@
       .deal-body { padding: 16px; }
     }
     @media (max-width: 768px) {
-      .deal-gallery { grid-template-columns: 1fr; }
-      .gallery-side-grid { display: none; }
+      .deal-gallery { height: 280px; }
       .deal-header-row { flex-wrap: wrap; }
     }
   </style>
@@ -622,9 +585,8 @@
   </div>
 
   <!-- Photo gallery: split 60/40 layout -->
-  <div class="deal-gallery" id="dealGallery" style="display:none;">
-    <div class="gallery-main-photo" id="galleryMainPhoto" onclick="openGalleryModal(0)"></div>
-    <div class="gallery-side-grid" id="gallerySideGrid"></div>
+  <div class="deal-gallery" id="dealGallery" style="display:none;" onclick="openGalleryModal(0)">
+    <img id="galleryHeroImg2" src="" alt="Property photo">
   </div>
 
   <!-- Fullscreen gallery modal -->
@@ -847,47 +809,10 @@
       galleryPhotos = photos;
       galleryIdx = 0;
 
-      // Single-photo case: main photo fills full gallery, side grid hidden.
-      var galleryRoot = document.getElementById('dealGallery');
-      if (galleryRoot) {
-        if (photos.length === 1) {
-          galleryRoot.style.gridTemplateColumns = '1fr';
-          var sideEl0 = document.getElementById('gallerySideGrid');
-          if (sideEl0) sideEl0.style.display = 'none';
-        } else {
-          galleryRoot.style.gridTemplateColumns = ''; // revert to CSS default (60% 40%)
-          var sideEl1 = document.getElementById('gallerySideGrid');
-          if (sideEl1) sideEl1.style.display = '';
-        }
-      }
-
-      // Main photo
-      var mainEl = document.getElementById('galleryMainPhoto');
-      if (mainEl) {
-        mainEl.innerHTML = '<img src="' + photos[0].url + '" alt="Property photo" loading="eager">';
-        mainEl.onclick = function() { openGalleryModal(0); };
-      }
-
-      // Side grid: photos[1..4], last cell gets "+N more" overlay
-      var sideEl = document.getElementById('gallerySideGrid');
-      if (sideEl) {
-        var extra = Math.max(0, photos.length - 5);
-        var cells = [];
-        for (var i = 1; i <= 4; i++) {
-          if (photos[i]) {
-            var isLast = (i === 4 && extra > 0);
-            var idx = i;
-            cells.push(
-              '<div class="gallery-thumb" onclick="openGalleryModal(' + idx + ')">' +
-              '<img src="' + photos[i].url + '" alt="Photo ' + (i + 1) + '" loading="lazy">' +
-              (isLast ? '<div class="gallery-more-overlay">+' + extra + ' more</div>' : '') +
-              '</div>'
-            );
-          } else {
-            cells.push('<div class="gallery-thumb" style="cursor:default;"></div>');
-          }
-        }
-        sideEl.innerHTML = cells.join('');
+      var heroImg = document.getElementById('galleryHeroImg2');
+      if (heroImg) {
+        heroImg.src = photos[0].url;
+        heroImg.alt = 'Property photo';
       }
 
       var el = document.getElementById('dealGallery');
