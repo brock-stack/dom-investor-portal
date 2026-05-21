@@ -16,62 +16,157 @@
   </script>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
+  <style>
+    @media (max-width: 768px) {
+      /* Push hero below sticky nav on mobile */
+      html, body { min-height: unset !important; height: auto !important; overflow-x: hidden; }
+      body { padding-top: 64px !important; }
+      /* Hero headline — slightly larger, single line kept with nowrap already */
+      .hero h1 { font-size: clamp(22px, 6vw, 32px) !important; }
+      /* Buttons — equal width, full stretch, not stacked awkwardly */
+      .hero-buttons { display: flex; flex-direction: column; align-items: stretch; gap: 12px; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto; }
+      .hero-buttons a { width: 100% !important; justify-content: center !important; box-sizing: border-box; text-align: center; }
+      /* Hide trust badges on mobile — saves space */
+      .hero-buttons + div { display: none !important; }
+      /* Move sub-headline below buttons on mobile */
+      .hero-content { display: flex; flex-direction: column; }
+      .hero-sub { order: 3; color: rgba(255,255,255,0.6) !important; font-size: 13px !important; margin-top: 12px !important; margin-bottom: 0 !important; }
+      .hero-buttons { order: 2; }
+      .hero h1 { order: 1; }
+      .intro-top-cols { flex-direction: column !important; }
+      .intro-top-cols .intro-video-col { flex: 0 0 auto !important; width: 100% !important; }
+      .intro-top-cols .intro-text-col { flex: 1 1 auto !important; width: 100% !important; }
+    }
+  </style>
+  <style>
+    /* ============================================
+       MOBILE STYLES — additions only, no desktop changes
+       ============================================ */
+
+    /* 1. GLOBAL: Reduce section padding on mobile */
+    @media (max-width: 768px) {
+      section { padding-top: 40px !important; padding-bottom: 40px !important; }
+      .featured-strip, .testimonials-section, .closings-section, .faq-section, .investor-cta-strip { padding-top: 40px !important; padding-bottom: 40px !important; }
+    }
+
+    /* 2. Intro/video section top padding on mobile */
+    @media (max-width: 768px) {
+      #introSection { padding-top: 32px !important; }
+      #introSection > div { padding-top: 32px !important; }
+    }
+
+    /* 5. List Price color in light mode */
+    [data-theme="light"] .mini-card { --accent: #0284c7; }
+    [data-theme="light"] .mini-card .mini-price { color: #0284c7; }
+
+    /* 6. DOM Difference cards — tighten gap on mobile */
+    @media (max-width: 768px) {
+      .benefit-grid { gap: 10px !important; }
+    }
+
+    /* 7. Testimonials — quote marks and section spacing */
+    @media (max-width: 768px) {
+      .testimonial-quote::before { font-size: 24px !important; opacity: 0.3 !important; }
+      .testimonials-section { padding-top: 32px !important; }
+    }
+
+    /* 11. FAQ — Normalize question color (remove any teal/blue overrides) */
+    .faq-q { color: var(--text) !important; }
+
+    /* 12. FAQ — Light mode visual break */
+    [data-theme="light"] .faq-section { background: #f8fafc; }
+    @media (max-width: 768px) {
+      [data-theme="light"] .faq-section { background: #f8fafc !important; border-top: 1px solid #e2e8f0 !important; }
+    }
+
+    /* 13. Social icons — larger on mobile */
+    @media (max-width: 768px) {
+      .footer-social-link svg { width: 28px !important; height: 28px !important; }
+      .footer-social-link { gap: 12px !important; }
+      .site-footer .nav-right, [class*="social"] { gap: 12px !important; }
+    }
+
+    /* 14. Section eyebrow — darker cyan in light mode */
+    [data-theme="light"] .section-eyebrow { color: #0891b2 !important; }
+  </style>
 </head>
 <body>
 
   <!-- Navigation -->
-  <nav id="investorNav" class="investor-nav">
-    <a href="/homepage.html" class="nav-brand">
-      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:44px;width:auto;max-width:160px;object-fit:contain;">
+    <nav id="investorNav" class="investor-nav">
+    <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
+    </button>
+    <a class='nav-brand' href='/homepage'>
+      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:28px;width:auto;max-width:130px;object-fit:contain;vertical-align:middle;">
     </a>
-    <div class="nav-right" id="navRight">
-      <a href="/login.html" class="btn-secondary btn-sm">Sign In</a>
-      <a href="/signup.html" class="btn-primary btn-sm">Get Access</a>
-      <button class="theme-toggle" onclick="Portal.toggleTheme()"></button>
+    <div class="nav-right" id="navRight" style="margin-left:auto;min-width:44px;">
     </div>
   </nav>
 
   <!-- Hero Section -->
   <section class="hero" style="background: url('/img/hero-bg.jpg') center center / cover no-repeat;">
     <div class="hero-content">
-      <div class="hero-eyebrow">OFF-MARKET DEALS &mdash; FLORIDA</div>
-      <h1><span style="white-space:nowrap">Off-Market Investment Deals.</span><br><span style="color:#4fc3f7">Curated. Verified. Ready.</span></h1>
+
+      <h1><span style="white-space:nowrap">Off-Market Investment Deals.</span><br><span style="color:#4fc3f7">Serious Deals for Serious Investors.</span></h1>
       <p class="hero-sub">We're investors ourselves. We know what a good deal actually is.</p>
       <div class="hero-buttons">
-        <a href="/marketplace.html" class="btn-white" style="font-size:14px;padding:10px 22px;">Browse Inventory</a>
-        <a href="/signup.html" class="btn-primary">Get Investor Access &rarr;</a>
-      </div>
-      <p class="hero-fine">Instant access &middot; Sign terms &middot; Start investing</p>
-      <!-- Trust Badges -->
-      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:28px;">
-        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.92);backdrop-filter:blur(8px);">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          500+ Active Investors
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.92);backdrop-filter:blur(8px);">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Off-Market Only
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:100px;padding:8px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.92);backdrop-filter:blur(8px);">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Verified &amp; Underwritten
-        </div>
+        <a class='btn-white' href='/marketplace' style='font-size:16px;font-weight:700;padding:14px 28px;display:inline-flex;align-items:center;'>Browse Inventory</a>
+        <a class='btn-primary' href='/signup' style='font-size:16px;font-weight:700;padding:14px 28px;display:inline-flex;align-items:center;'>Get Investor Access &rarr;</a>
       </div>
     </div>
   </section>
 
-  <!-- Featured Deals -->
-  <section class="featured-strip" id="featuredSection" style="padding-top: 120px;">
-    <div style="max-width:1100px;margin:0 auto;">
-      <h2 class="section-title" style="margin-bottom:8px;">Featured Deals</h2>
-      <p class="section-sub">Hand-picked opportunities from our current inventory.</p>
-      <div class="featured-grid" id="featuredGrid">
-        <div class="loading-state">
-          <div class="spinner" style="margin-bottom:16px;"></div>
-          <p>Loading deals...</p>
+  <!-- Video + Featured Deals (combined) -->
+  <section id="introSection" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+    <div style="max-width:1100px;margin:0 auto;padding:72px 24px;">
+
+      <!-- TOP HALF: Two columns -->
+      <div class="intro-top-cols" style="display:flex;flex-direction:row;gap:48px;align-items:center;">
+
+        <!-- Left: Video placeholder -->
+        <div class="intro-video-col" style="flex:0 0 40%;">
+          <div data-youtube-url="" style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10);">
+            <div style="position:absolute;inset:0;background:#1a2744;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:48px;opacity:0.5;margin-bottom:24px;">
+              <div style="width:64px;height:64px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0.9;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="#0f172a"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:14px;font-weight:500;">Watch: Why Investors Choose DOM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Text content -->
+        <div class="intro-text-col" style="flex:1;">
+          <div style="font-size:11px;font-weight:700;color:#3b82f6;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">FROM THE FOUNDER</div>
+          <h2 style="font-size:clamp(24px,3vw,36px);font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:16px;">Real deals. Real investor. No BS.</h2>
+          <p style="font-size:15px;color:#475569;line-height:1.7;margin-bottom:16px;">I'm Brock Holliman — licensed Florida broker, builder of 600+ homes, and full-time real estate investor. Every property on this portal is a deal I'd put my own money into. This isn't a listing aggregator. This is a curated investment marketplace built by someone who actually does the work.</p>
+          <p style="font-size:15px;color:#475569;line-height:1.7;">I personally own and manage over 100 rental properties through my own property management company. When I say I know what makes a good investment, it's because I'm living it every day — not just selling it.</p>
+        </div>
+
+      </div>
+
+      <!-- Divider -->
+      <hr style="margin:48px 0 40px;border:none;border-top:1px solid #e2e8f0;">
+
+      <!-- BOTTOM HALF: Featured Deals -->
+      <div>
+
+        <h2 style="font-size:20px;font-weight:700;color:#0f172a;margin-bottom:4px;">Featured Deals</h2>
+        <p style="font-size:14px;color:#64748b;margin-bottom:24px;">Hand-picked opportunities from our current inventory.</p>
+        <div class="featured-grid" id="featuredGrid">
+          <div class="loading-state">
+            <img src="/img/dom-icon.gif" style="width:64px;height:64px;object-fit:contain;margin-bottom:8px;">
+            <p>Loading deals...</p>
+          </div>
         </div>
       </div>
+
     </div>
+        <div style="text-align:center;margin-top:32px;">
+          <a href='/signup' style='background:#4fc3f7;color:#0f172a;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none;display:inline-block;font-size:15px;'>Get Investor Access &rarr;</a>
+        </div>
   </section>
 
   <!-- How It Works -->
@@ -98,7 +193,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </div>
           <h3>Browse &amp; Analyze Deals</h3>
-          <p>View our vetted off-market inventory. Run your own pro forma with live underwriting data. See flood zones, comps, and photos.</p>
+          <p>Run your own pro forma with live underwriting data. Full comps, flood zones, photos, and neighborhood intel.</p>
         </div>
 
         <div class="step-card" style="cursor:pointer;position:relative;z-index:1;" onclick="location.href='/signup.html'">
@@ -107,11 +202,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </div>
           <h3>Submit Your Offer</h3>
-          <p>Submit offers directly through the portal. Track status updates in real time. Bring your agent — we make it easy.</p>
+          <p>Submit offers directly through the portal. Track status in real time. Close faster.</p>
         </div>
       </div>
       <div style="text-align:center;margin-top:40px;">
-        <a href="/signup.html" class="btn-primary" style="padding:14px 36px;font-size:16px;">Create Your Free Account &rarr;</a>
+        <a class='btn-primary' href='/signup' style='padding:14px 36px;font-size:16px;'>Create Your Free Account &rarr;</a>
       </div>
     </div>
   </section>
@@ -176,201 +271,32 @@
     </div>
   </section>
 
-  <!-- Testimonials -->
-  <section style="padding:80px 24px;">
-    <div class="section-container">
-      <div class="section-eyebrow">INVESTOR REVIEWS</div>
-      <h2 class="section-heading">What Our Investors Say</h2>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:40px;">
-
-        <div style="background:var(--surface);border:1px solid var(--border-color);border-radius:12px;padding:28px 24px;">
-          <div style="color:#f97316;font-size:36px;line-height:1;margin-bottom:12px;font-family:Georgia,serif;">&ldquo;</div>
-          <p style="font-size:15px;line-height:1.65;color:var(--text-secondary);margin:0 0 24px;">Found my first deal through DOM and closed in 23 days. The pro forma calculator alone saved me hours of spreadsheet work. These deals are actually underwritten — it's a different category from wholesaler email lists.</p>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:44px;height:44px;border-radius:50%;background:#f97316;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:white;flex-shrink:0;">JM</div>
-            <div>
-              <div style="font-weight:600;font-size:14px;color:var(--text-primary);">Jason M.</div>
-              <div style="font-size:12px;color:var(--text-muted);">Fix &amp; Flip Investor &mdash; Tampa, FL</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:var(--surface);border:1px solid var(--border-color);border-radius:12px;padding:28px 24px;">
-          <div style="color:#f97316;font-size:36px;line-height:1;margin-bottom:12px;font-family:Georgia,serif;">&ldquo;</div>
-          <p style="font-size:15px;line-height:1.65;color:var(--text-secondary);margin:0 0 24px;">I've been building my rental portfolio for 6 years and this is the cleanest deal flow I've seen outside of a direct wholesaler relationship. The flood zone maps are genuinely useful — I almost passed on a deal before seeing the data.</p>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:44px;height:44px;border-radius:50%;background:#f97316;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:white;flex-shrink:0;">SR</div>
-            <div>
-              <div style="font-weight:600;font-size:14px;color:var(--text-primary);">Sandra R.</div>
-              <div style="font-size:12px;color:var(--text-muted);">Buy &amp; Hold Investor &mdash; Orlando, FL</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:var(--surface);border:1px solid var(--border-color);border-radius:12px;padding:28px 24px;">
-          <div style="color:#f97316;font-size:36px;line-height:1;margin-bottom:12px;font-family:Georgia,serif;">&ldquo;</div>
-          <p style="font-size:15px;line-height:1.65;color:var(--text-secondary);margin:0 0 24px;">Signed up skeptical. Signed a contract two weeks later. The lender network they connected us to moved faster than any hard money lender I've worked with. Already looking at my second deal on the platform.</p>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:44px;height:44px;border-radius:50%;background:#f97316;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:white;flex-shrink:0;">DT</div>
-            <div>
-              <div style="font-weight:600;font-size:14px;color:var(--text-primary);">David T.</div>
-              <div style="font-size:12px;color:var(--text-muted);">BRRRR Investor &mdash; Sarasota, FL</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Recent Closings -->
-  <section style="padding:80px 24px;background:var(--bg-secondary);">
-    <div class="section-container">
-      <div class="section-eyebrow">TRACK RECORD</div>
-      <h2 class="section-heading">Recent Closings</h2>
-      <p class="section-sub" style="max-width:580px;margin:0 auto 40px;">Properties that moved from listed to closed. Proof the deals get done.</p>
-      <div id="closingsGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;">
-        <div class="loading-state"><div class="spinner" style="margin-bottom:16px;"></div><p>Loading closings...</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section style="padding:80px 24px;">
-    <div class="section-container" style="max-width:760px;">
-      <div class="section-eyebrow">FAQ</div>
-      <h2 class="section-heading">Frequently Asked Questions</h2>
-      <div style="margin-top:40px;">
-
-        <div class="faq-item" style="border-bottom:1px solid var(--border-color);">
-          <button onclick="domToggleFaq(this)" style="width:100%;text-align:left;background:none;border:none;padding:20px 4px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);gap:16px;">
-            Are these properties listed on the MLS?
-            <span class="faq-arrow" style="font-size:22px;line-height:1;color:#4fc3f7;flex-shrink:0;transition:transform .2s;">+</span>
-          </button>
-          <div class="faq-answer" style="display:none;padding:0 4px 20px;font-size:15px;line-height:1.65;color:var(--text-secondary);">
-            No. Every property on this platform is off-market — not listed on the MLS, Zillow, Realtor.com, or any public site. These are direct-from-seller deals sourced by our acquisitions team.
-          </div>
-        </div>
-
-        <div class="faq-item" style="border-bottom:1px solid var(--border-color);">
-          <button onclick="domToggleFaq(this)" style="width:100%;text-align:left;background:none;border:none;padding:20px 4px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);gap:16px;">
-            How much does it cost to access deals?
-            <span class="faq-arrow" style="font-size:22px;line-height:1;color:#4fc3f7;flex-shrink:0;transition:transform .2s;">+</span>
-          </button>
-          <div class="faq-answer" style="display:none;padding:0 4px 20px;font-size:15px;line-height:1.65;color:var(--text-secondary);">
-            Access to the investor portal is completely free. No subscription fees, no monthly charges, no cost to browse. We earn an assignment fee when a deal closes — that's it.
-          </div>
-        </div>
-
-        <div class="faq-item" style="border-bottom:1px solid var(--border-color);">
-          <button onclick="domToggleFaq(this)" style="width:100%;text-align:left;background:none;border:none;padding:20px 4px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);gap:16px;">
-            Can I tour properties before making an offer?
-            <span class="faq-arrow" style="font-size:22px;line-height:1;color:#4fc3f7;flex-shrink:0;transition:transform .2s;">+</span>
-          </button>
-          <div class="faq-answer" style="display:none;padding:0 4px 20px;font-size:15px;line-height:1.65;color:var(--text-secondary);">
-            Yes. Many listings have open house or showing windows scheduled. You can also request a private showing through the portal. We coordinate access directly with the seller.
-          </div>
-        </div>
-
-        <div class="faq-item" style="border-bottom:1px solid var(--border-color);">
-          <button onclick="domToggleFaq(this)" style="width:100%;text-align:left;background:none;border:none;padding:20px 4px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);gap:16px;">
-            How do I submit an offer?
-            <span class="faq-arrow" style="font-size:22px;line-height:1;color:#4fc3f7;flex-shrink:0;transition:transform .2s;">+</span>
-          </button>
-          <div class="faq-answer" style="display:none;padding:0 4px 20px;font-size:15px;line-height:1.65;color:var(--text-secondary);">
-            Once you create an account and sign the investor agreement, submit offers directly from the deal page. Fill in your purchase price and terms and our team responds within 24 hours.
-          </div>
-        </div>
-
-        <div class="faq-item" style="border-bottom:1px solid var(--border-color);">
-          <button onclick="domToggleFaq(this)" style="width:100%;text-align:left;background:none;border:none;padding:20px 4px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);gap:16px;">
-            Can I use financing or hard money?
-            <span class="faq-arrow" style="font-size:22px;line-height:1;color:#4fc3f7;flex-shrink:0;transition:transform .2s;">+</span>
-          </button>
-          <div class="faq-answer" style="display:none;padding:0 4px 20px;font-size:15px;line-height:1.65;color:var(--text-secondary);">
-            Yes. Most buyers use hard money, DSCR loans, or private financing. We have a preferred lender network in the portal with lenders who know how to close these transactions quickly.
-          </div>
-        </div>
-
-        <div class="faq-item" style="border-bottom:1px solid var(--border-color);">
-          <button onclick="domToggleFaq(this)" style="width:100%;text-align:left;background:none;border:none;padding:20px 4px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);gap:16px;">
-            Are deals only in Florida?
-            <span class="faq-arrow" style="font-size:22px;line-height:1;color:#4fc3f7;flex-shrink:0;transition:transform .2s;">+</span>
-          </button>
-          <div class="faq-answer" style="display:none;padding:0 4px 20px;font-size:15px;line-height:1.65;color:var(--text-secondary);">
-            Currently yes. Direct Off Market operates exclusively in Florida, with concentrations in Central Florida (Orlando metro, Polk County, Osceola), Southwest Florida (Charlotte, Lee, Sarasota), and the Tampa Bay area.
-          </div>
-        </div>
-
-        <div class="faq-item" style="border-bottom:1px solid var(--border-color);">
-          <button onclick="domToggleFaq(this)" style="width:100%;text-align:left;background:none;border:none;padding:20px 4px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:16px;font-weight:600;color:var(--text-primary);gap:16px;">
-            What does "off-market" actually mean?
-            <span class="faq-arrow" style="font-size:22px;line-height:1;color:#4fc3f7;flex-shrink:0;transition:transform .2s;">+</span>
-          </button>
-          <div class="faq-answer" style="display:none;padding:0 4px 20px;font-size:15px;line-height:1.65;color:var(--text-secondary);">
-            Off-market means the seller agreed to sell directly — without listing publicly or using a listing agent. These deals are typically priced below retail because the seller values speed and certainty over maximum price. The spread between purchase price and ARV is where your profit lives.
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <section class="testimonials-section">
-  <div class="section-container">
-    <div class="section-eyebrow">INVESTOR STORIES</div>
-    <h2 class="section-heading">What Our Investors Say</h2>
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="testimonial-quote">"I was skeptical at first, but the underwriting data and pro forma tools made it easy to run my own numbers. Closed on a Cape Coral SFR in under 30 days."</div>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">MR</div>
-          <div><div class="testimonial-name">Michael R.</div><div class="testimonial-detail">Buy & Hold Investor · Cape Coral, FL</div></div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-quote">"The flood zone maps alone saved me from a bad deal. I could see FEMA data right on the listing before I even submitted an offer. That is not something you get anywhere else."</div>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">JL</div>
-          <div><div class="testimonial-name">Jennifer L.</div><div class="testimonial-detail">Fix & Flip Investor · Tampa, FL</div></div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-quote">"DOM actually underwrites their deals. I have not seen numbers fabricated to look good — everything checks out."</div>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">DK</div>
-          <div><div class="testimonial-name">David K.</div><div class="testimonial-detail">Portfolio Investor · Orlando, FL</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <section class="closings-section">
   <div class="section-container">
     <div class="section-eyebrow">TRACK RECORD</div>
     <h2 class="section-heading">Recently Closed Deals</h2>
-    <p class="section-sub">Proof that our inventory actually closes.</p>
+
     <div class="closings-grid" id="recentClosings">
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:28px;opacity:0.15;"></div><div class="closing-content"><div class="closing-location">Cape Coral, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$285,000</div><div class="closing-days">Closed in 18 days</div></div></div>
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:28px;opacity:0.15;"></div><div class="closing-content"><div class="closing-location">North Port, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$219,000</div><div class="closing-days">Closed in 24 days</div></div></div>
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:28px;opacity:0.15;"></div><div class="closing-content"><div class="closing-location">Kissimmee, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$310,000</div><div class="closing-days">Closed in 14 days</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Cape Coral, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$285,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">North Port, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$219,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Kissimmee, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$310,000</div></div></div>
     </div>
   </div>
 </section>
 
 <section class="faq-section">
   <div class="section-container">
-    <div class="section-eyebrow">INVESTOR FAQ</div>
+
     <h2 class="section-heading">Common Questions</h2>
     <p class="section-sub">Everything you need to know before you dive in.</p>
     <div class="faq-list">
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are these deals on the MLS? <span class="faq-icon">+</span></button><div class="faq-a">No. Every deal is sourced off-market directly from sellers before hitting the MLS. You get access before the general public.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What are the fees? <span class="faq-icon">+</span></button><div class="faq-a">A $1,495 marketplace service fee and a $450 document preparation fee apply to all closed transactions. No monthly subscription fees.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I see the property before I buy? <span class="faq-icon">+</span></button><div class="faq-a">Yes. Most deals include a scheduled open house date. Virtual walkthroughs can also be arranged for out-of-state investors.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I make an offer? <span class="faq-icon">+</span></button><div class="faq-a">Create a free account, browse the marketplace, open any listing, and click Make an Offer. Our team follows up within 24 hours.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do you offer financing? <span class="faq-icon">+</span></button><div class="faq-a">We do not lend directly, but our Lender Marketplace has vetted investor-friendly lenders -- hard money, DSCR, bridge, and conventional options.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are the deals in Florida only? <span class="faq-icon">+</span></button><div class="faq-a">Yes, currently all deals are sourced across Florida. Active coverage in Cape Coral, North Port, Sarasota, Tampa, Orlando, Kissimmee, and Miami.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are these properties listed on the MLS? <span class="faq-icon">+</span></button><div class="faq-a">Some are, some aren't. Either way, when you work with us directly on our platform, you get first access — our deals move fast and we prioritize offers from our own members. Being in our network means you're not competing against the general public.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How much does it cost to access deals? <span class="faq-icon">+</span></button><div class="faq-a">A $1,495 marketplace service fee and a $450 document preparation fee apply to all closed transactions. No monthly subscription fees — access to the full deal feed is completely free.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I tour a property before making an offer? <span class="faq-icon">+</span></button><div class="faq-a">Most of our listings are not open for individual scheduled showings. Instead, we hold a one-day open house for each property where all interested buyers can walk through and submit their highest and best offer within 24 hours. Virtual walkthroughs can also be arranged for out-of-state investors.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I submit an offer? <span class="faq-icon">+</span></button><div class="faq-a">Once you create a free account and sign the investor agreement, you can submit offers directly from any deal page. Fill in your purchase price and terms — our team responds within 24 hours. You're also welcome to work with a buyer's agent, though working direct is the most efficient path since no commission comes out of the deal.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I use financing or hard money? <span class="faq-icon">+</span></button><div class="faq-a">Absolutely. We work with cash buyers, hard money lenders, DSCR loans, bridge financing, and private money. Our Lender Marketplace connects you with vetted investor-friendly lenders who know how to move fast. For qualifying properties, conventional financing, VA loans, and FHA loans may also be an option — just note that deals move quickly, so having your financing lined up in advance matters.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are deals only in Florida? <span class="faq-icon">+</span></button><div class="faq-a">Yes — we focus exclusively on Florida and cover the entire state. We source deals across Tampa Bay, Orlando, Sarasota, Fort Myers, Cape Coral, North Port, Kissimmee, Fort Lauderdale, Miami, Jacksonville, and more. No area of Florida is off limits.</div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What does off-market actually mean? <span class="faq-icon">+</span></button><div class="faq-a">Off-market means the property is not publicly listed on any platform (MLS, Zillow, Redfin). DOM sources deals through direct seller relationships.</div></div>
     </div>
   </div>
@@ -379,71 +305,67 @@
   <!-- Investor CTA Strip -->
   <section class="investor-cta-strip">
     <div class="section-container" style="text-align:center;">
-      <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:white;margin-bottom:12px;">Ready to browse the inventory?</h2>
-      <p style="color:rgba(255,255,255,0.65);font-size:16px;margin-bottom:28px;">Join 500+ investors who have access to Florida's best off-market deals.</p>
+      <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:#0f172a;margin-bottom:12px;">Ready to browse the inventory?</h2>
+      <p style="color:#64748b;font-size:16px;margin-bottom:28px;">Get access to Florida's best off-market investment deals.</p>
       <div id="ctaButtons" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <a href="/signup.html" class="btn-primary" style="padding:14px 36px;font-size:16px;">Get Investor Access &rarr;</a>
-        <a href="/marketplace.html" class="btn-white" style="padding:14px 36px;font-size:16px;">Browse Deals</a>
+        <a href='/signup' onmouseout='this.style.background=\'#4fc3f7\'' onmouseover='this.style.background=\'#38b2e8\'' style='background:#4fc3f7;color:#0f172a;padding:14px 36px;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;display:inline-block;transition:background .2s;'>Get Investor Access &rarr;</a>
+        <a class='cta-btn-outline' href='/marketplace'>Browse Deals</a>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
   <footer class="site-footer">
-    <!-- Newsletter bar -->
-    <div style="background:var(--surface);border-bottom:1px solid var(--border-color);padding:28px 24px;">
-      <div style="max-width:560px;margin:0 auto;text-align:center;">
-        <p style="font-size:15px;font-weight:600;color:var(--text-primary);margin:0 0 14px;">Stay ahead of new listings. Get deal alerts in your inbox.</p>
-        <form onsubmit="domNewsletterSubmit(event)" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <input type="email" id="newsletterEmail" placeholder="your@email.com" required style="padding:10px 16px;border-radius:6px;border:1px solid var(--border-color);background:var(--surface);color:var(--text-primary);font-size:14px;min-width:220px;outline:none;flex:1;max-width:300px;">
-          <button type="submit" class="btn-primary" style="padding:10px 22px;font-size:14px;white-space:nowrap;">Subscribe</button>
-        </form>
-      </div>
-    </div>
+
     <div class="footer-inner">
       <div class="footer-top">
         <div>
           <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:40px;width:auto;max-width:200px;object-fit:contain;opacity:0.9;">
-          <p class="footer-tagline">Off-market investment opportunities in Florida. Curated, verified, and ready to analyze.</p>
+          <p class="footer-tagline">Serious deals for serious investors. Off-market investment opportunities across Florida.</p>
           <div style="display:flex;gap:14px;margin-top:16px;">
-            <a href="https://www.instagram.com/directoffmarket" target="_blank" rel="noopener" aria-label="Instagram" style="color:var(--text-muted);transition:color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color=''">
+            <a href="https://www.instagram.com/directoffmarket" target="_blank" rel="noopener" aria-label="Instagram" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
             </a>
-            <a href="https://www.facebook.com/directoffmarket" target="_blank" rel="noopener" aria-label="Facebook" style="color:var(--text-muted);transition:color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color=''">
+            <a href="https://www.facebook.com/directoffmarket" target="_blank" rel="noopener" aria-label="Facebook" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
             </a>
-            <a href="https://www.youtube.com/@directoffmarket" target="_blank" rel="noopener" aria-label="YouTube" style="color:var(--text-muted);transition:color .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color=''">
+            <a href="https://www.youtube.com/@directoffmarket" target="_blank" rel="noopener" aria-label="YouTube" class="footer-social-link">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.4a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
             </a>
           </div>
         </div>
         <div class="footer-col">
           <h4>Platform</h4>
-          <a href="/marketplace.html">Marketplace</a>
-          <a href="/marketplace.html">Lender Marketplace</a>
-          <a href="/dashboard.html">Investor Tools</a>
+          <a href='/marketplace'>Marketplace</a>
+          <a href='/marketplace'>Lender Marketplace</a>
+          <a href='/dashboard'>Investor Tools</a>
         </div>
         <div class="footer-col">
           <h4>Account</h4>
-          <a href="/signup.html">Get Investor Access</a>
-          <a href="/login.html">Sign In</a>
-          <a href="/dashboard.html">My Dashboard</a>
+          <a href='/signup'>Get Investor Access</a>
+          <a href='/login'>Sign In</a>
+          <a href='/dashboard'>My Dashboard</a>
         </div>
         <div class="footer-col">
           <h4>Company</h4>
           <a href="mailto:deals@directoffmarket.com">Contact Us</a>
-          <a href="/homepage.html">About</a>
+          <a href='/homepage'>About</a>
         </div>
       </div>
       <div class="footer-bottom">
-        <div class="equal-housing">
-          <img src="/img/equal-housing.png" alt="Equal Housing Opportunity" style="height:52px;width:auto;opacity:0.75;">
+        <div style="display:flex;flex-direction:column;gap:8px;max-width:340px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="eh-logo-wrap">
+              <img src="/img/equal-housing.png" alt="Equal Housing Opportunity" style="height:44px;width:44px;display:block;object-fit:contain;">
+            </div>
+            <span class="footer-legal">We are committed to Equal Housing Opportunity. We operate in full compliance with the Fair Housing Act and all applicable equal opportunity laws.</span>
+          </div>
         </div>
         <div>
           <div class="footer-legal">
             Direct Off Market, LLC is not a licensed real estate broker. All properties are sold as-is. Investors should perform their own due diligence. This platform is for informational purposes only and does not constitute financial, legal, or tax advice.
           </div>
-          <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">&copy; <span id="footerYear"></span> Direct Off Market, LLC. All rights reserved. &nbsp;&middot;&nbsp; <a href="/tos.html" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:2px;">Terms of Service</a> &nbsp;&middot;&nbsp; <a href="/privacy.html" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:2px;">Privacy Policy</a></p>
+          <p class="footer-legal" style="margin-top:8px;">&copy; <span id="footerYear"></span> Direct Off Market, LLC. All rights reserved. &nbsp;&middot;&nbsp; <a class='footer-legal' href='/terms' style='text-decoration:underline;text-underline-offset:2px;'>Terms of Service</a> &nbsp;&middot;&nbsp; <a class='footer-legal' href='/privacy' style='text-decoration:underline;text-underline-offset:2px;'>Privacy Policy</a></p>
         </div>
       </div>
     </div>
@@ -455,17 +377,16 @@
   <script>
   // Nav is static HTML -- just update theme button and check if logged in
   Portal.initTheme();
+  Portal.renderNav().catch(function(){});
   Portal.getSession().then(function(session) {
     if (session) {
-      var navRight = document.getElementById('navRight');
-      if (navRight) {
-        navRight.innerHTML = '<a href="/marketplace.html" class="nav-link">Marketplace</a><a href="/dashboard.html" class="nav-link">Dashboard</a><button onclick="Portal.logout()" class="btn-secondary btn-sm">Sign Out</button><button class="theme-toggle" onclick="Portal.toggleTheme()"></button>';
-        Portal.updateThemeBtn();
+      window._portalMenuUser = { name: _navFirstName || session.user.email.split('@')[0], email: session.user.email };
+      Portal.updateThemeBtn();
       }
       // Auth-aware CTA strip
       var ctaButtons = document.getElementById('ctaButtons');
       if (ctaButtons) {
-        ctaButtons.innerHTML = '<a href="/marketplace.html" class="btn-primary" style="padding:14px 36px;font-size:16px;">Browse Deals &rarr;</a><a href="/dashboard.html" class="btn-white" style="padding:14px 36px;font-size:16px;">My Dashboard</a>';
+        ctaButtons.innerHTML = '<a href="/marketplace.html" style="background:#3b82f6;color:#fff;padding:14px 36px;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;display:inline-block;">Browse Deals &rarr;</a><a href="/dashboard.html" class="cta-btn-outline" style="margin-left:12px;">My Dashboard</a>';
       }
     }
   });
@@ -484,7 +405,7 @@
 
   // Load hero preview cards
   async function loadHeroPreview() {
-    // var previewEl = document.getElementById('heroCardsPreview');
+    var previewEl = document.getElementById('heroCardsPreview');
     if (!previewEl) return;
     try {
       var { data, error } = await Portal.supabase
@@ -502,17 +423,18 @@
         try {
           var { data: photos } = await Portal.supabase
             .from('listing_photos')
-            .select('url')
+            .select('storage_path')
             .eq('listing_id', lid)
-            .eq('is_primary', true)
+            .order('sort_order', { ascending: true })
             .limit(1);
           if (photos && photos.length > 0) {
-            photoUrl = photos[0].url;
+            var { data: urlData } = Portal.supabase.storage.from('listing-photos').getPublicUrl(photos[0].storage_path);
+            photoUrl = urlData && urlData.publicUrl;
           }
         } catch(e) {}
         var imgHtml = photoUrl
           ? '<img src="' + photoUrl + '" alt="' + label + '" loading="lazy">'
-          : '<div style="width:100%;height:110px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:32px;">🏠</div>';
+          : '<div style="width:100%;height:110px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:24px;opacity:0.18;"></div>';
         return '<div class="hero-preview-card" onclick="location.href=\'/deal.html?id=' + l.id + '\'">' + imgHtml + '<div class="hero-preview-card-label">' + label + '</div></div>';
       }));
       previewEl.innerHTML = cards.join('');
@@ -528,7 +450,7 @@
     try {
       const { data, error } = await Portal.supabase
         .from('portal_listings')
-        .select('id, listing_id, asking_price, status, notes, property_id, properties(city, state, property_type, bedrooms, bathrooms, estimated_arv)')
+        .select('id, listing_id, asking_price, status, notes, property_id, properties(city, state, property_type, bedrooms, bathrooms, estimated_arv, sqft)')
         .eq('status', 'published')
         .eq('featured', true)
         .limit(3);
@@ -548,8 +470,9 @@
         }
       }
 
-      if (error || !data || data.length === 0) {
-        section.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">🏠</div><p>Check back soon for featured deals.</p></div>';
+      console.log('[loadFeatured] data:', data ? data.length : 'null', 'error:', error ? error.message : 'none');
+      if ((!data || data.length === 0)) {
+        section.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p>Check back soon for featured deals.</p></div>';
         return;
       }
 
@@ -558,24 +481,35 @@
         var loc = [p.city, p.state].filter(Boolean).join(', ') || 'Florida';
         var specs = [
           p.property_type || 'SFR',
-          p.bedrooms ? p.bedrooms + ' Bd' : null,
-          p.bathrooms ? p.bathrooms + ' Ba' : null
-        ].filter(Boolean).join(' · ');
+          p.bedrooms ? p.bedrooms + ' Bd' : 'Pending',
+          p.bathrooms ? p.bathrooms + ' Ba' : 'Pending'
+        ].join(' · ');
         var price = l.asking_price
           ? '$' + Number(l.asking_price).toLocaleString('en-US', { maximumFractionDigits: 0 })
           : 'Price TBD';
-        var arvHtml = (l.properties && l.properties.estimated_arv)
-          ? '<span style="font-size:12px;font-weight:500;color:var(--text-muted);margin-left:8px;">ARV: $' + Number(l.properties.estimated_arv).toLocaleString('en-US', { maximumFractionDigits: 0 }) + '</span>'
-          : '';
+        var arvVal = (l.properties && l.properties.estimated_arv)
+          ? '$' + Number(l.properties.estimated_arv).toLocaleString('en-US', { maximumFractionDigits: 0 })
+          : null;
         var photoHtml = l._photo
           ? '<img src="' + l._photo + '" alt="' + loc + '" style="width:100%;height:100%;object-fit:cover;">'
-          : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:40px;">🏠</div>';
+          : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:28px;opacity:0.18;"></div>';
         return '<div class="mini-card">' +
-          '<div class="mini-photo">' + photoHtml + '</div>' +
+          '<div class="mini-photo" style="position:relative;">' + photoHtml +
+            '<span style="position:absolute;top:10px;left:10px;background:#f97316;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;">⭐ Featured</span>' +
+          '</div>' +
           '<div class="mini-content">' +
             '<div class="mini-location">' + loc + '</div>' +
             '<div class="mini-specs">' + specs + '</div>' +
-            '<div class="mini-price">' + price + arvHtml + '</div>' +
+            '<div class="mini-price" style="display:flex;gap:32px;align-items:flex-start;">' +
+              '<div>' +
+                '<div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">List Price</div>' +
+                '<div style="font-size:17px;font-weight:700;color:var(--accent);">' + price + '</div>' +
+              '</div>' +
+              (arvVal ? '<div>' +
+                '<div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">ARV</div>' +
+                '<div style="font-size:17px;font-weight:700;color:var(--text-muted);">' + arvVal + '</div>' +
+              '</div>' : '') +
+            '</div>' +
             '<a href="/login.html" class="mini-link">View Deal &rarr;</a>' +
           '</div>' +
         '</div>';
@@ -607,9 +541,31 @@
         '</div>' +
       '</div>';
     }
-    // TODO v0.4.x — wire closed-deal data source
-    if (false) { /* disabled: portal_listings has no closed_at column */ }
-    grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
+    try {
+      var { data, error } = await Portal.supabase
+        .from('listings')
+        .select('id, list_price, sold_date, properties(city, state, property_type, bedrooms, bathrooms)')
+        .eq('stage', 'sold')
+        .order('sold_date', { ascending: false })
+        .limit(3);
+      if (error || !data || data.length === 0) {
+        grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
+        return;
+      }
+      grid.innerHTML = data.map(function(l) {
+        var p = l.properties || {};
+        var city = p.city || 'Florida';
+        var state = p.state || 'FL';
+        var type = p.property_type || 'SFR';
+        var beds = p.bedrooms || '—';
+        var baths = p.bathrooms || '—';
+        var price = l.asking_price || 0;
+        var closedLabel = l.published_at ? new Date(l.published_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
+        return closingCard(city, state, type, beds, baths, price, closedLabel);
+      }).join('');
+    } catch(e) {
+      grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
+    }
   }
 
   // FAQ accordion
@@ -637,20 +593,27 @@
     e.preventDefault();
     var email = document.getElementById('newsletterEmail').value.trim();
     if (!email) return;
-    Portal.supabase.from('newsletter_subscribers').insert([{ email: email }]).then(function(){}).catch(function(){});
+    Portal.supabase.from('newsletter_signups').insert([{ email: email, source: 'homepage_footer' }]).then(function(){}).catch(function(){});
     e.target.innerHTML = '<p style="color:#22c55e;font-weight:600;font-size:15px;">&#10003; You\'re on the list. We\'ll send you new deal alerts.</p>';
   }
 
-  loadFeatured();
-  loadHeroPreview();
-  loadRecentClosings();
+  setTimeout(function(){loadFeatured();loadHeroPreview();loadRecentClosings();},100);
 
   function toggleFaq(btn) {
+    var item = btn.closest('.faq-item') || btn.parentElement;
     var answer = btn.nextElementSibling;
-    var isOpen = answer.classList.contains('open');
-    document.querySelectorAll('.faq-a').forEach(function(a) { a.classList.remove('open'); });
-    document.querySelectorAll('.faq-q').forEach(function(q) { q.classList.remove('open'); });
-    if (!isOpen) { answer.classList.add('open'); btn.classList.add('open'); }
+    var icon = btn.querySelector('.faq-icon');
+    var isOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+    document.querySelectorAll('.faq-a').forEach(function(a) { a.style.display = 'none'; });
+    document.querySelectorAll('.faq-icon').forEach(function(ic) { if(ic) ic.textContent = '+'; });
+    // Open this one if it was closed
+    if (!isOpen) {
+      item.classList.add('open');
+      answer.style.display = 'block';
+      if (icon) icon.textContent = '×';
+    }
   }
   </script>
 </body>

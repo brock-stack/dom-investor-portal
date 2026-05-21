@@ -63,6 +63,17 @@
       margin-top: 70px;
     }
 
+    /* Mapbox conflict prevention: isolate map pointer events from panel */
+    .marketplace-map { isolation: isolate; }
+    .map-panel-barrier {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 100%;
+      z-index: 10;
+      pointer-events: all;
+    }
     .marketplace-map {
       flex: 1;
       position: relative;
@@ -148,7 +159,8 @@
       transition: background 0.15s, border-color 0.15s;
     }
     .deal-card:hover { background: var(--surface-2); }
-    .list-card:hover { background: var(--surface-2); border-left: 3px solid #4fc3f7; }
+    /* List card hover: use box-shadow accent instead of border-width change (border-width change causes layout shift = flicker) */
+
 
     .list-card {
       display: flex;
@@ -157,8 +169,10 @@
       padding: 8px 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      margin-bottom: 6px;
+      margin-bottom: 0;
+      position: relative;
     }
+    .list-card .card-photo-sm img { height: 110px !important; object-fit: cover !important; width: 100% !important; }
 
     .card-photo-sm {
       width: 140px;
@@ -175,7 +189,7 @@
     .card-content { flex: 1; min-width: 0; }
     .card-location { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .card-specs { font-size: 11px; color: var(--text-muted); margin: 1px 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-price { font-size: 17px; font-weight: 800; color: var(--text); }
+    .card-price { font-size: 17px; font-weight: 800; color: #1a2744; }
     .card-arrow { color: var(--text-muted); font-size: 16px; }
 
     /* Tile view */
@@ -184,8 +198,28 @@
       border: 1px solid var(--border);
       overflow: hidden;
       background: var(--surface);
+      /* NO hover styles on the card itself -- prevents repaint flicker loop */
     }
-    .deal-card:not(.list-card):hover { border-color: #1a2744; box-shadow: 0 4px 20px rgba(79,195,247,0.18); background: var(--surface-2); }
+    /* Card wrapper handles all hover visual feedback via pseudo-element */
+    .card-wrapper {
+      position: relative;
+      border-radius: 10px;
+    }
+    .card-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 12px;
+      border: 1.5px solid transparent;
+      box-shadow: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .card-wrapper:hover::after {
+      border-color: #4fc3f7;
+      box-shadow: 0 4px 20px rgba(79,195,247,0.18);
+    }
 
     .card-photo {
       position: relative;
@@ -205,7 +239,7 @@
     }
     .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
     .badge-pending { background: #f97316; color: #fff; font-weight: 700; }
-    .badge-coming-soon { background: #8b5cf6; color: #fff; font-weight: 700; }
+    .badge-coming-soon { background: #4fc3f7; color: #1a2744; font-weight: 700; }
     .badge-sold { background: #64748b; color: #fff; font-weight: 700; }
 
     /* Map controls */
@@ -332,7 +366,7 @@
     .popup-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; }
     .popup-status-published { background: #22c55e; color: #fff; }
     .popup-status-pending { background: #f97316; color: #fff; }
-    .popup-status-coming_soon { background: #8b5cf6; color: #fff; }
+    .popup-status-coming_soon { background: #4fc3f7; color: #1a2744; }
 
     /* Empty state */
     .empty-state {
@@ -354,6 +388,11 @@
     .listings-panel::-webkit-scrollbar-track { background: transparent; }
     .listings-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+    @media (max-width: 768px) {
+      .map-legend { bottom: 60px !important; }
+      .view-toggle { flex-shrink: 0; overflow: visible; }
+    }
+
     /* Toast */
     #portalToast {
       position: fixed;
@@ -366,39 +405,268 @@
       gap: 8px;
       pointer-events: none;
     }
+
+    /* MOBILE ZILLOW LAYOUT */
+    @media (max-width: 768px) {
+      .marketplace-layout {
+        flex-direction: column !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+        position: relative !important;
+      }
+
+      /* Hide nav — map fills screen */
+      .investor-nav { display: none !important; }
+      body { padding-top: 0 !important; overflow: hidden; height: 100vh; }
+
+      .marketplace-layout {
+        height: 100vh !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .marketplace-map, #mapContainer {
+        width: 100% !important;
+        height: 100vh !important;
+        flex-shrink: 0 !important;
+        position: relative !important;
+      }
+      .mapboxgl-map { padding-top: 0 !important; }
+      /* Pad map canvas bottom so pins near bottom aren't hidden by peek bar */
+      .mapboxgl-canvas { padding-bottom: 0 !important; }
+
+      .marketplace-panel {
+        display: none !important;
+      }
+
+      .mobile-bottom-sheet {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 200 !important;
+        background: #1a2744 !important;
+        border-radius: 0 !important;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.4) !important;
+        transition: height 0.3s cubic-bezier(0.32, 0.72, 0, 1), max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1) !important;
+        color: #f0f4ff !important;
+      }
+
+      .sheet-handle {
+        width: 40px;
+        height: 4px;
+        background: var(--border);
+        border-radius: 2px;
+        margin: 12px auto 8px;
+        cursor: grab;
+      }
+
+      .sheet-count {
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+        margin: 0 16px;
+      }
+
+      .sheet-cards {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 0 12px;
+        height: auto;
+        max-height: calc(100% - 60px);
+        display: flex;
+        gap: 12px;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        align-items: flex-start;
+      }
+      .sheet-cards::-webkit-scrollbar { display: none; }
+      .sheet-cards-inner {
+      }
+
+      .mobile-listing-card {
+        background: var(--surface-2);
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        position: relative;
+        flex: 0 0 85vw;
+        max-width: 85vw;
+        scroll-snap-align: center;
+        margin: 0 6px;
+      }
+      .mobile-listing-card:first-child { margin-left: 16px; }
+      .mobile-listing-card:last-child { margin-right: 16px; }
+
+      .mobile-card-photo-wrap {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        overflow: hidden;
+        background: var(--surface-2);
+      }
+
+      .mobile-card-photo-wrap img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .mobile-card-heart {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 5;
+        background: rgba(0,0,0,0.4);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px;
+        color: white;
+      }
+
+      .mobile-card-body {
+        padding: 12px 14px 16px;
+      }
+
+      .mobile-card-price {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+
+      .mobile-card-specs {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+      }
+
+      .mobile-card-address {
+        font-size: 13px;
+        color: var(--text);
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+
+      .mobile-card-brand {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      /* Map style buttons: move to left on mobile so hamburger doesn't overlap */
+      #desktopMapControls { display: none !important; }  /* desktop bar hidden on mobile — select added by JS */
+      /* Hide the sky-blue dot markers on mobile — price pills already show location */
+      .dom-map-marker { display: none !important; }
+
+      .mobile-map-fab {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 300;
+        background: #1a2744;
+        color: #4fc3f7;
+        border: 1.5px solid #4fc3f7;
+        border-radius: 24px;
+        padding: 10px 22px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      }
+
+      .map-price-pin {
+        background: #f97316;
+        color: white;
+        font-size: 11px;
+        font-weight: 800;
+        padding: 4px 8px;
+        border-radius: 12px;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s;
+        will-change: transform;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+      }
+
+      .map-price-pin.active {
+        background: #4fc3f7;
+        color: #0f172a;
+        transform: scale(1.15);
+      }
+
+      .mobile-filter-bar {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        z-index: 150;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 8px 12px;
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .mobile-filter-bar::-webkit-scrollbar { display: none; }
+    }
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
 </head>
 <body>
-  <nav id="investorNav" class="investor-nav">
-    <a href="/homepage.html" class="nav-brand">
-      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:44px;width:auto;max-width:160px;object-fit:contain;">
+    <nav id="investorNav" class="investor-nav">
+    <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
+    </button>
+    <a class='nav-brand' href='/homepage'>
+      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:28px;width:auto;max-width:130px;object-fit:contain;vertical-align:middle;">
     </a>
-    <div class="nav-right" id="navRight">
-      <button class="theme-toggle" onclick="Portal.toggleTheme()"></button>
+    <div class="nav-right" id="navRight" style="margin-left:auto;min-width:44px;">
     </div>
   </nav>
 
   <div class="marketplace-layout">
     <div class="marketplace-map" id="mapContainer">
-      <div class="map-controls">
+      <!-- Desktop map controls (original button bar) -->
+      <div class="map-controls" id="desktopMapControls">
         <button class="map-style-btn active" data-style="custom">Map</button>
         <button class="map-style-btn" data-style="satellite-streets-v12">Satellite</button>
         <button class="map-style-btn" data-style="dark-v11">Dark</button>
         <button class="map-style-btn" data-style="light-v11">Mono</button>
-      </div>
-      <div class="map-legend">
-        <div><span class="legend-dot orange"></span> Listing</div>
-        <div><span class="legend-dot red"></span> Sold Comp</div>
-        <div><span class="legend-dot purple"></span> Rental Comp</div>
-      </div>
-      <div style="position:absolute;bottom:12px;right:12px;z-index:10;display:flex;flex-direction:column;gap:4px;background:rgba(26,39,68,0.92);border:1px solid rgba(79,195,247,0.2);border-radius:8px;padding:4px;backdrop-filter:blur(8px);">
-        <button id="floodToggleBtn" class="map-style-btn" style="white-space:nowrap;">&#128167; Flood Zones</button>
+        <button id="floodToggleBtn" class="map-style-btn" style="white-space:nowrap;">Flood Zones</button>
         <button id="resetMapBtn" class="map-style-btn" style="white-space:nowrap;">Reset Map</button>
       </div>
+      <!-- Mobile map style select (injected by initMobileZillow, desktop hidden via CSS) -->
+      <select id="mapStyleSelect" onchange="changeMapStyle(this.value)" style="display:none;"></select>
+      
+      <!-- flood/reset now in desktop map-controls bar -->
     </div>
 
+    <div class="map-panel-barrier"></div>
     <div class="marketplace-panel">
       <div class="panel-header">
         <div class="filter-bar">
@@ -406,14 +674,10 @@
           <button class="filter-pill" data-status="published">Available</button>
           <button class="filter-pill" data-status="pending">Pending</button>
           <button class="filter-pill" data-status="coming_soon">Coming Soon</button>
-          <button class="filter-pill" data-status="favorites">Favorites</button>
         </div>
         <div class="panel-title-row">
           <span id="listingCount">Loading...</span>
-          <div class="view-toggle">
-            <button id="listViewBtn" class="view-btn active" title="List view">&#8801;</button>
-            <button id="tileViewBtn" class="view-btn" title="Tile view">&#8862;</button>
-          </div>
+
         </div>
       </div>
       <div id="listingsPanel" class="listings-panel"></div>
@@ -433,21 +697,12 @@
       'light-v11': 'mapbox://styles/mapbox/light-v11'
     };
 
-    let map, allListings = [], markers = {}, currentFilter = 'all', currentView = 'list', floodVisible = false, favListingIds = [];
+    let map, allListings = [], markers = {}, currentFilter = 'all', currentView = 'tile', floodVisible = false;
 
     async function init() {
       const session = await Portal.requireAuth();
       if (!session) return;
-
-      const _navProfile = await Portal.getProfile(session.user.id);
-      const _navFirstName = _navProfile ? (_navProfile.first_name || '') : '';
-      document.getElementById('navRight').innerHTML =
-        '<a href="/marketplace.html" class="nav-link active">Marketplace</a>' +
-        '<a href="/dashboard.html" class="nav-link">Dashboard</a>' +
-        (_navFirstName ? '<span style="color:var(--text-muted);font-size:13px">' + _navFirstName + '</span>' : '') +
-        '<button onclick="Portal.logout()" class="btn-secondary btn-sm">Sign Out</button>' +
-        '<button class="theme-toggle" onclick="Portal.toggleTheme()"></button>';
-      Portal.updateThemeBtn();
+      await Portal.renderNav();
 
       // Wait for layout to render before init map
       await new Promise(function(resolve) { requestAnimationFrame(function() { requestAnimationFrame(resolve); }); });
@@ -466,9 +721,9 @@
         container: 'mapContainer',
         style: CUSTOM_STYLE,
         center: [-81.5, 27.8],
-        zoom: 7
+        zoom: 6
       });
-      map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+      // NavigationControl removed — custom buttons used instead
 
       } catch(webglErr) {
         console.warn('WebGL not available:', webglErr.message);
@@ -483,7 +738,8 @@
       if (map) {
         map.on('load', function() {
           map.resize();
-          allListings.forEach(function(l) { addMarker(l); });
+          // _applyThemeMapStyle triggers setStyle + styledata which adds markers
+          // Don't add markers here to avoid doubles
         });
       }
 
@@ -501,22 +757,37 @@
         });
       });
 
+      // Global changeMapStyle for mobile dropdown
+      // Auto-switch map style on theme change
+      window._applyThemeMapStyle = function() {
+        if (!map) return;
+        var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        var newStyle = isDark ? STYLE_MAP['satellite-streets-v12'] : CUSTOM_STYLE;
+        if (map.getStyle() && map.getStyle().sprite && map.getStyle().sprite.indexOf(isDark ? 'satellite' : 'brockchain8') !== -1) return; // already correct style
+        map.setStyle(newStyle);
+        map.once('styledata', function() {
+          // Clear existing markers before re-adding
+          Object.values(markers).forEach(function(m) { m.remove(); });
+          markers = {};
+          allListings.forEach(function(l) { addMarker(l); });
+          if (floodVisible) toggleFloodLayer(true);
+        });
+      };
+      // Apply on load based on current theme
+      map.on('load', function() { window._applyThemeMapStyle(); });
+
+      window.changeMapStyle = function(styleKey) {
+        var style = STYLE_MAP[styleKey] || CUSTOM_STYLE;
+        map.setStyle(style);
+        map.once('styledata', function() {
+          allListings.forEach(function(l) { addMarker(l); });
+          if (floodVisible) toggleFloodLayer(true);
+        });
+      };
+
       // Filter pills
       document.querySelectorAll('.filter-pill').forEach(function(pill) {
-        pill.addEventListener('click', async function() {
-          if (pill.dataset.status === 'favorites') {
-            var mktSession = await Portal.getSession();
-            var mktPortalUserId = mktSession ? await Portal.getPortalUserId(mktSession.user.id) : null;
-            if (!mktPortalUserId) {
-              Portal.toast('Sign in to see your favorites', 'info');
-              return;
-            }
-            var { data: favRows } = await Portal.supabase
-              .from('investor_saved_deals')
-              .select('listing_id')
-              .eq('user_id', mktPortalUserId);
-            favListingIds = (favRows || []).map(function(r) { return r.listing_id; });
-          }
+        pill.addEventListener('click', function() {
           document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
           pill.classList.add('active');
           currentFilter = pill.dataset.status;
@@ -526,18 +797,7 @@
       });
 
       // View toggle
-      document.getElementById('listViewBtn').addEventListener('click', function() {
-        currentView = 'list';
-        document.getElementById('listViewBtn').classList.add('active');
-        document.getElementById('tileViewBtn').classList.remove('active');
-        renderListings();
-      });
-      document.getElementById('tileViewBtn').addEventListener('click', function() {
-        currentView = 'tile';
-        document.getElementById('tileViewBtn').classList.add('active');
-        document.getElementById('listViewBtn').classList.remove('active');
-        renderListings();
-      });
+
 
       // Reset map
       var resetBtn = document.getElementById('resetMapBtn'); if (resetBtn) resetBtn.addEventListener('click', function() {
@@ -580,7 +840,9 @@
 
         allListings.forEach(function(l) { addMarker(l); });
         renderListings();
-        fitToMarkers();
+        _initMktFavs();
+        slowFlyToMarkers();
+        if (window.innerWidth <= 768) initMobileZillow();
       } catch(e) {
         if (e.message && e.message.includes('does not exist')) {
           showEmpty('No listings available yet. Check back soon!');
@@ -599,6 +861,7 @@
       }
 
       var el = document.createElement('div');
+      el.className = 'dom-map-marker';
       el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#4fc3f7;border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
       el.dataset.id = listing.id;
 
@@ -624,6 +887,88 @@
         .addTo(map);
 
       markers[listing.id] = marker;
+
+      // Mobile price pins
+      if (window.innerWidth <= 768 && listing.asking_price) {
+        var pinEl = document.createElement('div');
+        pinEl.className = 'map-price-pin';
+        var priceVal = listing.asking_price >= 1000000
+          ? (listing.asking_price / 1000000).toFixed(1) + 'M'
+          : Math.round(listing.asking_price / 1000) + 'K';
+        pinEl.textContent = '$' + priceVal;
+        pinEl.dataset.listingId = listing.id;
+        pinEl.style.position = 'relative';
+        pinEl.style.display = 'inline-block';
+        // Heart badge for favorited properties
+        var favs = JSON.parse(localStorage.getItem('dom_portal_favorites') || '[]');
+        if (favs.some(function(f){return String(f.id) === String(listing.id);})) {
+          var hb = document.createElement('span');
+          hb.className = 'pin-heart-badge';
+          hb.textContent = '\u2665';
+          hb.style.cssText = 'position:absolute;top:-7px;right:-7px;width:13px;height:13px;background:#e8476a;color:white;border-radius:50%;font-size:8px;line-height:13px;text-align:center;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,0.5);';
+          pinEl.appendChild(hb);
+        }
+        (function(lid) {
+          pinEl.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Lock the active pin IMMEDIATELY — before any async fires
+            window._lockedActiveLid = String(lid);
+            clearTimeout(window._suppressCardNavTimer);
+            // Highlight active pin
+            document.querySelectorAll('.map-price-pin').forEach(function(pin) { pin.classList.remove('active'); });
+            pinEl.classList.add('active');
+            var isFullMap = (window._mobileSheetState === 'peek');
+            if (isFullMap && map) {
+              // Slow sexy fly-in to the marker, then pull up the deal sheet
+              var sheetH = window.innerHeight * 0.5;
+              map.flyTo({
+                center: [p.lng, p.lat],
+                zoom: 15,
+                duration: 1600,
+                essential: true,
+                padding: { top: 0, bottom: sheetH, left: 0, right: 0 }
+              });
+              // After fly completes: snap sheet up, scroll card into position silently
+              setTimeout(function() {
+                // Pre-scroll the card into position BEFORE sheet opens
+                var strip = document.getElementById('sheetCards');
+                var card = strip ? strip.querySelector('[data-listing-id="' + lid + '"]') : null;
+                if (card && strip) {
+                  strip.scrollTo({ left: card.offsetLeft - (strip.offsetWidth - card.offsetWidth) / 2, behavior: 'instant' });
+                }
+                // Snap sheet up
+                // Re-apply BEFORE sheet opens so observer sees it already set
+                setActivePin(lid);
+                if (window._mobileSetSheetState) window._mobileSetSheetState('half');
+                // Re-apply again after each potential override window
+                setTimeout(function() { if (window._lockedActiveLid === String(lid)) setActivePin(lid); }, 50);
+                setTimeout(function() { if (window._lockedActiveLid === String(lid)) setActivePin(lid); }, 200);
+                setTimeout(function() { if (window._lockedActiveLid === String(lid)) setActivePin(lid); }, 700);
+                setTimeout(function() { if (window._lockedActiveLid === String(lid)) setActivePin(lid); }, 1400);
+                // Hold nav block for 2s — long enough for observer to settle
+                clearTimeout(window._suppressCardNavTimer);
+                window._suppressCardNav = true;
+                window._suppressCardNavTimer = setTimeout(function() {
+                  window._suppressCardNav = false;
+                  window._lockedActiveLid = null;
+                }, 2000);
+              }, 1500);
+            } else {
+              // Already in half view — just scroll to card
+              if (window._mobileSetSheetState) window._mobileSetSheetState('half');
+              setTimeout(function() {
+                var strip = document.getElementById('sheetCards');
+                var card = strip ? strip.querySelector('[data-listing-id="' + lid + '"]') : null;
+                if (card && strip) {
+                  var cardLeft = card.offsetLeft - (strip.offsetWidth - card.offsetWidth) / 2;
+                  strip.scrollTo({ left: cardLeft, behavior: 'smooth' });
+                }
+              }, 350);
+            }
+          });
+        })(listing.id);
+        new mapboxgl.Marker({element: pinEl, anchor: 'bottom'}).setLngLat([p.lng, p.lat]).addTo(map);
+      }
     }
 
     function slugToLabel(slug) {
@@ -641,54 +986,33 @@
       return m[status] || '';
     }
 
+    function updatePillCounts() {
+      var counts = { all: allListings.length, published: 0, pending: 0, coming_soon: 0 };
+      allListings.forEach(function(l) { if (counts[l.status] !== undefined) counts[l.status]++; });
+      var labels = { all: 'All', published: 'Available', pending: 'Pending', coming_soon: 'Coming Soon' };
+      document.querySelectorAll('.filter-pill').forEach(function(pill) {
+        var s = pill.dataset.status;
+        var count = counts[s] !== undefined ? counts[s] : 0;
+        pill.textContent = labels[s] + ' (' + count + ')';
+        pill.style.opacity = (count === 0 && s !== 'all') ? '0.5' : '';
+      });
+    }
+
     function renderListings() {
       var panel = document.getElementById('listingsPanel');
-      var filtered;
-      if (currentFilter === 'favorites') {
-        filtered = allListings.filter(function(l) { return favListingIds.indexOf(l.id) !== -1; });
-      } else {
-        filtered = currentFilter === 'all' ? allListings : allListings.filter(function(l) { return l.status === currentFilter; });
-      }
+      var filtered = currentFilter === 'all' ? allListings : allListings.filter(function(l) { return l.status === currentFilter; });
 
-      document.getElementById('listingCount').textContent = filtered.length + ' listing' + (filtered.length !== 1 ? 's' : '');
+      updatePillCounts();
+      document.getElementById('listingCount').textContent = 'Showing ' + filtered.length + ' of ' + allListings.length;
 
       if (filtered.length === 0) {
-        panel.innerHTML = '<div class="empty-state"><div class="empty-icon">&#127968;</div><p>' + (currentFilter === 'favorites' ? 'No favorites yet. Browse the marketplace and tap ♥ on a deal.' : 'No listings match this filter.') + '</p></div>';
+        var filterLabel = currentFilter === 'all' ? 'active' : getStatusLabel(currentFilter).toLowerCase();
+        panel.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p style="margin-top:12px;color:var(--text-muted);">No ' + filterLabel + ' deals right now.<br>Check back soon.</p></div>';
         panel.style.cssText = '';
         return;
       }
 
-      if (currentView === 'list') {
-        panel.style.cssText = '';
-        panel.innerHTML = filtered.map(function(l) {
-          var p = (l.listings && l.listings.properties) || l.properties || {};
-          var street = p.address || '';
-          var cityState = [p.city, p.state].filter(Boolean).join(', ') || 'Florida';
-          var specsRow1 = [slugToLabel(p.property_type), p.year_built ? 'Built ' + p.year_built : null].filter(Boolean).join(' &middot; ');
-          var specsRow2 = [p.bedrooms ? p.bedrooms + ' Bd' : null, p.bathrooms ? p.bathrooms + ' Ba' : null, p.sqft ? p.sqft.toLocaleString() + ' sqft' : null].filter(Boolean).join(' &middot; ');
-          var arv = p.estimated_arv ? Portal.fc(p.estimated_arv) : null;
-          var photo = l._photo
-            ? '<img src="' + l._photo + '" alt="property" onerror="this.style.display=\'none\'">'
-            : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:24px;">&#127968;</div>';
-          var addressHtml = street
-            ? '<div style="font-size:13px;font-weight:600;color:var(--text);">' + street + '</div><div style="font-size:13px;font-weight:600;color:var(--text);">' + cityState + '</div>'
-            : '<div style="font-size:13px;font-weight:600;color:var(--text);">' + cityState + '</div>';
-          return '<div class="deal-card list-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)">' +
-            '<div class="card-photo-sm">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:4px;left:4px;font-size:9px;">' + getStatusLabel(l.status) + '</span></div>' +
-            '<div class="card-content">' +
-              addressHtml +
-              (specsRow1 ? '<div class="card-specs">' + specsRow1 + '</div>' : '') +
-              (specsRow2 ? '<div class="card-specs">' + specsRow2 + '</div>' : '') +
-              '<div style="display:flex;gap:20px;align-items:flex-end;margin-top:6px;">' +
-                '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div class="card-price">' + Portal.fc(l.asking_price) + '</div></div>' +
-                (arv ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:17px;font-weight:800;color:#4fc3f7;">' + arv + '</div></div>' : '') +
-              '</div>' +
-            '</div>' +
-            '<div class="card-arrow">&rarr;</div>' +
-          '</div>';
-        }).join('');
-      } else {
-        panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;overflow-y:auto;align-content:start;';
+panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;overflow-y:auto;align-content:start;';
         panel.innerHTML = filtered.map(function(l) {
           var p = (l.listings && l.listings.properties) || l.properties || {};
           var loc = [p.city, p.state].filter(Boolean).join(', ') || 'Florida';
@@ -701,22 +1025,121 @@
             ? '<div style="font-size:13px;font-weight:600;color:var(--text);">' + p.address + '</div><div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>'
             : '<div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>';
           var arvHtml = p.estimated_arv
-            ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:16px;font-weight:800;color:#4fc3f7;">' + Portal.fc(p.estimated_arv) + '</div></div>'
+            ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:14px;font-weight:700;color:#2d6a8f;">' + Portal.fc(p.estimated_arv) + '</div></div>'
             : '';
-          return '<div class="deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;">' +
-            '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status) + '</span></div>' +
+          return '<div class="card-wrapper"><div class="deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;">' +
+            '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status) + '</span>' +
+            '<button onclick="event.stopPropagation();toggleMktFavorite(this,\'' + l.id + '\')" data-lid="' + l.id + '" class="mkt-heart-btn" title="Save to Favorites" style="position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:background .15s;z-index:5;"">&#9825;</button>' +
+          '</div>' +
             '<div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">' +
               addressHtml +
               (tileSpecsRow1 ? '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow1 + '</div>' : '') +
               (tileSpecsRow2 ? '<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow2 + '</div>' : '') +
               '<div style="display:flex;gap:14px;align-items:flex-end;margin-top:8px;">' +
-                '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div style="font-size:16px;font-weight:800;color:var(--text);">' + Portal.fc(l.asking_price) + '</div></div>' +
+                '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div style="font-size:16px;font-weight:800;color:var(--accent);">' + Portal.fc(l.asking_price) + '</div></div>' +
                 arvHtml +
               '</div>' +
             '</div>' +
-          '</div>';
+          '</div></div>';
         }).join('');
+    }
+
+    var _mktFavIds = new Set();
+    var _mktPortalUid = null;
+
+    async function _initMktFavs() {
+      try {
+        var session = await Portal.getSession();
+        if (!session) return;
+        var pu = await Portal.supabase.from('portal_users').select('id').eq('user_id', session.user.id).maybeSingle();
+        if (!pu.data) return;
+        _mktPortalUid = pu.data.id;
+        var res = await Portal.supabase.from('investor_saved_deals').select('listing_id').eq('user_id', _mktPortalUid);
+        (res.data||[]).forEach(function(r){ _mktFavIds.add(r.listing_id); });
+        _applyMktHearts();
+      } catch(e) {}
+    }
+
+    function _applyMktHearts() {
+      document.querySelectorAll('.mkt-heart-btn').forEach(function(btn){
+        if (_mktFavIds.has(btn.dataset.lid)) {
+          btn.innerHTML = '&#9829;';
+          btn.style.color = '#e8476a';
+          btn.style.background = 'rgba(232,71,106,0.18)';
+        } else {
+          btn.innerHTML = '&#9825;';
+          btn.style.color = '#fff';
+          btn.style.background = 'rgba(0,0,0,0.45)';
+        }
+      });
+    }
+
+    function _showFavModal(added) {
+      var existing = document.getElementById('mktFavModal');
+      if (existing) existing.remove();
+      var modal = document.createElement('div');
+      modal.id = 'mktFavModal';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;pointer-events:none;';
+      modal.innerHTML = added
+        ? '<div style="background:#1a2744;border:1px solid rgba(79,195,247,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
+          '<div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e8476a,#c0254a);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;">&#9829;</div>' +
+          '<div style="font-size:18px;font-weight:800;color:#f0f4ff;margin-bottom:8px;">Added to Favorites</div>' +
+          '<div style="font-size:13px;color:#8a9bbf;">Find this deal anytime in your Favorites tab.</div>' +
+          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#e8476a,#4fc3f7);margin-top:20px;width:100%;transform-origin:left;"></div>' +
+          '</div>'
+        : '<div style="background:#1a2744;border:1px solid rgba(79,195,247,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
+          '<div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.07);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#8a9bbf;">&#9825;</div>' +
+          '<div style="font-size:18px;font-weight:800;color:#f0f4ff;margin-bottom:8px;">Removed from Favorites</div>' +
+          '<div style="font-size:13px;color:#8a9bbf;">This deal has been removed from your saved list.</div>' +
+          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#4fc3f7,#2563eb);margin-top:20px;width:100%;transform-origin:left;"></div>' +
+          '</div>';
+      document.body.appendChild(modal);
+      // Animate countdown bar
+      var bar = document.getElementById('mktFavBar');
+      if (bar) {
+        bar.style.transition = 'none';
+        bar.style.transform = 'scaleX(1)';
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){
+            bar.style.transition = 'transform 2.5s linear';
+            bar.style.transform = 'scaleX(0)';
+          });
+        });
       }
+      setTimeout(function(){
+        modal.style.opacity = '0';
+        modal.style.transition = 'opacity 0.3s';
+        setTimeout(function(){ if (modal.parentNode) modal.parentNode.removeChild(modal); }, 300);
+      }, 2500);
+    }
+
+    async function toggleMktFavorite(btn, listingId) {
+      try {
+        var session = await Portal.getSession();
+        if (!session) { window.location.href = '/login.html?redirect=/marketplace.html'; return; }
+        if (!_mktPortalUid) {
+          var pu = await Portal.supabase.from('portal_users').select('id').eq('user_id', session.user.id).maybeSingle();
+          if (!pu.data) return;
+          _mktPortalUid = pu.data.id;
+        }
+        if (_mktFavIds.has(listingId)) {
+          await Portal.supabase.from('investor_saved_deals').delete().eq('user_id', _mktPortalUid).eq('listing_id', listingId);
+          _mktFavIds.delete(listingId);
+          _applyMktHearts();
+          _showFavModal(false);
+        } else {
+          var pl = await Portal.supabase.from('portal_listings').select('property_id').eq('id', listingId).maybeSingle();
+          await Portal.supabase.from('investor_saved_deals').insert({
+            user_id: _mktPortalUid,
+            listing_id: listingId,
+            property_id: pl.data ? pl.data.property_id : null,
+            saved_at: new Date().toISOString()
+          });
+          _mktFavIds.add(listingId);
+          _applyMktHearts();
+          _showFavModal(true);
+        }
+      } catch(e) { Portal.toast('Error: ' + e.message, 'error'); }
     }
 
     function updateMarkers() {
@@ -724,12 +1147,7 @@
         var marker = markers[l.id];
         if (!marker) return;
         var el = marker.getElement();
-        var show;
-        if (currentFilter === 'favorites') {
-          show = favListingIds.indexOf(l.id) !== -1;
-        } else {
-          show = currentFilter === 'all' || l.status === currentFilter;
-        }
+        var show = currentFilter === 'all' || l.status === currentFilter;
         el.style.display = show ? 'block' : 'none';
       });
     }
@@ -743,6 +1161,29 @@
       el.style.zIndex = on ? '10' : '';
     }
 
+    function slowFlyToMarkers() {
+      var points = allListings
+        .filter(function(l) { var p=(l.listings&&l.listings.properties)||l.properties||{}; return p.lat&&p.lng; })
+        .map(function(l) { var p=(l.listings&&l.listings.properties)||l.properties||{}; return [p.lng,p.lat]; });
+      if (!points.length || !map) return;
+      var isMobile = window.innerWidth <= 768;
+      setTimeout(function() {
+        if (isMobile) {
+          // Mobile: cinematic flyTo with speed control
+          var lngs = points.map(function(p){return p[0];});
+          var lats = points.map(function(p){return p[1];});
+          var centerLng = (Math.min.apply(null,lngs) + Math.max.apply(null,lngs)) / 2;
+          var centerLat = (Math.min.apply(null,lats) + Math.max.apply(null,lats)) / 2;
+          map.flyTo({ center: [centerLng, centerLat], zoom: 10, speed: 0.25, curve: 1.2,
+            easing: function(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }, essential: true });
+        } else {
+          // Desktop: fitBounds to show all markers, 1.8s animation
+          var bounds = points.reduce(function(b,p){return b.extend(p);}, new mapboxgl.LngLatBounds(points[0],points[0]));
+          map.fitBounds(bounds, { padding: 80, maxZoom: 12, duration: 1800 });
+        }
+      }, 400);
+    }
+
     function fitToMarkers() {
       var points = allListings
         .filter(function(l) { return ((l.listings && l.listings.properties) || l.properties) && (((l.listings && l.listings.properties) || l.properties).lat) && (((l.listings && l.listings.properties) || l.properties) || {}).lng; })
@@ -754,7 +1195,13 @@
       }
       if (!map) return;
       var bounds = points.reduce(function(b, p) { return b.extend(p); }, new mapboxgl.LngLatBounds(points[0], points[0]));
-      map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
+      // On mobile: the View Deals bar + iOS browser chrome = ~200px dead zone at bottom
+      // Filter bar = ~52px dead zone at top. Use these to constrain fitBounds.
+      var isMobile = window.innerWidth <= 768;
+      var fitPad = isMobile
+        ? { top: 100, bottom: 200, left: 50, right: 50 }
+        : 60;
+      map.fitBounds(bounds, { padding: fitPad, maxZoom: 13, duration: 1000 });
     }
 
     function toggleFloodLayer(show) {
@@ -766,8 +1213,430 @@
     }
 
     function showEmpty(msg) {
-      document.getElementById('listingsPanel').innerHTML = '<div class="empty-state"><div class="empty-icon">&#127968;</div><p>' + msg + '</p></div>';
+      document.getElementById('listingsPanel').innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p style="margin-top:12px;">' + msg + '</p></div>';
       document.getElementById('listingCount').textContent = '0 listings';
+    }
+
+    function initMobileZillow() {
+      if (window.innerWidth > 768) return;
+
+      // Remove existing sheet if reinitializing
+      var existing = document.getElementById('mobileBottomSheet');
+      if (existing) { existing.remove(); }
+      var existingFab = document.getElementById('mapFab');
+      if (existingFab) { existingFab.remove(); }
+      var existingBar = document.getElementById('mobileFilterBar');
+      if (existingBar) { existingBar.remove(); }
+
+      var sheet = document.createElement('div');
+      sheet.className = 'mobile-bottom-sheet';
+      sheet.id = 'mobileBottomSheet';
+      sheet.innerHTML =
+        '<div id="sheetDragArea" style="cursor:pointer;padding:8px 0 12px;">' +
+          '<div class="sheet-handle" id="sheetHandle"></div>' +
+          '<div class="sheet-count" id="sheetCount" style="color:#4fc3f7;font-weight:700;font-size:15px;text-align:center;">Loading deals...</div>' +
+        '</div>' +
+        '<div class="sheet-cards" id="sheetCards"></div>';
+      document.body.appendChild(sheet);
+      
+      // Hamburger button overlaid on map top-right
+      var hamburgerExists = document.getElementById('mapHamburger');
+      if (!hamburgerExists) {
+        var hamburger = document.createElement('button');
+        hamburger.id = 'mapHamburger';
+        hamburger.style.cssText = 'position:fixed;top:12px;right:12px;z-index:300;background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);color:#4fc3f7;border:1.5px solid rgba(79,195,247,0.5);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.3);';
+        hamburger.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>';
+        hamburger.onclick = function() { Portal.openPinMenu(); };
+        document.body.appendChild(hamburger);
+      }
+
+      var fab = document.createElement('button');
+      fab.className = 'mobile-map-fab';
+      fab.style.bottom = 'calc(75vh + 12px)';  // always above expanded sheet
+      fab.id = 'mapFab';
+      fab.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7"/></svg> Map';
+      fab.onclick = function() { if (window.setSheetState) window.setSheetState('peek'); };
+      document.body.appendChild(fab);
+
+      // Custom branded filter controls (no native select)
+      var filterBar = document.createElement('div');
+      filterBar.id = 'mobileFilterBar';
+      filterBar.style.cssText = 'position:fixed;top:12px;left:12px;z-index:290;display:flex;gap:8px;align-items:center;';
+
+      function makeDropdown(labelText, options, onChange) {
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'position:relative;';
+        var pill = document.createElement('div');
+        pill.style.cssText = 'background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);border:1.5px solid #4fc3f7;border-radius:20px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(0,0,0,0.3);white-space:nowrap;';
+        var lbl = document.createElement('span');
+        lbl.textContent = labelText;
+        lbl.style.cssText = 'color:#4fc3f7;font-size:13px;font-weight:700;';
+        var arr = document.createElement('span');
+        arr.innerHTML = '<svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 1L5 5L9 1" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round"/></svg>';
+        pill.appendChild(lbl); pill.appendChild(arr);
+        var menu = document.createElement('div');
+        menu.style.cssText = 'display:none;position:absolute;top:44px;left:0;background:#1a2744;border:1px solid rgba(79,195,247,0.3);border-radius:12px;overflow:hidden;min-width:150px;box-shadow:0 4px 24px rgba(0,0,0,0.5);z-index:100;';
+        options.forEach(function(opt) {
+          var item = document.createElement('div');
+          item.style.cssText = 'padding:12px 16px;color:#f0f4ff;font-size:14px;font-weight:600;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);';
+          item.textContent = opt.label;
+          item.addEventListener('touchstart', function(){item.style.background='rgba(79,195,247,0.15)';},{passive:true});
+          item.addEventListener('touchend', function(){item.style.background='';},{passive:true});
+          item.onclick = function(e) { e.stopPropagation(); lbl.textContent = opt.label; menu.style.display = 'none'; onChange(opt.value); };
+          menu.appendChild(item);
+        });
+        pill.onclick = function(e) {
+          e.stopPropagation();
+          var showing = menu.style.display !== 'none';
+          document.querySelectorAll('.mobile-dropdown-menu').forEach(function(m){m.style.display='none';});
+          menu.style.display = showing ? 'none' : 'block';
+        };
+        menu.className = 'mobile-dropdown-menu';
+        wrap.appendChild(pill); wrap.appendChild(menu);
+        return wrap;
+      }
+
+      document.addEventListener('click', function() {
+        document.querySelectorAll('.mobile-dropdown-menu').forEach(function(m){m.style.display='none';});
+      });
+
+      // Status filter removed on mobile — all listings shown by default
+      var mapDrop = makeDropdown('Map', [
+        {label:'Map',value:'custom'},{label:'Satellite',value:'satellite-streets-v12'},
+        {label:'Dark',value:'dark-v11'},{label:'Mono',value:'light-v11'}
+      ], function(val) { if (typeof changeMapStyle === 'function') changeMapStyle(val); });
+      filterBar.appendChild(mapDrop);
+
+      document.body.appendChild(filterBar);
+
+      var sheetState = 'peek';
+      var peekHeight = '72px';  // just drag handle + deal count
+      var halfHeight = 'auto';
+      var fullHeight = '75vh';  // capped so FAB remains visible
+
+      function setSheetState(state) {
+        sheetState = state;
+        window._mobileSheetState = state;
+        // Suppress card navigation for 500ms after state change (iOS synthetic click fires after touchend)
+        window._suppressCardNav = true;
+        clearTimeout(window._suppressCardNavTimer);
+        window._suppressCardNavTimer = setTimeout(function() { window._suppressCardNav = false; }, 500);
+        var s = document.getElementById('mobileBottomSheet');
+        var f = document.getElementById('mapFab');
+        if (state === 'peek') {
+          s.style.height = peekHeight;
+          s.style.maxHeight = peekHeight;
+          s.style.transition = 'height 0.25s cubic-bezier(0.32,0.72,0,1), max-height 0.25s cubic-bezier(0.32,0.72,0,1)';
+          if (f) f.style.display = 'none';
+          var ce2 = document.getElementById('sheetCount'); if (ce2 && window._mobileDealsLabel) { ce2.textContent = window._mobileDealsLabel; ce2.style.color = '#4fc3f7'; }
+        } else if (state === 'half') {
+          s.style.height = 'auto';
+          s.style.maxHeight = '65vh';
+          if (f) f.style.display = 'none';
+          var ceH = document.getElementById('sheetCount'); if (ceH) { ceH.textContent = 'View Map'; ceH.style.color = '#4fc3f7'; }
+        } else if (state === 'full') {
+          // Redirect full to half — only two states allowed
+          s.style.height = 'auto';
+          s.style.maxHeight = '65vh';
+          if (f) f.style.display = 'none';
+          var ce = document.getElementById('sheetCount'); if (ce) { ce.textContent = 'View Map'; ce.style.color = '#4fc3f7'; }
+        }
+      }
+
+      // Expose for price pin handlers
+      window._mobileSetSheetState = setSheetState;
+
+      var startY, startH;
+      var dragArea = document.getElementById('sheetDragArea') || document.getElementById('sheetHandle');
+
+      var _dragged = false;
+
+      function onDragStart(e) {
+        startY = (e.touches ? e.touches[0].clientY : e.clientY);
+        var s = document.getElementById('mobileBottomSheet');
+        s.style.transition = 'none';
+        startH = s.offsetHeight;
+        _dragged = false;
+        _swipeStartTime = Date.now();
+        document.addEventListener('mousemove', onDragMove);
+        document.addEventListener('touchmove', onDragMove, { passive: false });
+        document.addEventListener('mouseup', onDragEnd);
+        document.addEventListener('touchend', onDragEnd);
+      }
+
+      function onDragMove(e) {
+        var y = (e.touches ? e.touches[0].clientY : e.clientY);
+        var delta = startY - y;
+        if (Math.abs(delta) < 8) return; // ignore micro-movements
+        _dragged = true;
+        if (e.cancelable) e.preventDefault();
+        var newH = Math.max(120, Math.min(window.innerHeight * 0.65, startH + delta));
+        var s = document.getElementById('mobileBottomSheet');
+        s.style.height = newH + 'px';
+        s.style.maxHeight = newH + 'px';
+      }
+
+      function onDragEnd(e) {
+        document.removeEventListener('mousemove', onDragMove);
+        document.removeEventListener('touchmove', onDragMove);
+        document.removeEventListener('mouseup', onDragEnd);
+        document.removeEventListener('touchend', onDragEnd);
+        var s = document.getElementById('mobileBottomSheet');
+        s.style.transition = 'height 0.25s cubic-bezier(0.32,0.72,0,1), max-height 0.25s cubic-bezier(0.32,0.72,0,1)';
+        if (!_dragged) {
+          // Short touch = tap — toggle sheet state
+          mobileSheetTap();
+          _dragged = false;
+          return;
+        }
+        _dragged = false;
+        // Determine snap point based on drag direction
+        var endY = e.changedTouches ? e.changedTouches[0].clientY : (e.clientY || startY);
+        var swipeDir = startY - endY; // positive = swiped up
+        var h = s.offsetHeight;
+        if (swipeDir > 30) {
+          // Swiped up — expand
+          setSheetState(h < window.innerHeight * 0.5 ? 'half' : 'full');
+        } else if (swipeDir < -30) {
+          // Swiped down — collapse
+          setSheetState(h < window.innerHeight * 0.5 ? 'peek' : 'half');
+        } else {
+          // Short movement — snap to nearest
+          if (h < window.innerHeight * 0.25) setSheetState('peek');
+          else if (h < window.innerHeight * 0.6) setSheetState('half');
+          else setSheetState('full');
+        }
+      }
+
+      if (dragArea) {
+        dragArea.addEventListener('mousedown', onDragStart);
+        dragArea.addEventListener('touchstart', onDragStart, { passive: false });
+      }
+
+      window._mobileSetSheetState = setSheetState;
+      setSheetState('half');
+      // Render cards with retries to handle timing
+      setTimeout(renderMobileCards, 150);
+      setTimeout(function() {
+        renderMobileCards();
+        // Correct label: deals are showing, so button = View Map
+        var countEl = document.getElementById('sheetCount');
+        if (countEl) { countEl.textContent = 'View Map'; countEl.style.color = '#4fc3f7'; }
+      }, 500);
+    }
+
+    var _lastTapTime = 0;
+    function mobileSheetTap() {
+      // Debounce: ignore taps within 400ms of each other (prevents double-fire glitch)
+      var now = Date.now();
+      if (now - _lastTapTime < 400) return;
+      _lastTapTime = now;
+      var countEl = document.getElementById('sheetCount');
+      var label = countEl ? countEl.textContent : '';
+      if (window._mobileSetSheetState) {
+        if (label === 'View Map') {
+          window._mobileSetSheetState('peek');
+          // Reset pins immediately
+          document.querySelectorAll('.map-price-pin').forEach(function(pin){pin.classList.remove('active');});
+          // Slow zoom out after sheet collapses (250ms sheet anim + buffer)
+          setTimeout(function() {
+            if (!map) return;
+            var points = allListings
+              .filter(function(l) { var p=(l.listings&&l.listings.properties)||l.properties||{}; return p.lat&&p.lng; })
+              .map(function(l) { var p=(l.listings&&l.listings.properties)||l.properties||{}; return [p.lng,p.lat]; });
+            if (points.length === 1) {
+              map.flyTo({ center: points[0], zoom: 12, duration: 2000, essential: true });
+            } else if (points.length > 1) {
+              var bounds = points.reduce(function(b,p){return b.extend(p);}, new mapboxgl.LngLatBounds(points[0],points[0]));
+              map.fitBounds(bounds, { padding: {top:100,bottom:200,left:50,right:50}, maxZoom: 13, duration: 2000 });
+            }
+          }, 300);
+        } else {
+          window._mobileSetSheetState('half');
+        }
+      }
+    }
+
+    function renderMobileCards() {
+      if (window.innerWidth > 768) return;
+      currentFilter = 'all'; // Mobile always shows all
+      var container = document.getElementById('sheetCards');
+      var countEl = document.getElementById('sheetCount');
+      if (!container) return;
+      // All markers always visible on mobile
+
+      // Show all when 'all', or filter by status
+      var filtered = (currentFilter === 'all' || !currentFilter)
+        ? allListings.slice()
+        : allListings.filter(function(l) { return l.status === currentFilter; });
+
+      window._mobileDealsLabel = 'View Deals';
+      if (countEl) { countEl.textContent = 'View Deals'; countEl.style.color = '#4fc3f7'; countEl.style.fontWeight = '700'; countEl.style.fontSize = '15px'; }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:32px 16px;color:var(--text-muted);">No deals match this filter.<br>Check back soon.</div>';
+        return;
+      }
+
+      try {
+      container.innerHTML = filtered.map(function(l) {
+        var p = (l.listings && l.listings.properties) || l.properties || {};
+        var addr = [p.address, p.city, p.state].filter(Boolean).join(', ');
+        var specs = [
+          p.bedrooms ? p.bedrooms + ' bds' : '— bds',
+          p.bathrooms ? p.bathrooms + ' ba' : '— ba',
+          p.sqft ? p.sqft.toLocaleString() + ' sqft' : null,
+          p.property_type ? p.property_type.replace(/_/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();}) : null
+        ].filter(Boolean).join(' | ');
+        var photo = l._photo
+          ? '<img src="' + l._photo + '" alt="property" loading="lazy">'
+          : '<div style="position:absolute;inset:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg></div>';
+        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? '#f97316' : '#4fc3f7');
+        var statusLabel = getStatusLabel(l.status).toUpperCase();
+        var isFav = (JSON.parse(localStorage.getItem('dom_portal_favorites') || '[]')).some(function(f){return f.id === l.id;});
+
+        return '<div class="mobile-listing-card" data-listing-id="' + l.id + '" onclick="mobileCardClick(event,\'' + l.id + '\')">' +
+          '<div class="mobile-card-photo-wrap">' +
+            photo +
+            '<span style="position:absolute;top:10px;left:10px;background:' + statusColor + ';color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;">' + statusLabel + '</span>' +
+            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:#f97316;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
+            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:#f97316;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
+            '<button class="mobile-card-heart" style="' + (isFav ? 'color:#e8476a;' : '') + '" onclick="event.stopPropagation();toggleMobileFav(this,\'' + l.id + '\')">' + (isFav ? '♥' : '♡') + '</button>' +
+          '</div>' +
+          '<div class="mobile-card-body">' +
+            '<div class="mobile-card-address" style="font-size:15px;font-weight:700;margin-bottom:6px;">' + addr + '</div>' +
+            '<div class="mobile-card-specs" style="margin-bottom:8px;">' + specs + '</div>' +
+            '<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:4px;">' +
+              '<div style="flex:1;min-width:80px;">' +
+                '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">List Price</div>' +
+                '<div style="font-size:16px;font-weight:800;color:#4fc3f7;">$' + (l.asking_price ? Math.round(l.asking_price).toLocaleString('en-US') : '—') + '</div>' +
+              '</div>' +
+              (p.estimated_arv ? '<div style="flex:1;min-width:80px;">' +
+                '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">ARV</div>' +
+                '<div style="font-size:16px;font-weight:800;color:var(--text);">$' + Math.round(p.estimated_arv).toLocaleString('en-US') + '</div>' +
+              '</div>' : '') +
+              (p.year_built ? '<div style="flex:1;min-width:70px;">' +
+                '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Year Built</div>' +
+                '<div style="font-size:16px;font-weight:800;color:var(--text);">' + p.year_built + '</div>' +
+              '</div>' : '') +
+            '</div>' +
+
+          '</div>' +
+        '</div>';
+      }).join('');
+      } catch(err) {
+        container.innerHTML = '<div style="text-align:center;padding:32px;color:#94a3b8;">Error loading cards: ' + err.message + '</div>';
+        console.error('[MobileCards]', err);
+      }
+
+      // Attach scroll listener to fly map to active card's pin
+      attachCardScrollListener(filtered);
+    }
+
+    function setActivePin(listingId) {
+      if (window._lockedActiveLid && String(listingId) !== String(window._lockedActiveLid)) {
+        console.log('[PIN] BLOCKED setActivePin for', listingId, '(locked to', window._lockedActiveLid, ')');
+        return false;
+      }
+      console.log('[PIN] setActivePin', listingId, 'caller:', new Error().stack.split('\n')[2]);
+      document.querySelectorAll('.map-price-pin').forEach(function(pin) { pin.classList.remove('active'); });
+      var activePin = document.querySelector('.map-price-pin[data-listing-id="' + String(listingId) + '"]');
+      if (activePin) { activePin.classList.add('active'); return true; }
+      return false;
+    }
+
+    function flyMapToListing(listing, retries) {
+      if (!map || !listing) return;
+      var p = (listing.listings && listing.listings.properties) || listing.properties || {};
+      var lng = parseFloat(p.lng || p.longitude || listing.lng || listing.longitude);
+      var lat = parseFloat(p.lat || p.latitude || listing.lat || listing.latitude);
+      // Highlight active pin — retry up to 3x if markers not yet in DOM
+      var found = setActivePin(listing.id);
+      if (!found && (retries || 0) < 3) {
+        setTimeout(function() { flyMapToListing(listing, (retries || 0) + 1); }, 300);
+      }
+      if (isNaN(lng) || isNaN(lat)) return;
+      var sheetH = window.innerHeight * 0.5;
+      map.easeTo({
+        center: [lng, lat],
+        zoom: map.getZoom() < 13 ? 13 : map.getZoom(),
+        padding: { top: 0, bottom: sheetH, left: 0, right: 0 },
+        duration: 400
+      });
+    }
+
+    var _cardObserver = null;
+    function attachCardScrollListener(filtered) {
+      var strip = document.getElementById('sheetCards');
+      if (!strip || !filtered || !filtered.length) return;
+      // Disconnect any prior observer
+      if (_cardObserver) { _cardObserver.disconnect(); _cardObserver = null; }
+      // Use IntersectionObserver — fires when a card is >=70% visible in the strip
+      _cardObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (!entry.isIntersecting) return;
+          var lid = entry.target.dataset.listingId;
+          if (!lid) return;
+          // Don't override a pin locked by marker tap
+          if (window._lockedActiveLid) return;
+          setActivePin(lid);
+          var listing = allListings.find(function(l) { return String(l.id) === String(lid); });
+          if (listing) flyMapToListing(listing);
+        });
+      }, { root: strip, threshold: 0.7 });
+      // Observe all cards
+      setTimeout(function() {
+        strip.querySelectorAll('.mobile-listing-card').forEach(function(card) {
+          _cardObserver.observe(card);
+        });
+        // Activate first card immediately — skip if a pin tap has locked the active lid
+        var first = strip.querySelector('.mobile-listing-card');
+        if (first && !window._lockedActiveLid) {
+          var lid = first.dataset.listingId;
+          setActivePin(lid);
+          var listing = allListings.find(function(l) { return String(l.id) === String(lid); });
+          if (listing) flyMapToListing(listing);
+        }
+      }, 600);
+    }
+
+    function mobileCardClick(e, id) {
+      // Block navigation during the 500ms window after sheet state change
+      // (iOS synthetic click fires at old coordinates after touchend + animation)
+      if (window._suppressCardNav) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      var state = window._mobileSheetState || 'peek';
+      if (state === 'half' || state === 'full') {
+        window.location.href = '/deal.html?id=' + id;
+      } else {
+        e.preventDefault();
+        e.stopPropagation();
+        if (window._mobileSetSheetState) window._mobileSetSheetState('half');
+      }
+    }
+
+    function toggleMobileFav(btn, listingId) {
+      var favs = JSON.parse(localStorage.getItem('dom_portal_favorites') || '[]');
+      var idx = favs.findIndex(function(f){return String(f.id) === String(listingId);});
+      var adding = idx === -1;
+      if (adding) { favs.push({id: listingId}); btn.textContent = '\u2665'; btn.style.color = '#e8476a'; }
+      else { favs.splice(idx, 1); btn.textContent = '\u2661'; btn.style.color = ''; }
+      localStorage.setItem('dom_portal_favorites', JSON.stringify(favs));
+      // Sync heart badge on map pin
+      var pin = document.querySelector('.map-price-pin[data-listing-id="' + listingId + '"]');
+      if (pin) {
+        var old = pin.querySelector('.pin-heart-badge');
+        if (adding && !old) {
+          var hb = document.createElement('span');
+          hb.className = 'pin-heart-badge';
+          hb.textContent = '\u2665';
+          hb.style.cssText = 'position:absolute;top:-7px;right:-7px;width:13px;height:13px;background:#e8476a;color:white;border-radius:50%;font-size:8px;line-height:13px;text-align:center;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,0.5);';
+          pin.appendChild(hb);
+        } else if (!adding && old) { old.remove(); }
+      }
     }
 
     init();
