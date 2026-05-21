@@ -234,7 +234,7 @@
 
     <!-- Footer -->
     <div class="notfound-footer">
-      &copy; 2026 Direct Off Market, LLC. All rights reserved.
+      &copy; <span id="footerYear"></span> Direct Off Market, LLC. All rights reserved.
     </div>
 
   </div>
@@ -245,6 +245,9 @@
   <script>
     // Portal.initTheme() is called automatically by investor-auth.js
     // updateThemeBtn() runs on load to set correct icon for the theme toggle
+  </script>
+  <script>
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
