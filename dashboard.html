@@ -586,10 +586,8 @@
   <div class="tab-content" id="tabFavorites">
     <h2 class="section-heading">Favorites</h2>
     <p class="section-sub">Save your favorite listings for quick access.</p>
-    <div class="coming-soon-box">
-      <div class="coming-soon-icon">⭐</div>
-      <div class="coming-soon-title">Coming Soon</div>
-      <p class="coming-soon-desc">Save your favorite listings for quick access. This feature is coming soon.</p>
+    <div id="favoritesContainer">
+      <div class="empty-state-inline">Loading favorites...</div>
     </div>
   </div>
 
@@ -664,6 +662,7 @@
     };
 
     let offersLoaded = false;
+    let favoritesLoaded = false;
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -679,93 +678,78 @@
           loadOffers();
           offersLoaded = true;
         }
+        if (this.dataset.tab === 'favorites' && !favoritesLoaded) {
+          loadFavorites();
+          favoritesLoaded = true;
+        }
       });
     });
 
     // ── Buy Box: Load ──────────────────────────────────────────
 
-    if (profile && profile.custom_fields && profile.custom_fields.buy_box) {
-      const bb = profile.custom_fields.buy_box;
+    const portalUserId = await Portal.getPortalUserId(session.user.id);
 
-      // Property types
-      if (bb.prop_types && Array.isArray(bb.prop_types)) {
-        document.querySelectorAll('input[name="prop_types"]').forEach(cb => {
-          cb.checked = bb.prop_types.includes(cb.value);
-        });
+    if (portalUserId) {
+      const { data: bb } = await Portal.supabase.from('investor_buy_box')
+        .select('*').eq('user_id', portalUserId).maybeSingle();
+
+      if (bb) {
+        if (bb.markets && Array.isArray(bb.markets)) {
+          document.getElementById('targetMarkets').value = bb.markets.join(', ');
+        }
+        if (bb.property_types && Array.isArray(bb.property_types)) {
+          document.querySelectorAll('input[name="prop_types"]').forEach(cb => {
+            cb.checked = bb.property_types.includes(cb.value);
+          });
+        }
+        if (bb.strategy && Array.isArray(bb.strategy)) {
+          document.querySelectorAll('input[name="strategies"]').forEach(cb => {
+            cb.checked = bb.strategy.includes(cb.value);
+          });
+        }
+        if (bb.max_price) document.getElementById('maxPurchasePrice').value = bb.max_price;
+        if (bb.min_arv) document.getElementById('minArv').value = bb.min_arv;
+        if (bb.min_cash_on_cash) document.getElementById('minCoc').value = bb.min_cash_on_cash;
+        if (bb.notes) document.getElementById('buyboxNotes').value = bb.notes;
       }
-
-      if (bb.target_markets) document.getElementById('targetMarkets').value = bb.target_markets;
-      if (bb.min_bedrooms) document.getElementById('minBedrooms').value = bb.min_bedrooms;
-      if (bb.min_bathrooms) document.getElementById('minBathrooms').value = bb.min_bathrooms;
-      if (bb.max_purchase_price) document.getElementById('maxPurchasePrice').value = bb.max_purchase_price;
-      if (bb.min_arv) document.getElementById('minArv').value = bb.min_arv;
-
-      // Strategies
-      if (bb.strategies && Array.isArray(bb.strategies)) {
-        document.querySelectorAll('input[name="strategies"]').forEach(cb => {
-          cb.checked = bb.strategies.includes(cb.value);
-        });
-      }
-
-      // Cash buyer
-      if (bb.cash_buyer) {
-        const radio = document.querySelector('input[name="cashBuyer"][value="' + bb.cash_buyer + '"]');
-        if (radio) radio.checked = true;
-      }
-
-      if (bb.min_coc) document.getElementById('minCoc').value = bb.min_coc;
-      if (bb.notes) document.getElementById('buyboxNotes').value = bb.notes;
     }
 
     // ── Buy Box: Save ──────────────────────────────────────────
 
     document.getElementById('saveBuyboxBtn').addEventListener('click', async function() {
-      if (!profile) {
-        Portal.toast('Could not find your profile. Please try again.', 'error');
-        return;
-      }
-
       const btn = this;
       btn.disabled = true;
       btn.textContent = 'Saving...';
 
-      const propTypes = Array.from(document.querySelectorAll('input[name="prop_types"]:checked')).map(cb => cb.value);
-      const strategies = Array.from(document.querySelectorAll('input[name="strategies"]:checked')).map(cb => cb.value);
-      const cashBuyerEl = document.querySelector('input[name="cashBuyer"]:checked');
+      if (!portalUserId) {
+        Portal.toast('Could not find your investor profile. Please refresh.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Save Buy Box';
+        return;
+      }
 
-      const buyBox = {
-        prop_types: propTypes,
-        target_markets: document.getElementById('targetMarkets').value.trim(),
-        min_bedrooms: document.getElementById('minBedrooms').value || null,
-        min_bathrooms: document.getElementById('minBathrooms').value || null,
-        max_purchase_price: parseFloat(document.getElementById('maxPurchasePrice').value) || null,
-        min_arv: parseFloat(document.getElementById('minArv').value) || null,
-        strategies: strategies,
-        cash_buyer: cashBuyerEl ? cashBuyerEl.value : null,
-        min_coc: parseFloat(document.getElementById('minCoc').value) || null,
-        notes: document.getElementById('buyboxNotes').value.trim(),
-        updated_at: new Date().toISOString()
-      };
-
-      // Merge with existing custom_fields
-      const existingCustomFields = (profile.custom_fields) || {};
-      const updatedCustomFields = Object.assign({}, existingCustomFields, { buy_box: buyBox });
+      const marketsInput = document.getElementById('targetMarkets').value.trim();
+      const targetMarketsArray = marketsInput ? marketsInput.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const propertyTypesArray = Array.from(document.querySelectorAll('input[name="prop_types"]:checked')).map(cb => cb.value);
+      const strategiesArray = Array.from(document.querySelectorAll('input[name="strategies"]:checked')).map(cb => cb.value);
 
       try {
-        const { error } = await Portal.supabase
-          .from('contacts')
-          .update({ custom_fields: updatedCustomFields })
-          .eq('id', profile.id);
+        const { error } = await Portal.supabase.from('investor_buy_box').upsert({
+          user_id: portalUserId,
+          markets: targetMarketsArray,
+          property_types: propertyTypesArray,
+          strategy: strategiesArray,
+          max_price: parseFloat(document.getElementById('maxPurchasePrice').value) || null,
+          min_arv: parseFloat(document.getElementById('minArv').value) || null,
+          min_cash_on_cash: parseFloat(document.getElementById('minCoc').value) || null,
+          notes: document.getElementById('buyboxNotes').value.trim(),
+        }, { onConflict: 'user_id' });
 
         if (error) throw error;
-
-        // Update local profile reference
-        profile.custom_fields = updatedCustomFields;
 
         const statusEl = document.getElementById('saveStatus');
         statusEl.classList.add('visible');
         setTimeout(() => statusEl.classList.remove('visible'), 3000);
-
         Portal.toast('Buy box saved!', 'success');
       } catch (err) {
         console.error('Buy box save error:', err);
