@@ -3603,7 +3603,9 @@
         } catch(e) {}
 
         // Comp markers stored for lazy load on Map & Comps tab
-        window._compMarkersData = property.comps_data ? (typeof property.comps_data === 'string' ? JSON.parse(property.comps_data) : property.comps_data) : null;
+        // Preserve raw Atlas shape for geocode write-back; normalize for renderer.
+        window._compsDataRaw = property.comps_data ? (typeof property.comps_data === 'string' ? JSON.parse(property.comps_data) : property.comps_data) : null;
+        window._compMarkersData = normalizeCompsData(window._compsDataRaw);
         window._activeCompMarkers = [];
         window._activeRentalMarkers = [];
 
@@ -3631,9 +3633,20 @@
             }
           }
           // Save geocoded coords back to Supabase so it only runs once
-          if (anyGeocoded && property && property.id) {
+          if (anyGeocoded && property && property.id && window._compsDataRaw) {
+            // Write geocoded coords back into the raw shape (preserves Atlas's cmv/rental/flip structure)
+            var srcArray = window._compsDataRaw.cmv || window._compsDataRaw.sold_comps;
+            if (srcArray) {
+              comps.sold_comps.forEach(function(normalizedComp) {
+                var rawComp = srcArray.find(function(r) { return r.address === normalizedComp.address; });
+                if (rawComp && normalizedComp.lat && normalizedComp.lng) {
+                  rawComp.lat = normalizedComp.lat;
+                  rawComp.lng = normalizedComp.lng;
+                }
+              });
+            }
             try {
-              await Portal.supabase.from('properties').update({comps_data: comps}).eq('id', property.id);
+              await Portal.supabase.from('properties').update({comps_data: window._compsDataRaw}).eq('id', property.id);
             } catch(e) { console.warn('comps_data save:', e); }
           }
           var compMarkers = [], rentalMarkers = [];
@@ -3752,6 +3765,28 @@
       } catch(e) {}
     }
 
+    // ============ COMPS DATA ADAPTER ============
+    // Normalizes Atlas's cmv/rental/flip shape to the renderer's sold_comps/rental_comps shape.
+    // Prefer cmv if present, fall back to legacy sold_comps.
+    // rental + flip deferred to future spec.
+    function normalizeCompsData(raw) {
+      if (!raw) return { sold_comps: [], rental_comps: [] };
+      var soldSrc = (Array.isArray(raw.cmv) && raw.cmv.length) ? raw.cmv
+        : (Array.isArray(raw.sold_comps) && raw.sold_comps.length) ? raw.sold_comps
+        : [];
+      var sold = soldSrc.map(function(c) {
+        // Only normalize distance: Atlas uses distance_miles, renderer uses distance.
+        return Object.assign({}, c, {
+          distance: (c.distance != null) ? c.distance : (c.distance_miles != null ? c.distance_miles : null)
+        });
+      });
+      return { sold_comps: sold, rental_comps: [] }; // rental + flip: future spec
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
     function formatCompDate(d) {
       if (!d) return '\u2014';
       var date = new Date(d + 'T00:00:00'); // force local date parse
@@ -3773,16 +3808,23 @@
       if (comps.sold_comps && comps.sold_comps.length > 0) {
         html += '<h3 style="font-size:16px;font-weight:700;margin:0 0 12px;">Sold Comps</h3>' +
           '<table class="comps-table" id="soldCompsTable" style="margin-bottom:24px;">' +
-            '<thead><tr><th>#</th><th>Address</th><th>Beds</th><th>Baths</th><th>Sqft</th><th>Year</th><th>Sale Price</th><th>Date</th><th>Dist</th></tr></thead>' +
+            '<thead><tr><th>#</th><th>Address</th><th>Beds</th><th>Baths</th><th>Sqft</th><th>$/sqft</th><th>Year</th><th>Sale Price</th><th>Date</th><th>Dist</th></tr></thead>' +
             '<tbody>' + (comps.sold_comps || []).map(function(c, i) {
+              var addrCell = c.url
+                ? '<a href="' + escapeHtml(c.url) + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dashed var(--text-muted);">' + escapeHtml(c.address || '—') + '</a>'
+                : escapeHtml(c.address || '—');
+              if (c.notes) addrCell += '<div style="font-size:11px;color:var(--text-muted);font-style:italic;margin-top:2px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + escapeHtml(c.notes) + '</div>';
+              var saleCell = '<td style="color:#22c55e;font-weight:700;">' + Portal.fc(c.price || c.sale_price) +
+                (c.list_price && c.list_price !== (c.price || c.sale_price) ? '<div style="font-size:11px;font-weight:500;color:var(--text-muted);">list ' + Portal.fc(c.list_price) + '</div>' : '') + '</td>';
               return '<tr data-comp-idx="' + i + '">' +
                 '<td><span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#22c55e;color:white;font-size:11px;font-weight:800;">' + (i+1) + '</span></td>' +
-                '<td>' + (c.address || '—') + '</td>' +
+                '<td>' + addrCell + '</td>' +
                 '<td>' + (c.beds || c.bedrooms || '—') + '</td>' +
                 '<td>' + (c.baths || c.bathrooms || '—') + '</td>' +
                 '<td>' + (c.sqft ? c.sqft.toLocaleString() : '—') + '</td>' +
+                '<td>' + (c.price_per_sqft ? '$' + c.price_per_sqft + '/sqft' : '—') + '</td>' +
                 '<td>' + (c.year || '—') + '</td>' +
-                '<td style="color:#22c55e;font-weight:700;">' + Portal.fc(c.price || c.sale_price) + '</td>' +
+                saleCell +
                 '<td>' + formatCompDate(c.sold || c.sale_date) + '</td>' +
                 '<td>' + (c.distance != null ? c.distance + ' mi' : '—') + '</td>' +
               '</tr>';
