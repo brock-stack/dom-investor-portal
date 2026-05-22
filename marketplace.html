@@ -723,7 +723,10 @@
         center: [-81.5, 27.8],
         zoom: 6
       });
-      // NavigationControl removed — custom buttons used instead
+      map.addControl(
+        new mapboxgl.NavigationControl({ showCompass: false, showZoom: true, visualizePitch: false }),
+        'bottom-right'
+      );
 
       } catch(webglErr) {
         console.warn('WebGL not available:', webglErr.message);
