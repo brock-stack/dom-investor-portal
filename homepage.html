@@ -382,7 +382,6 @@
     if (session) {
       window._portalMenuUser = { name: _navFirstName || session.user.email.split('@')[0], email: session.user.email };
       Portal.updateThemeBtn();
-      }
       // Auth-aware CTA strip
       var ctaButtons = document.getElementById('ctaButtons');
       if (ctaButtons) {
