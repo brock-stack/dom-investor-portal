@@ -1903,8 +1903,15 @@
       }
     }
 
-
-
+    // Honor ?tab=<name> and #<name> deep-links on load.
+    (function() {
+      var validTabs = ['dashboard','favorites','offers','proformas','transactions','settings','home'];
+      var params = new URLSearchParams(window.location.search);
+      var tab = params.get('tab') || (window.location.hash || '').replace(/^#/, '');
+      if (tab && validTabs.indexOf(tab) !== -1) {
+        switchTab(tab);
+      }
+    })();
 
   })();
   </script>
