@@ -425,8 +425,8 @@
     /* Photos grid */
     .photos-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
     }
     .photos-grid img {
       width: 100%;
@@ -2496,7 +2496,7 @@
           btn.classList.add('active');
           document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
           // Hide map on Pro Forma and Property Details tabs
-          var hideMapTabs = ['proforma', 'details'];
+          var hideMapTabs = ['proforma', 'details', 'photos'];
           var dealBody = document.querySelector('.deal-body-v2');
           if (dealBody) dealBody.classList.toggle('map-hidden', hideMapTabs.indexOf(btn.dataset.tab) !== -1);
           // Comp markers: add when Map & Comps tab active, remove otherwise
