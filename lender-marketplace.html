@@ -223,6 +223,7 @@
     .rate-change.down { color: #22c55e; }
     .rate-divider { width: 1px; height: 28px; background: var(--border); }
     .rate-source { font-size: 11px; color: var(--text-muted); }
+    .rate-source-block { display: flex; flex-direction: column; gap: 2px; }
     @media (max-width: 580px) {
       .rate-bar { gap: 16px; padding: 10px 16px; }
       .rate-divider { display: none; }
@@ -506,13 +507,10 @@
         <span class="rate-change" id="rate15chg"></span>
       </div>
       <div class="rate-divider"></div>
-      <div class="rate-item">
-        <span class="rate-label">5-1 ARM</span>
-        <span class="rate-value" id="rate51">—</span>
-        <span class="rate-change" id="rate51chg"></span>
+      <div class="rate-source-block">
+        <div class="rate-source">Source: Freddie Mac PMMS</div>
+        <div class="rate-source" id="rateLastUpdated"></div>
       </div>
-      <div class="rate-divider"></div>
-      <span class="rate-source">Source: Freddie Mac PMMS</span>
     </div>
 
     <div class="lender-body">
@@ -778,18 +776,22 @@
       };
       if (data.rate30) setRate('rate30', 'rate30chg', data.rate30, data.change30);
       if (data.rate15) setRate('rate15', 'rate15chg', data.rate15, data.change15);
-      if (data.rate51) setRate('rate51', 'rate51chg', data.rate51, '');
-      // Update source label with date if available
+      // Update "Last updated" line
       if (data.date) {
-        var src = document.querySelector('.rate-source');
-        if (src) src.textContent = 'Freddie Mac PMMS — week of ' + data.date;
+        var lu = document.getElementById('rateLastUpdated');
+        if (lu) {
+          var parts = data.date.split('-');
+          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          var formatted = months[parseInt(parts[1], 10) - 1] + ' ' + parseInt(parts[2], 10) + ', ' + parts[0];
+          lu.textContent = 'Last updated: ' + formatted;
+        }
       }
     } catch(e) {
-      // Static fallback
-      ['rate30','rate15','rate51'].forEach(function(id, i){
-        var el = document.getElementById(id);
-        if (el) el.textContent = ['6.30%','5.64%','5.65%'][i];
-      });
+      // Static fallback: 30yr + 15yr only, no date
+      var f30 = document.getElementById('rate30'); if (f30) f30.textContent = '6.30%';
+      var f15 = document.getElementById('rate15'); if (f15) f15.textContent = '5.64%';
+      var lu = document.getElementById('rateLastUpdated');
+      if (lu) lu.textContent = '';
     }
   })();
 
