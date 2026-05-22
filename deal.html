@@ -3660,7 +3660,7 @@
             cel.textContent = i + 1;
             var m = new mapboxgl.Marker(cel).setLngLat([lng, lat])
               .setPopup(new mapboxgl.Popup({offset:15}).setHTML(
-                formatPopupAddr(comp.address||'Comp') +
+                (function(){ var pu = publicCompUrl(comp); return pu ? '<a href="' + escapeHtml(pu) + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dashed currentColor;">' + formatPopupAddr(comp.address||'Comp') + '</a>' : formatPopupAddr(comp.address||'Comp'); })() +
                 '<br><span style="color:#22c55e;font-weight:700;">Sold: ' + Portal.fc(comp.price||comp.sale_price) + '</span>' +
                 '<br>' + (comp.beds||comp.bedrooms||'?') + ' bd / ' + (comp.baths||comp.bathrooms||'?') + ' ba' +
                 (comp.sqft ? ' &bull; ' + comp.sqft.toLocaleString() + ' sqft' : '') +
@@ -3783,6 +3783,23 @@
       return { sold_comps: sold, rental_comps: [] }; // rental + flip: future spec
     }
 
+    function publicCompUrl(comp) {
+      if (!comp) return null;
+      var allowedHosts = ['zillow.com', 'redfin.com', 'realtor.com', 'homes.com'];
+      if (comp.url && typeof comp.url === 'string') {
+        try {
+          var u = new URL(comp.url);
+          var host = u.hostname.replace(/^www\./, '');
+          if (allowedHosts.indexOf(host) !== -1) return comp.url;
+        } catch(e) { /* malformed url — fall through to address rewrite */ }
+      }
+      if (comp.address && typeof comp.address === 'string') {
+        var slug = comp.address.trim().replace(/\s+/g, '-').replace(/[,]/g, '');
+        return 'https://www.zillow.com/homes/' + encodeURIComponent(slug) + '_rb/';
+      }
+      return null;
+    }
+
     function escapeHtml(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
@@ -3810,8 +3827,9 @@
           '<table class="comps-table" id="soldCompsTable" style="margin-bottom:24px;">' +
             '<thead><tr><th>#</th><th>Address</th><th>Beds</th><th>Baths</th><th>Sqft</th><th>$/sqft</th><th>Year</th><th>Sale Price</th><th>Date</th><th>Dist</th></tr></thead>' +
             '<tbody>' + (comps.sold_comps || []).map(function(c, i) {
-              var addrCell = c.url
-                ? '<a href="' + escapeHtml(c.url) + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dashed var(--text-muted);">' + escapeHtml(c.address || '—') + '</a>'
+              var publicUrl = publicCompUrl(c);
+              var addrCell = publicUrl
+                ? '<a href="' + escapeHtml(publicUrl) + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px dashed var(--text-muted);">' + escapeHtml(c.address || '—') + '</a>'
                 : escapeHtml(c.address || '—');
               if (c.notes) addrCell += '<div style="font-size:11px;color:var(--text-muted);font-style:italic;margin-top:2px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + escapeHtml(c.notes) + '</div>';
               var saleCell = '<td style="color:#22c55e;font-weight:700;">' + Portal.fc(c.price || c.sale_price) +
