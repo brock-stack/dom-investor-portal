@@ -719,6 +719,8 @@
     .pf-proj-collapse-header { display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; padding:14px 20px; border-top:1px solid var(--border); font-size:13px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
     .pf-proj-collapse-body { overflow:hidden; transition:max-height 0.4s ease; }
     .pf-proj-collapse-body.collapsed { max-height:0; }
+    .pf-collapsibles-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:24px; }
+    @media (max-width:768px) { .pf-collapsibles-row { grid-template-columns:1fr; } }
 
     /* === BOTTOM CTA BAR === */
     .deal-bottom-bar { display:flex; gap:24px; padding:24px; background:var(--surface); border-top:1px solid var(--border); }
@@ -1537,16 +1539,26 @@
           <div id="pfExitFootnote" style="font-size:11px;color:var(--text-muted);margin-top:12px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;"></div>
         </div>
 
-        <!-- Equity Growth Line Chart -->
-        <div class="pf-chart-card">
-          <div class="pf-chart-title">Equity Growth (Yrs 1–10)</div>
-          <canvas id="pfEquityChart" height="200"></canvas>
-        </div>
 
       </div>
 
-      <!-- Section 3: Year-by-Year Breakdown (collapsible) -->
-      <div class="pf-proj-wrap">
+      <!-- Section 3: Equity Growth + Year-by-Year Breakdown (side-by-side collapsibles) -->
+      <div class="pf-collapsibles-row">
+
+        <!-- Equity Growth (collapsible) -->
+        <div class="pf-proj-wrap" id="pfEquityWrap">
+          <div class="pf-proj-collapse-header" onclick="pfToggleEquityCollapse()" id="pfEquityCollapseHeader">
+            Equity Growth (Yrs 1–10) <span id="pfEquityCollapseChevron" style="transform:rotate(-90deg);display:inline-block;transition:transform 0.3s;">&#9660;</span>
+          </div>
+          <div class="pf-proj-collapse-body collapsed" id="pfEquityCollapseBody" style="max-height:0;">
+            <div style="padding:16px 20px;">
+              <canvas id="pfEquityChart" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year-by-Year Breakdown (collapsible) -->
+        <div class="pf-proj-wrap">
         <div class="pf-proj-collapse-header" onclick="pfToggleProjCollapse()" id="pfProjCollapseHeader">
           Year-by-Year Breakdown <span id="pfProjCollapseChevron">&#9660;</span>
         </div>
@@ -1578,7 +1590,9 @@
             </table>
           </div>
         </div>
-      </div>
+      </div><!-- end pf-proj-wrap (Year-by-Year) -->
+
+      </div><!-- end pf-collapsibles-row -->
 
       <!-- Section 4: Actions + Disclaimer -->
       <div style="display:flex;gap:8px;margin-bottom:16px;" class="pf-print-hide">
@@ -3966,6 +3980,27 @@
           window._pfCharts.expense = null;
         }
         setTimeout(function() { pfCalc(); }, 50);
+      }
+    }
+
+    function pfToggleEquityCollapse() {
+      var body = document.getElementById('pfEquityCollapseBody');
+      var chevron = document.getElementById('pfEquityCollapseChevron');
+      if (!body) return;
+      var isCollapsed = body.classList.contains('collapsed');
+      if (isCollapsed) {
+        body.classList.remove('collapsed');
+        body.style.maxHeight = '600px';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        setTimeout(function() {
+          if (window._pfCharts && window._pfCharts.equity && typeof window._pfCharts.equity.resize === 'function') {
+            window._pfCharts.equity.resize();
+          }
+        }, 400);
+      } else {
+        body.classList.add('collapsed');
+        body.style.maxHeight = '0';
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
       }
     }
 
