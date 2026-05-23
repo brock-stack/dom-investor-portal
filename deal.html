@@ -2449,6 +2449,7 @@
         }
 
         document.getElementById('interestModal').style.display = 'none';
+        if (typeof renderInterestCard === 'function') { try { await renderInterestCard(); } catch(_){} }
         Portal.toast('Thanks! We\'ll be in touch.', 'success');
       } catch(err) {
         Portal.toast('Submit failed: ' + err.message, 'error');
@@ -3031,7 +3032,7 @@
           '<p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">Let us know you\'re interested and our team will follow up.</p>' +
           (interest
             ? '<div class="interest-noted">&#10003; Interest noted ' + interestDate + '</div>'
-            : '<button class="btn-primary" style="width:100%;" onclick="submitInterest(\'' + userId + '\')">I\'m Interested</button>'
+            : '<button class="btn-primary" style="width:100%;" onclick="scrollToInterest()">I\'m Interested</button>'
           ) +
         '</div>';
 
@@ -3043,21 +3044,7 @@
         '</div>';
     }
 
-    async function submitInterest(userId) {
-      var result = await Portal.supabase.from('investor_interest').insert({
-        portal_listing_id: listingId,
-        investor_id: userId,
-        type: 'interested',
-        notes: null
-      });
-      if (result.error) {
-        Portal.toast('Unable to submit interest. Please try again.', 'error');
-        return;
-      }
-      Portal.toast('Interest submitted! Our team will be in touch.', 'success');
-      var now = new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
-      document.getElementById('interestCard').innerHTML = '<h3>Express Interest</h3><div class="interest-noted" style="margin-top:12px;">&#10003; Interest noted ' + now + '</div>';
-    }
+
 
     async function scrollToInterest() {
       var modal = document.getElementById('interestModal');
