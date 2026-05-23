@@ -3498,6 +3498,7 @@
 
     function renderPropertyDetails() {
       function fv(v) { return (v != null && v !== '' && v !== false && v !== 'false') ? String(v) : null; }
+      function tc(v) { var s = fv(v); if (s == null) return null; return s.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); }); }
       function cell(label, val, span) {
         if (val == null) val = '\u2014';
         var style = 'padding:12px 16px;border-bottom:1px solid var(--border);' + (span ? 'grid-column:1/-1;' : '');
@@ -3565,17 +3566,17 @@
         cell('Lot Size', lotDisplay) +
         cell('Stories', fv(property.stories)) +
         cell('Property Type', property.property_type ? slugLabel(property.property_type) : null) +
-        cell('County', fv(property.county)) +
-        cell('Zoning', fv(property.zoning))
+        cell('County', tc(property.county)) +
+        cell('Zoning', tc(property.zoning))
       );
 
       // CONSTRUCTION grid
       html += grid(
         sectionHeader('Construction') +
-        cell('Construction Type', fv(property.construction_type)) +
-        cell('Flooring', fv(property.floor_cover_type || property.flooring)) +
+        cell('Construction Type', tc(property.construction_type)) +
+        cell('Flooring', tc(property.floor_cover_type || property.flooring)) +
         cell('Garage', garageDisplay) +
-        cell('Roof Type', fv(property.roof_type)) +
+        cell('Roof Type', tc(property.roof_type)) +
         cell('Pool', property.has_pool === true ? 'Yes' : (property.has_pool === false ? 'No' : null)) +
         cell('Stories', fv(property.stories))
       );
@@ -3583,11 +3584,11 @@
       // UTILITIES & HOA grid
       html += grid(
         sectionHeader('Utilities & HOA') +
-        cell('Heating', fv(property.heating_type || property.heating)) +
-        cell('Cooling / A/C', fv(property.ac_type || property.cooling)) +
+        cell('Heating', tc(property.heating_type || property.heating)) +
+        cell('Cooling / A/C', tc(property.ac_type || property.cooling)) +
         cell('HOA', hoaDisplay) +
-        cell('Sewer', fv(property.sewer_type || property.sewer)) +
-        cell('Water', fv(property.water_type || property.water)) +
+        cell('Sewer', tc(property.sewer_type || property.sewer)) +
+        cell('Water', tc(property.water_type || property.water)) +
         cell('Flood Zone', floodDisplay)
       );
 
@@ -3595,8 +3596,8 @@
       html += grid(
         sectionHeader('Legal') +
         cell('Parcel ID', fv(property.parcel_number) || fv(property.parcel_id)) +
-        cell('Zoning', fv(property.zoning)) +
-        cell('MLS Status', fv(property.mls_status)) +
+        cell('Zoning', tc(property.zoning)) +
+        cell('MLS Status', tc(property.mls_status)) +
         cell('Legal Description', fv(property.legal_description), true)
       );
 
