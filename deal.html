@@ -2977,9 +2977,29 @@
       document.getElementById('interestCard').innerHTML = '<h3>Express Interest</h3><div class="interest-noted" style="margin-top:12px;">&#10003; Interest noted ' + now + '</div>';
     }
 
-    function scrollToInterest() {
+    async function scrollToInterest() {
       var modal = document.getElementById('interestModal');
-      if (modal) { modal.style.display = 'flex'; }
+      if (!modal) return;
+      modal.style.display = 'flex';
+      try {
+        var sessionResult = await Portal.supabase.auth.getSession();
+        var session = sessionResult && sessionResult.data && sessionResult.data.session;
+        if (!session || !session.user) return;
+        var pu = await Portal.supabase
+          .from('portal_users')
+          .select('first_name, last_name, email, phone')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!pu.data) return;
+        var fn = document.getElementById('iFirstName');
+        var ln = document.getElementById('iLastName');
+        var em = document.getElementById('iEmail');
+        var ph = document.getElementById('iPhone');
+        if (fn && !fn.value && pu.data.first_name) fn.value = pu.data.first_name;
+        if (ln && !ln.value && pu.data.last_name) ln.value = pu.data.last_name;
+        if (em && !em.value && pu.data.email) em.value = pu.data.email;
+        if (ph && !ph.value && pu.data.phone) ph.value = pu.data.phone;
+      } catch(e) { /* silent — modal stays usable blank */ }
     }
 
     // ============ PRO FORMA V2 ============
