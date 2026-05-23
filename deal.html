@@ -381,6 +381,26 @@
       font-size: 13px;
       font-weight: 600;
     }
+    .btn-interest-submitted {
+      background: rgba(34,197,94,0.12);
+      border: 1.5px solid rgba(34,197,94,0.5);
+      color: var(--green);
+      border-radius: 7px;
+      padding: 11px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: default;
+      font-family: 'Inter', sans-serif;
+      flex: 1;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .btn-interest-submitted:disabled { opacity: 1; }
+    .hero-action-btns .btn-interest-submitted { min-height: 54px; padding: 11px 20px; font-size: 16px; }
 
     /* Pro forma */
     .pro-forma-section {
@@ -999,7 +1019,7 @@
       <!-- Actions -->
       <div class="hero-action-btns" id="headerCtaArea">
         <button class="btn-primary" style="min-height:54px;font-size:16px;" onclick="goToOffer()">Make an Offer</button>
-        <button class="btn-outline-secondary" style="min-height:54px;font-size:16px;" onclick="scrollToInterest()">I'm Interested</button>
+        <button class="btn-outline-secondary" style="min-height:54px;font-size:16px;" onclick="scrollToInterest()" data-interest-cta>I'm Interested</button>
       </div>
     </div>
   </div>
@@ -1673,7 +1693,7 @@
   <!-- Sticky CTA bar for mobile -->
   <div class="deal-sticky-cta" id="dealStickyCta">
     <button class="btn-primary" onclick="goToOffer()">Make an Offer</button>
-    <button class="btn-outline-secondary" onclick="scrollToInterest()">I'm Interested</button>
+    <button class="btn-outline-secondary" onclick="scrollToInterest()" data-interest-cta>I'm Interested</button>
   </div>
   <div id="portalToast"></div>
   <script>
@@ -2365,9 +2385,9 @@
             email: investorEmail,
             phone: phone
           }
-        }).select('id');
+        });
         if (intRes.error) throw new Error(intRes.error.message);
-        var interestRowId = (intRes.data && intRes.data[0]) ? intRes.data[0].id : null;
+        var interestRowId = null; // RETURNING not used — RLS would block it for non-team users
 
         // 2. Investor confirmation email (existing, unchanged)
         if (investorEmail) {
@@ -2449,7 +2469,7 @@
         }
 
         document.getElementById('interestModal').style.display = 'none';
-        if (typeof renderInterestCard === 'function') { try { await renderInterestCard(); } catch(_){} }
+        try { await _refreshInterestState(); } catch(_){}
         Portal.toast('Thanks! We\'ll be in touch.', 'success');
       } catch(err) {
         Portal.toast('Submit failed: ' + err.message, 'error');
@@ -2960,7 +2980,7 @@
       }
 
       // CTA cards in right column
-      await renderInterestSidebar(session ? session.user.id : null);
+      await _refreshInterestState();
 
       // Section 3: Key Features
       var featuresEl = document.getElementById('keyFeatures');
@@ -3010,27 +3030,81 @@
       }
     }
 
+    // Returns the latest matching investor_interest row for the current user on this listing, or null.
+    // Lookup keys (OR'd): investor_id (when contact_id resolves) AND/OR meta->>email (session email fallback).
+    async function _userHasInterest(targetListingId) {
+      if (!targetListingId) return null;
+      try {
+        var session = await Portal.getSession();
+        if (!session) return null;
+        // Resolve contact_id from portal_users (v2.2.8 lookup key)
+        var contactId = null;
+        try {
+          var puRes = await Portal.supabase.from('portal_users').select('contact_id').eq('user_id', session.user.id).maybeSingle();
+          if (puRes.data) contactId = puRes.data.contact_id;
+        } catch(_){}
+        var sessionEmail = session.user.email || null;
+        // Build OR filter — covers both lookup paths
+        var orParts = [];
+        if (contactId) orParts.push('investor_id.eq.' + contactId);
+        if (sessionEmail) orParts.push('meta->>email.eq.' + sessionEmail);
+        if (!orParts.length) return null;
+        var q = Portal.supabase.from('investor_interest')
+          .select('id, created_at, type, investor_id, meta')
+          .eq('portal_listing_id', targetListingId)
+          .or(orParts.join(','))
+          .order('created_at', { ascending: false })
+          .limit(1);
+        var res = await q.maybeSingle();
+        return (res && res.data) ? res.data : null;
+      } catch(e) { console.warn('[_userHasInterest]', e && e.message); return null; }
+    }
+
+    async function _refreshInterestState() {
+      var hasInterest = await _userHasInterest(listingId);
+      // Update header + sticky CTA buttons (any element tagged with data-interest-cta)
+      _setInterestCtaButtons(!!hasInterest, hasInterest && hasInterest.created_at);
+      // Update footer card via existing renderer
+      try {
+        var session = await Portal.getSession();
+        await renderInterestSidebar(session ? session.user.id : null);
+      } catch(_){}
+    }
+
+    function _setInterestCtaButtons(isInterested, createdAt) {
+      var btns = document.querySelectorAll('[data-interest-cta]');
+      btns.forEach(function(btn) {
+        if (isInterested) {
+          btn.className = 'btn-interest-submitted';
+          btn.removeAttribute('onclick');
+          btn.setAttribute('disabled', 'disabled');
+          btn.innerHTML = '&#10003; Interested';
+          btn.title = createdAt ? 'Interest expressed ' + new Date(createdAt).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : 'Interest expressed';
+        } else {
+          btn.className = 'btn-outline-secondary';
+          btn.setAttribute('onclick', 'scrollToInterest()');
+          btn.removeAttribute('disabled');
+          btn.textContent = "I'm Interested";
+          btn.removeAttribute('title');
+        }
+      });
+    }
+
     async function renderInterestSidebar(userId) {
       var leftEl = document.getElementById('dealCTALeft');
       var rightEl = document.getElementById('dealCTARight');
       if (!leftEl && !rightEl) return;
-      if (!userId) return; // not logged in — modals handle unauthenticated case
 
-      var result = await Portal.supabase
-        .from('investor_interest')
-        .select('id, created_at, type')
-        .eq('portal_listing_id', listingId)
-        .eq('investor_id', userId)
-        .maybeSingle();
-
-      var interest = result.data;
-      var interestDate = interest ? new Date(interest.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : null;
+      var hasInterest = await _userHasInterest(listingId);
+      var interestDate = hasInterest && hasInterest.created_at
+        ? new Date(hasInterest.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
+        : null;
 
       if (leftEl) leftEl.innerHTML =
         '<div class="interest-card" id="interestCard">' +
           '<h3>Express Interest</h3>' +
           '<p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">Let us know you\'re interested and our team will follow up.</p>' +
-          (interest
+          (hasInterest
             ? '<div class="interest-noted">&#10003; Interest noted ' + interestDate + '</div>'
             : '<button class="btn-primary" style="width:100%;" onclick="scrollToInterest()">I\'m Interested</button>'
           ) +
