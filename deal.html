@@ -2337,22 +2337,30 @@
       if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
       try {
         var session = await Portal.getSession();
-        var userId = null;
+        var contactId = null;
         if (session) {
-          var puRes = await Portal.supabase.from('portal_users').select('id').eq('user_id', session.user.id).maybeSingle();
-          if (puRes.data) userId = puRes.data.id;
+          // Resolve the linked CRM contact (NOT the portal_users.id — investor_id FK points to contacts.id)
+          var puRes = await Portal.supabase
+            .from('portal_users')
+            .select('contact_id')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+          if (puRes.data) contactId = puRes.data.contact_id;
         }
         var intRes = await Portal.supabase.from('investor_interest').insert({
-          user_id: userId,
-          listing_id: listingId,
-          name: (first + ' ' + last).trim(),
-          email: email || (session ? session.user.email : null),
-          phone: phone,
-          message: notes || null,
-          status: 'new'
+          portal_listing_id: listingId,
+          investor_id: contactId, // null when no CRM contact yet — FK allows it
+          type: 'interested',
+          notes: notes || null,
+          meta: {
+            first_name: first,
+            last_name: last,
+            email: email || (session ? session.user.email : null),
+            phone: phone
+          }
         });
         if (intRes.error) throw new Error(intRes.error.message);
-        // Send confirmation email
+        // Send confirmation email (existing path, unchanged)
         var toEmail = email || (session ? session.user.email : null);
         if (toEmail) {
           var tplRes = await Portal.supabase.from('email_templates').select('subject,body_html').eq('api_name','investor_portal_express_interest').maybeSingle();
