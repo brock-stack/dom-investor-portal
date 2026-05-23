@@ -2385,9 +2385,9 @@
             email: investorEmail,
             phone: phone
           }
-        }).select('id');
+        });
         if (intRes.error) throw new Error(intRes.error.message);
-        var interestRowId = (intRes.data && intRes.data[0]) ? intRes.data[0].id : null;
+        var interestRowId = null; // RETURNING not used — RLS would block it for non-team users
 
         // 2. Investor confirmation email (existing, unchanged)
         if (investorEmail) {
