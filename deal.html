@@ -2258,7 +2258,7 @@
         }
 
         // 2. Team notifications (email + SMS) — fire-and-forget
-        Portal.supabase.from('team_members').select('email,phone,notification_email,notification_sms').eq('notification_email',true).then(async function(tmRes) {
+        Portal.supabase.from('team_members').select('email,phone,notification_email,notification_sms').eq('role','admin').eq('notification_email',true).then(async function(tmRes) {
           var teamEmailTpl = await Portal.supabase.from('email_templates').select('subject,body_html').eq('api_name','team_offer_submitted').maybeSingle();
           var teamSmsTpl = await Portal.supabase.from('email_templates').select('body_text').eq('api_name','team_sms_offer_submitted').maybeSingle();
           var members = tmRes.data || [];
@@ -2339,7 +2339,6 @@
         var session = await Portal.getSession();
         var contactId = null;
         if (session) {
-          // Resolve the linked CRM contact (NOT the portal_users.id — investor_id FK points to contacts.id)
           var puRes = await Portal.supabase
             .from('portal_users')
             .select('contact_id')
@@ -2347,33 +2346,108 @@
             .maybeSingle();
           if (puRes.data) contactId = puRes.data.contact_id;
         }
+
+        var investorName = (first + ' ' + last).trim();
+        var investorEmail = email || (session ? session.user.email : null);
+        var propAddr = property ? [property.address, property.city, property.state].filter(Boolean).join(', ') : 'the property';
+        var interestAdminUrl = 'https://ai.directoffmarket.com/listings.html';
+        var submittedAt = new Date().toLocaleString('en-US',{timeZone:'America/New_York',month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true}) + ' ET';
+
+        // 1. Insert investor_interest row (v2.2.8 shape)
         var intRes = await Portal.supabase.from('investor_interest').insert({
           portal_listing_id: listingId,
-          investor_id: contactId, // null when no CRM contact yet — FK allows it
+          investor_id: contactId,
           type: 'interested',
           notes: notes || null,
           meta: {
             first_name: first,
             last_name: last,
-            email: email || (session ? session.user.email : null),
+            email: investorEmail,
             phone: phone
           }
-        });
+        }).select('id');
         if (intRes.error) throw new Error(intRes.error.message);
-        // Send confirmation email (existing path, unchanged)
-        var toEmail = email || (session ? session.user.email : null);
-        if (toEmail) {
+        var interestRowId = (intRes.data && intRes.data[0]) ? intRes.data[0].id : null;
+
+        // 2. Investor confirmation email (existing, unchanged)
+        if (investorEmail) {
           var tplRes = await Portal.supabase.from('email_templates').select('subject,body_html').eq('api_name','investor_portal_express_interest').maybeSingle();
           if (tplRes.data) {
-            var propAddr = property ? [property.address, property.city, property.state].filter(Boolean).join(', ') : 'the property';
             var body = tplRes.data.body_html
               .replace(/\{\{first_name\}\}/g, first || 'Investor')
               .replace(/\{\{property_address\}\}/g, propAddr);
-            await Portal.supabase.functions.invoke('send-email', {
-              body: { to: toEmail, from: 'alerts@directoffmarket.com', subject: tplRes.data.subject, body_html: body }
-            });
+            Portal.supabase.functions.invoke('send-email', {
+              body: { to: investorEmail, from: 'alerts@directoffmarket.com', subject: tplRes.data.subject, body_html: body }
+            }).catch(function(){});
           }
         }
+
+        // 3. Team notifications (email + SMS) — fire-and-forget, mirrors offer block
+        // role='admin' filter ensures only Andrew + Brock receive these (no agent noise)
+        Portal.supabase.from('team_members')
+          .select('email,phone,notification_email,notification_sms')
+          .eq('role', 'admin')
+          .eq('notification_email', true)
+          .then(async function(tmRes) {
+            var teamEmailTpl = await Portal.supabase.from('email_templates')
+              .select('subject,body_html')
+              .eq('api_name','team_interest_submitted').maybeSingle();
+            var teamSmsTpl = await Portal.supabase.from('email_templates')
+              .select('body_text')
+              .eq('api_name','team_sms_interest_submitted').maybeSingle();
+            var members = tmRes.data || [];
+            for (var i=0; i<members.length; i++) {
+              var m = members[i];
+              // Team email
+              if (m.notification_email && m.email && teamEmailTpl.data) {
+                var tBody = teamEmailTpl.data.body_html
+                  .replace(/\{\{property_address\}\}/g, propAddr || 'Unknown')
+                  .replace(/\{\{investor_name\}\}/g, investorName)
+                  .replace(/\{\{investor_email\}\}/g, investorEmail || 'Not provided')
+                  .replace(/\{\{investor_phone\}\}/g, phone || 'Not provided')
+                  .replace(/\{\{message\}\}/g, notes || '(no message)')
+                  .replace(/\{\{submitted_at\}\}/g, submittedAt)
+                  .replace(/\{\{interest_admin_url\}\}/g, interestAdminUrl);
+                var tSubj = (teamEmailTpl.data.subject||'New Interest')
+                  .replace(/\{\{investor_name\}\}/g, investorName)
+                  .replace(/\{\{property_address\}\}/g, propAddr||'Unknown');
+                Portal.supabase.functions.invoke('send-email', { body: { to: m.email, from: 'alerts@directoffmarket.com', subject: tSubj, body_html: tBody } }).catch(function(){});
+              }
+              // Team SMS
+              if (m.notification_sms && m.phone && teamSmsTpl.data) {
+                var smsPhone = m.phone.replace(/\D/g,'');
+                if (smsPhone.length === 10) smsPhone = '+1' + smsPhone;
+                else if (smsPhone.length === 11 && smsPhone[0] === '1') smsPhone = '+' + smsPhone;
+                else smsPhone = '+' + smsPhone;
+                var smsBody = (teamSmsTpl.data.body_text||'')
+                  .replace(/\{\{property_address\}\}/g, propAddr||'Unknown')
+                  .replace(/\{\{investor_name\}\}/g, investorName)
+                  .replace(/\{\{investor_phone\}\}/g, phone||'')
+                  .replace(/\{\{interest_admin_url\}\}/g, interestAdminUrl);
+                Portal.supabase.functions.invoke('send-sms', { body: { to: smsPhone, body: smsBody } }).catch(function(){});
+              }
+            }
+          }).catch(function(){});
+
+        // 4. Log activity_events row (awaited — small, fast, needed for CRM feed)
+        if (listing && listing.property_id) {
+          try {
+            await Portal.supabase.from('activity_events').insert({
+              record_type: 'properties',
+              record_id: listing.property_id,
+              property_id: listing.property_id,
+              event_type: 'interest_submitted',
+              body: investorName + ' expressed interest in ' + (propAddr || 'this property') + (notes ? ' — "' + notes.substring(0,120) + (notes.length>120?'…':'') + '"' : ''),
+              event_data: {
+                investor_email: investorEmail,
+                investor_phone: phone,
+                portal_listing_id: listingId,
+                investor_interest_id: interestRowId
+              }
+            });
+          } catch(_){}
+        }
+
         document.getElementById('interestModal').style.display = 'none';
         Portal.toast('Thanks! We\'ll be in touch.', 'success');
       } catch(err) {
