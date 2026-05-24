@@ -428,7 +428,7 @@
       border: 1px solid #4fc3f7;
       border-radius: 6px;
       padding: 7px 10px;
-      color: var(--text);
+      color: #0f172a;
       font-size: 14px;
       font-family: 'Inter', sans-serif;
       outline: none;
@@ -716,7 +716,7 @@
     .pf-gauge-svg { display:block; margin:0 auto 8px; }
     .pf-gauge-label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; justify-content:center; gap:4px; }
     .pf-dscr-bar-wrap { width:100%; margin:8px 0; }
-    .pf-dscr-bar-track { position:relative; height:14px; border-radius:7px; overflow:visible; background: linear-gradient(to right, #ef4444 0%, #ef4444 50%, #f59e0b 50%, #f59e0b 62.5%, #22c55e 62.5%, #22c55e 100%); }
+    .pf-dscr-bar-track { position:relative; height:14px; border-radius:7px; overflow:visible; background: linear-gradient(to right, #ef4444 0%, #ef4444 50%, #f59e0b 50%, #f59e0b 54%, #22c55e 54%, #22c55e 100%); }
     .pf-dscr-marker { position:absolute; top:50%; transform:translate(-50%,-50%); width:16px; height:16px; border-radius:50%; background:#fff; border:3px solid #334155; box-shadow:0 1px 4px rgba(0,0,0,0.4); transition:left 0.3s; }
     .pf-dscr-value { font-size:18px; font-weight:800; color:var(--text); margin-bottom:2px; }
 
@@ -1250,7 +1250,7 @@
               <div class="pf-dscr-marker" id="gauge_dscr_marker" style="left:0%;"></div>
             </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:2px;"><span>0x</span><span>1.0x</span><span>1.25x</span><span>2.0x</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:2px;"><span>0x</span><span>1.0x</span><span>1.08x</span><span>2.0x</span></div>
           <div class="pf-gauge-label" style="margin-top:6px;">DSCR</div>
         </div>
       </div>
@@ -3653,8 +3653,106 @@
       pfCalc();
     }
 
-    function pfSave() {
-      Portal.toast('Pro Forma saving coming soon.', 'info');
+    async function pfSave() {
+      try {
+        // 1. Confirm logged in
+        var session = await Portal.getSession();
+        if (!session || !session.user) {
+          Portal.toast('Sign in to save your pro forma.', 'info');
+          return;
+        }
+
+        // 2. Resolve portal_users.id from auth user id
+        var puRes = await Portal.supabase
+          .from('portal_users')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!puRes.data || !puRes.data.id) {
+          Portal.toast('Could not resolve your portal profile.', 'error');
+          return;
+        }
+        var portalUserId = puRes.data.id;
+
+        // 3. Collect inputs from all pf2_* fields
+        var inputIds = [
+          'pf2_purchasePrice','pf2_closingCostPct','pf2_cashPurchase','pf2_downPct',
+          'pf2_loanFeePct','pf2_loanAmount','pf2_loanType','pf2_mortgageRate',
+          'pf2_rentLow','pf2_rentHigh','pf2_otherIncome','pf2_vacancyPct',
+          'pf2_propTaxPct','pf2_insurance','pf2_hoaMonthly','pf2_repairPct','pf2_pmPct',
+          'pf2_rentGrowth','pf2_expGrowth','pf2_priceGrowth','pf2_costOfSale'
+        ];
+        var inputs = {};
+        inputIds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          if (el.type === 'checkbox') inputs[id] = el.checked;
+          else inputs[id] = el.value;
+        });
+        // Also include the active hold period
+        if (typeof pf2HoldYears !== 'undefined') inputs.pf2HoldYears = pf2HoldYears;
+
+        // 4. Collect outputs (KPIs + bottom-line results)
+        function dom(id) {
+          var el = document.getElementById(id);
+          return el ? (el.textContent || '').trim() : null;
+        }
+        function pctNum(str) {
+          if (!str) return null;
+          var n = parseFloat(String(str).replace(/[^0-9.\-]/g, ''));
+          return isFinite(n) ? n : null;
+        }
+        var outputs = {
+          cap_rate:       pctNum(dom('gauge_capRate_val')),
+          coc_return:     pctNum(dom('gauge_coc_val')),
+          dscr:           (function(){ var s = dom('gauge_dscr_val'); var n = s ? parseFloat(s) : null; return isFinite(n) ? n : null; })(),
+          day1_equity:    dom('r2_day1Equity'),
+          monthly_cf:     dom('r2_monthlyCF'),
+          annual_cf:      dom('r2_annualCF'),
+          noi:            dom('r2_noi'),
+          total_acq_cost: dom('r2_totalAcqCost'),
+          initial_inv:    dom('r2_initialInvestment'),
+          debt_service:   dom('r2_debtService'),
+          hold_years:     dom('r2_holdLabel'),
+          sale_value:     dom('r2_saleValue'),
+          total_return:   dom('r2_totalReturn'),
+          ann_return:     dom('r2_annReturn'),
+          eq_multiple:    dom('r2_eqMultiple'),
+          irr:            dom('r2_irr')
+        };
+
+        // 5. Build name: short address + timestamp
+        var shortAddr = (property && property.address) ? property.address : 'Pro Forma';
+        var now = new Date();
+        var stamp = now.toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+        var name = shortAddr + ' - ' + stamp;
+
+        // 6. Insert row
+        var insertRes = await Portal.supabase
+          .from('investor_saved_proformas')
+          .insert({
+            user_id:     portalUserId,
+            listing_id:  (listing && listing.listing_id) ? listing.listing_id : null,
+            property_id: (property && property.id) ? property.id : null,
+            name:        name,
+            inputs:      inputs,
+            outputs:     outputs,
+            archived:    false
+          })
+          .select('id')
+          .single();
+
+        if (insertRes.error) {
+          console.error('pfSave insert error:', insertRes.error);
+          Portal.toast('Could not save pro forma. Try again.', 'error');
+          return;
+        }
+
+        Portal.toast('Pro forma saved to your dashboard.', 'success');
+      } catch (e) {
+        console.error('pfSave error:', e);
+        Portal.toast('Could not save pro forma. Try again.', 'error');
+      }
     }
 
     function pfPrint() {
@@ -4561,7 +4659,7 @@
       if (!isFinite(dVal)) { valEl.textContent = '\u2014'; marker.style.left = '0%'; return; }
       valEl.textContent = (dVal < 0 ? '-' : '') + Math.abs(dVal).toFixed(2) + 'x';
       // Color
-      if (dscrValue >= 1.25) valEl.style.color = '#22c55e';
+      if (dscrValue >= 1.08) valEl.style.color = '#22c55e';
       else if (dscrValue >= 1.0) valEl.style.color = '#f59e0b';
       else valEl.style.color = '#ef4444';
       // Position on 0-2.0 scale
