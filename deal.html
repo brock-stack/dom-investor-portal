@@ -3732,7 +3732,7 @@
           .from('investor_saved_proformas')
           .insert({
             user_id:     portalUserId,
-            listing_id:  (typeof listingId !== 'undefined' ? listingId : null),
+            listing_id:  (listing && listing.listing_id) ? listing.listing_id : null,
             property_id: (property && property.id) ? property.id : null,
             name:        name,
             inputs:      inputs,
