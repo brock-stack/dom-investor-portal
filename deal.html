@@ -3672,161 +3672,212 @@
 
     async function pfGeneratePDF() {
       var { jsPDF } = window.jspdf;
-      var doc = new jsPDF({ unit: 'pt', format: 'letter' }); // 612 x 792 pt
-      var W = doc.internal.pageSize.getWidth();
-      var H = doc.internal.pageSize.getHeight();
-      var M = 48; // page margin
-      var y = M;
 
-      // ---- Address + filename ----
+      // Helper: read DOM value, return '-' if missing (ASCII only)
+      function dom(id) {
+        var el = document.getElementById(id);
+        return el ? (el.textContent || '').trim() : '-';
+      }
+
+      // Build address + filename
       var addr = (property && property.address)
         ? [property.address, property.city, property.state, property.zip].filter(Boolean).join(', ')
         : 'Pro Forma';
 
-      // ---- Helper: text value from DOM id ----
-      function dom(id) {
-        var el = document.getElementById(id);
-        return el ? (el.textContent || '').trim() : '—';
+      // Palette (RGB arrays for apply())
+      var TEAL    = [14, 116, 144];   // #0e7490
+      var NAVY    = [15, 23, 42];     // #0f172a
+      var MUTED   = [100, 116, 139];  // #64748b
+      var RED     = [220, 38, 38];    // #dc2626
+      var BORDER  = [203, 213, 225];  // #cbd5e1
+      var BAND_BG = [241, 245, 249];  // #f1f5f9
+      var TILE_BG = [248, 250, 252];  // #f8fafc
+
+      // Document
+      var pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+      var W = pdf.internal.pageSize.getWidth();  // 612
+      var H = pdf.internal.pageSize.getHeight(); // 792
+      var M = 36; // page margin
+      var contentW = W - 2 * M; // 540
+      var y; // current draw cursor
+
+      // ---- Brand strip (top of every page — drawn in final loop) ----
+      function drawBrandStrip(pageNum, pageTotal) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor.apply(pdf, NAVY);
+        pdf.text('Direct Off Market', M, M);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf, MUTED);
+        pdf.text(addr, M, M + 12);
+        pdf.text('Page ' + pageNum + ' of ' + pageTotal, W - M, M + 12, { align: 'right' });
+        pdf.setDrawColor.apply(pdf, BORDER);
+        pdf.setLineWidth(0.5);
+        pdf.line(M, M + 18, W - M, M + 18);
       }
 
-      // ---- Header (every page) ----
-      function drawHeader(pageNum, pageTotal) {
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.setTextColor(15, 23, 42);
-        doc.text('Direct Off Market', M, M - 18);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.setTextColor(100, 116, 139);
-        doc.text(addr, M, M - 4);
-        doc.setFontSize(9);
-        doc.text('Page ' + pageNum + ' of ' + pageTotal, W - M, M - 4, { align: 'right' });
-        doc.setDrawColor(226, 232, 240);
-        doc.line(M, M + 4, W - M, M + 4);
-      }
-
-      // ---- Footer (every page) ----
+      // ---- Footer (bottom of every page — drawn in final loop) ----
       function drawFooter() {
-        doc.setFont('helvetica', 'italic');
-        doc.setFontSize(8);
-        doc.setTextColor(148, 163, 184);
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf, MUTED);
         var today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
-        doc.text('Generated ' + today + ' · For informational and illustrative purposes only. Not investment advice.', M, H - 24);
+        pdf.text('Generated ' + today + ' - For informational and illustrative purposes only. Not investment advice.', M, H - 18);
       }
 
-      // ---- Title block ----
-      y = M + 24;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(20);
-      doc.setTextColor(15, 23, 42);
-      doc.text('Investment Pro Forma', M, y);
-      y += 22;
+      // ---- Start page 1 ----
+      y = M + 36; // below brand strip
 
-      // ---- KPI strip (3 across) ----
-      var kpis = [
-        { label: 'Cap Rate',      value: dom('gauge_capRate_val') },
-        { label: 'Cash-on-Cash',  value: dom('gauge_coc_val') },
-        { label: 'DSCR',          value: dom('gauge_dscr_val') }
-      ];
-      var kpiW = (W - 2 * M - 16) / 3;
-      kpis.forEach(function (k, i) {
-        var x = M + i * (kpiW + 8);
-        doc.setDrawColor(226, 232, 240);
-        doc.setFillColor(248, 250, 252);
-        doc.roundedRect(x, y, kpiW, 50, 6, 6, 'FD');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(16);
-        doc.setTextColor(14, 116, 144);
-        doc.text(k.value || '—', x + kpiW / 2, y + 26, { align: 'center' });
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(100, 116, 139);
-        doc.text(k.label, x + kpiW / 2, y + 42, { align: 'center' });
-      });
-      y += 70;
+      // ---- Document title ----
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(20);
+      pdf.setTextColor.apply(pdf, NAVY);
+      pdf.text('Investment Pro Forma', M, y);
+      y += 18;
 
-      // ---- Acquisition Summary table ----
-      doc.autoTable({
-        startY: y,
-        margin: { left: M, right: M },
-        theme: 'plain',
-        headStyles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 11 },
-        bodyStyles: { fontSize: 10, textColor: [30, 41, 59] },
-        head: [['Acquisition Summary', '']],
-        body: [
-          ['Purchase Price',          dom('r2_purchasePrice')],
-          ['+ Closing Costs',         dom('r2_closingCosts')],
-          ['+ Loan Fees',             dom('r2_loanFees')],
-          ['= Total Acquisition Cost',dom('r2_totalAcqCost')],
-          ['Down Payment',            dom('r2_downPayment')],
-          ['= Initial Investment',    dom('r2_initialInvestment')],
-          ['Day 1 Equity',            dom('r2_day1Equity')]
-        ],
-        columnStyles: { 1: { halign: 'right' } }
-      });
-      y = doc.lastAutoTable.finalY + 16;
+      // ---- KPI tiles row helper ----
+      function drawKpiRow(items, height, valueSize) {
+        var gap = 10;
+        var tileW = (contentW - gap * (items.length - 1)) / items.length;
+        items.forEach(function(it, i) {
+          var x = M + i * (tileW + gap);
+          pdf.setDrawColor.apply(pdf, BORDER);
+          pdf.setFillColor.apply(pdf, TILE_BG);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(x, y, tileW, height, 6, 6, 'FD');
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(valueSize);
+          pdf.setTextColor.apply(pdf, TEAL);
+          pdf.text(it.value || '-', x + tileW / 2, y + height * 0.55, { align: 'center' });
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor.apply(pdf, MUTED);
+          pdf.text(it.label.toUpperCase(), x + tileW / 2, y + height - 8, { align: 'center' });
+        });
+        y += height + 12;
+      }
 
-      // ---- Annual Income & Expenses table ----
-      doc.autoTable({
-        startY: y,
-        margin: { left: M, right: M },
-        theme: 'plain',
-        headStyles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 11 },
-        bodyStyles: { fontSize: 10, textColor: [30, 41, 59] },
-        head: [['Annual Income & Expenses', '']],
-        body: [
-          ['Gross Rental Income',       dom('r2_grossIncome')],
-          ['− Vacancy Loss',            dom('r2_vacancyLoss')],
-          ['= Effective Gross Income',  dom('r2_egi')],
-          ['− Property Tax',            dom('r2_propTax')],
-          ['− Insurance',              dom('r2_insurance')],
-          ['− HOA',                    dom('r2_hoa')],
-          ['− Repair & Maintenance',   dom('r2_repairs')],
-          ['− Property Management',    dom('r2_pm')],
-          ['= Net Operating Income',   dom('r2_noi')],
-          ['− Annual Debt Service',    dom('r2_debtService')],
-          ['= Annual Cash Flow',       dom('r2_annualCF')],
-          ['Monthly Cash Flow',        dom('r2_monthlyCF')]
-        ],
-        columnStyles: { 1: { halign: 'right' } }
-      });
-      y = doc.lastAutoTable.finalY + 16;
+      // Primary KPI row
+      drawKpiRow([
+        { label: 'Cap Rate',     value: dom('gauge_capRate_val') },
+        { label: 'Cash-on-Cash', value: dom('gauge_coc_val') },
+        { label: 'DSCR',         value: dom('gauge_dscr_val') }
+      ], 60, 22);
 
-      // ---- Exit Analysis table ----
-      var holdLbl = dom('r2_holdLabel');
-      doc.autoTable({
-        startY: y,
-        margin: { left: M, right: M },
-        theme: 'plain',
-        headStyles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 11 },
-        bodyStyles: { fontSize: 10, textColor: [30, 41, 59] },
-        head: [['Exit Analysis (' + holdLbl + ' yr)', '']],
-        body: [
-          ['Est. Market Value at Sale',      dom('r2_saleValue')],
-          ['− Cost of Sale',                dom('r2_costOfSale')],
-          ['− Remaining Loan Balance',      dom('r2_loanBal')],
-          ['= Est. Proceeds at Sale',        dom('r2_saleProceeds')],
-          ['+ Total Cash Flow During Hold',  dom('r2_totalCFHold')],
-          ['= Est. Total Return',            dom('r2_totalReturn')],
-          ['Est. Annualized Return',         dom('r2_annReturn')],
-          ['Equity Multiple',               dom('r2_eqMultiple')],
-          ['IRR',                           dom('r2_irr')]
-        ],
-        columnStyles: { 1: { halign: 'right' } }
-      });
+      // Secondary money tile row
+      drawKpiRow([
+        { label: 'Day 1 Equity',              value: dom('r2_day1Equity') },
+        { label: 'Monthly Cash Flow (Yr 1)',  value: dom('r2_monthlyCF') },
+        { label: 'Annual Cash Flow',          value: dom('r2_annualCF') }
+      ], 48, 16);
 
-      // ---- Header/footer on every page (do after all content drawn) ----
-      var pageCount = doc.internal.getNumberOfPages();
+      y += 6; // extra breathing room before first section
+
+      // ---- Section banner helper ----
+      // If estimatedH given and section won't fit, start a new page first
+      function drawSectionBanner(title, estimatedH) {
+        var bottomLimit = H - M - 30;
+        if (estimatedH && (y + estimatedH > bottomLimit)) {
+          pdf.addPage();
+          y = M + 36;
+        }
+        pdf.setFillColor.apply(pdf, BAND_BG);
+        pdf.rect(M, y, contentW, 22, 'F');
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor.apply(pdf, TEAL);
+        pdf.text(title.toUpperCase(), M + 10, y + 15);
+        y += 22;
+      }
+
+      // ---- Data row helper ----
+      // kind: 'normal' | 'deduction' | 'sum' | 'highlight'
+      function drawRow(label, value, kind) {
+        var rowH = 18;
+        var isDeduction = kind === 'deduction';
+        var isSum       = kind === 'sum';
+        var isHighlight = kind === 'highlight';
+
+        if (isHighlight) {
+          pdf.setFillColor(232, 246, 252); // very light teal tint
+          pdf.rect(M, y, contentW, rowH, 'F');
+        }
+
+        pdf.setFont('helvetica', (isSum || isHighlight) ? 'bold' : 'normal');
+        pdf.setFontSize(10);
+
+        var labelColor = isDeduction ? RED : NAVY;
+        var valueColor = isDeduction ? RED : (isSum || isHighlight ? TEAL : NAVY);
+        var prefix     = isDeduction ? '- ' : (isSum ? '= ' : '');
+
+        pdf.setTextColor.apply(pdf, labelColor);
+        pdf.text(prefix + label, M + 12, y + 13);
+        pdf.setTextColor.apply(pdf, valueColor);
+        pdf.text(value || '-', W - M - 12, y + 13, { align: 'right' });
+
+        // thin divider under each row
+        pdf.setDrawColor.apply(pdf, BORDER);
+        pdf.setLineWidth(0.3);
+        pdf.line(M, y + rowH, W - M, y + rowH);
+
+        y += rowH;
+      }
+
+      // ---- Acquisition Summary ----
+      // 7 rows x 18 + banner 22 + spacing ~= 160pt
+      drawSectionBanner('Acquisition Summary', 160);
+      drawRow('Purchase Price',         dom('r2_purchasePrice'),    'normal');
+      drawRow('Closing Costs',          dom('r2_closingCosts'),     'normal');
+      drawRow('Loan Fees',              dom('r2_loanFees'),         'normal');
+      drawRow('Total Acquisition Cost', dom('r2_totalAcqCost'),     'sum');
+      drawRow('Down Payment',           dom('r2_downPayment'),      'normal');
+      drawRow('Initial Investment',     dom('r2_initialInvestment'),'sum');
+      drawRow('Day 1 Equity',           dom('r2_day1Equity'),       'highlight');
+      y += 8;
+
+      // ---- Annual Income & Expenses ----
+      // 12 rows x 18 + banner 22 + spacing ~= 250pt
+      drawSectionBanner('Annual Income & Expenses', 250);
+      drawRow('Gross Rental Income',  dom('r2_grossIncome'),  'normal');
+      drawRow('Vacancy Loss',         dom('r2_vacancyLoss'),  'deduction');
+      drawRow('Effective Gross Income',dom('r2_egi'),         'sum');
+      drawRow('Property Tax',         dom('r2_propTax'),      'deduction');
+      drawRow('Insurance',            dom('r2_insurance'),    'deduction');
+      drawRow('HOA',                  dom('r2_hoa'),          'deduction');
+      drawRow('Repair & Maintenance', dom('r2_repairs'),      'deduction');
+      drawRow('Property Management',  dom('r2_pm'),           'deduction');
+      drawRow('Net Operating Income', dom('r2_noi'),          'sum');
+      drawRow('Annual Debt Service',  dom('r2_debtService'),  'deduction');
+      drawRow('Annual Cash Flow',     dom('r2_annualCF'),     'sum');
+      drawRow('Monthly Cash Flow',    dom('r2_monthlyCF'),    'highlight');
+      y += 8;
+
+      // ---- Exit Analysis ----
+      // 9 rows x 18 + banner 22 + spacing ~= 195pt
+      drawSectionBanner('Exit Analysis (' + dom('r2_holdLabel') + ' yr)', 195);
+      drawRow('Est. Market Value at Sale',   dom('r2_saleValue'),    'normal');
+      drawRow('Cost of Sale',               dom('r2_costOfSale'),   'deduction');
+      drawRow('Remaining Loan Balance',     dom('r2_loanBal'),      'deduction');
+      drawRow('Est. Proceeds at Sale',      dom('r2_saleProceeds'), 'sum');
+      drawRow('Total Cash Flow During Hold',dom('r2_totalCFHold'),  'normal');
+      drawRow('Est. Total Return',          dom('r2_totalReturn'),  'sum');
+      drawRow('Est. Annualized Return',     dom('r2_annReturn'),    'highlight');
+      drawRow('Equity Multiple',            dom('r2_eqMultiple'),   'normal');
+      drawRow('IRR',                        dom('r2_irr'),          'normal');
+
+      // ---- Brand strip + footer on every page (after all content drawn) ----
+      var pageCount = pdf.internal.getNumberOfPages();
       for (var p = 1; p <= pageCount; p++) {
-        doc.setPage(p);
-        drawHeader(p, pageCount);
+        pdf.setPage(p);
+        drawBrandStrip(p, pageCount);
         drawFooter();
       }
 
       // ---- Sanitize filename + save ----
-      var raw = 'Pro Forma - ' + addr + '.pdf';
-      var safe = raw.replace(/[\/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
-      doc.save(safe);
+      var raw  = 'Pro Forma - ' + addr + '.pdf';
+      var safe = raw.replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+      pdf.save(safe);
     }
 
     function renderPropertyDetails() {
