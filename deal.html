@@ -15,6 +15,8 @@
 
   </script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
   <link href='https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css' rel='stylesheet'>
   <script src='https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js'></script>
   <style>
@@ -1113,7 +1115,7 @@
         </div>
         <div style="display:flex;gap:8px;">
           <button class="btn-ghost btn-sm" onclick="pfReset()">Reset to Defaults</button>
-          <button class="btn-ghost btn-sm" onclick="pfDownloadPDF()">&#128196; Download PDF</button>
+          <button class="btn-secondary" onclick="pfPrint()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Print this pro forma"><span style="font-size:18px;">&#128424;</span> Print</button>
           <button class="btn-secondary btn-sm" onclick="pfSave()">Save Pro Forma</button>
         </div>
       </div>
@@ -1632,7 +1634,7 @@
 
       <!-- Section 4: Actions + Disclaimer -->
       <div style="display:flex;gap:8px;margin-bottom:16px;" class="pf-print-hide">
-        <button class="btn-primary btn-sm" onclick="pfDownloadPDF()">&#128196; Download PDF</button>
+        <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Download a PDF of this pro forma"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
         <button class="btn-ghost btn-sm" onclick="pfSave()">Save Pro Forma</button>
       </div>
       <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:16px;line-height:1.7;">
@@ -3655,8 +3657,176 @@
       Portal.toast('Pro Forma saving coming soon.', 'info');
     }
 
-    function pfDownloadPDF() {
+    function pfPrint() {
       window.print();
+    }
+
+    async function pfDownloadPDF() {
+      try {
+        await pfGeneratePDF();
+      } catch (e) {
+        console.error('PDF generation failed:', e);
+        Portal.toast('PDF generation failed. Try the Print button instead.', 'error');
+      }
+    }
+
+    async function pfGeneratePDF() {
+      var { jsPDF } = window.jspdf;
+      var doc = new jsPDF({ unit: 'pt', format: 'letter' }); // 612 x 792 pt
+      var W = doc.internal.pageSize.getWidth();
+      var H = doc.internal.pageSize.getHeight();
+      var M = 48; // page margin
+      var y = M;
+
+      // ---- Address + filename ----
+      var addr = (property && property.address)
+        ? [property.address, property.city, property.state, property.zip].filter(Boolean).join(', ')
+        : 'Pro Forma';
+
+      // ---- Helper: text value from DOM id ----
+      function dom(id) {
+        var el = document.getElementById(id);
+        return el ? (el.textContent || '').trim() : '—';
+      }
+
+      // ---- Header (every page) ----
+      function drawHeader(pageNum, pageTotal) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text('Direct Off Market', M, M - 18);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139);
+        doc.text(addr, M, M - 4);
+        doc.setFontSize(9);
+        doc.text('Page ' + pageNum + ' of ' + pageTotal, W - M, M - 4, { align: 'right' });
+        doc.setDrawColor(226, 232, 240);
+        doc.line(M, M + 4, W - M, M + 4);
+      }
+
+      // ---- Footer (every page) ----
+      function drawFooter() {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(148, 163, 184);
+        var today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+        doc.text('Generated ' + today + ' · For informational and illustrative purposes only. Not investment advice.', M, H - 24);
+      }
+
+      // ---- Title block ----
+      y = M + 24;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.setTextColor(15, 23, 42);
+      doc.text('Investment Pro Forma', M, y);
+      y += 22;
+
+      // ---- KPI strip (3 across) ----
+      var kpis = [
+        { label: 'Cap Rate',      value: dom('gauge_capRate_val') },
+        { label: 'Cash-on-Cash',  value: dom('gauge_coc_val') },
+        { label: 'DSCR',          value: dom('gauge_dscr_val') }
+      ];
+      var kpiW = (W - 2 * M - 16) / 3;
+      kpis.forEach(function (k, i) {
+        var x = M + i * (kpiW + 8);
+        doc.setDrawColor(226, 232, 240);
+        doc.setFillColor(248, 250, 252);
+        doc.roundedRect(x, y, kpiW, 50, 6, 6, 'FD');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(14, 116, 144);
+        doc.text(k.value || '—', x + kpiW / 2, y + 26, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(100, 116, 139);
+        doc.text(k.label, x + kpiW / 2, y + 42, { align: 'center' });
+      });
+      y += 70;
+
+      // ---- Acquisition Summary table ----
+      doc.autoTable({
+        startY: y,
+        margin: { left: M, right: M },
+        theme: 'plain',
+        headStyles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 11 },
+        bodyStyles: { fontSize: 10, textColor: [30, 41, 59] },
+        head: [['Acquisition Summary', '']],
+        body: [
+          ['Purchase Price',          dom('r2_purchasePrice')],
+          ['+ Closing Costs',         dom('r2_closingCosts')],
+          ['+ Loan Fees',             dom('r2_loanFees')],
+          ['= Total Acquisition Cost',dom('r2_totalAcqCost')],
+          ['Down Payment',            dom('r2_downPayment')],
+          ['= Initial Investment',    dom('r2_initialInvestment')],
+          ['Day 1 Equity',            dom('r2_day1Equity')]
+        ],
+        columnStyles: { 1: { halign: 'right' } }
+      });
+      y = doc.lastAutoTable.finalY + 16;
+
+      // ---- Annual Income & Expenses table ----
+      doc.autoTable({
+        startY: y,
+        margin: { left: M, right: M },
+        theme: 'plain',
+        headStyles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 11 },
+        bodyStyles: { fontSize: 10, textColor: [30, 41, 59] },
+        head: [['Annual Income & Expenses', '']],
+        body: [
+          ['Gross Rental Income',       dom('r2_grossIncome')],
+          ['− Vacancy Loss',            dom('r2_vacancyLoss')],
+          ['= Effective Gross Income',  dom('r2_egi')],
+          ['− Property Tax',            dom('r2_propTax')],
+          ['− Insurance',              dom('r2_insurance')],
+          ['− HOA',                    dom('r2_hoa')],
+          ['− Repair & Maintenance',   dom('r2_repairs')],
+          ['− Property Management',    dom('r2_pm')],
+          ['= Net Operating Income',   dom('r2_noi')],
+          ['− Annual Debt Service',    dom('r2_debtService')],
+          ['= Annual Cash Flow',       dom('r2_annualCF')],
+          ['Monthly Cash Flow',        dom('r2_monthlyCF')]
+        ],
+        columnStyles: { 1: { halign: 'right' } }
+      });
+      y = doc.lastAutoTable.finalY + 16;
+
+      // ---- Exit Analysis table ----
+      var holdLbl = dom('r2_holdLabel');
+      doc.autoTable({
+        startY: y,
+        margin: { left: M, right: M },
+        theme: 'plain',
+        headStyles: { fontStyle: 'bold', fillColor: [241, 245, 249], textColor: [15, 23, 42], fontSize: 11 },
+        bodyStyles: { fontSize: 10, textColor: [30, 41, 59] },
+        head: [['Exit Analysis (' + holdLbl + ' yr)', '']],
+        body: [
+          ['Est. Market Value at Sale',      dom('r2_saleValue')],
+          ['− Cost of Sale',                dom('r2_costOfSale')],
+          ['− Remaining Loan Balance',      dom('r2_loanBal')],
+          ['= Est. Proceeds at Sale',        dom('r2_saleProceeds')],
+          ['+ Total Cash Flow During Hold',  dom('r2_totalCFHold')],
+          ['= Est. Total Return',            dom('r2_totalReturn')],
+          ['Est. Annualized Return',         dom('r2_annReturn')],
+          ['Equity Multiple',               dom('r2_eqMultiple')],
+          ['IRR',                           dom('r2_irr')]
+        ],
+        columnStyles: { 1: { halign: 'right' } }
+      });
+
+      // ---- Header/footer on every page (do after all content drawn) ----
+      var pageCount = doc.internal.getNumberOfPages();
+      for (var p = 1; p <= pageCount; p++) {
+        doc.setPage(p);
+        drawHeader(p, pageCount);
+        drawFooter();
+      }
+
+      // ---- Sanitize filename + save ----
+      var raw = 'Pro Forma - ' + addr + '.pdf';
+      var safe = raw.replace(/[\/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+      doc.save(safe);
     }
 
     function renderPropertyDetails() {
