@@ -131,6 +131,25 @@
     .btn-secondary:hover { background: #4fc3f7; color: #ffffff; border-color: #4fc3f7; }
     .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
     .btn-ghost:hover { background: var(--surface-2); }
+    .btn-outline-heavy {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--text);
+      border-radius: 8px;
+      padding: 9px 17px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn-outline-heavy:hover {
+      background: var(--text);
+      color: var(--bg, #0f1a2e);
+    }
     .btn-sm { padding: 6px 14px; font-size: 13px; }
 
     /* Header primary CTA: outlined white */
@@ -1114,9 +1133,10 @@
           <p style="color:var(--text-muted);font-size:14px;">Edit the highlighted fields to run your own numbers.</p>
         </div>
         <div style="display:flex;gap:8px;">
-          <button class="btn-ghost btn-sm" onclick="pfReset()">Reset to Defaults</button>
-          <button class="btn-secondary" onclick="pfPrint()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Print this pro forma"><span style="font-size:18px;">&#128424;</span> Print</button>
-          <button class="btn-secondary btn-sm" onclick="pfSave()">Save Pro Forma</button>
+          <button class="btn-outline-heavy" onclick="pfReset()" title="Reset all inputs to defaults">Reset to Defaults</button>
+          <button class="btn-outline-heavy" onclick="pfPrint()" title="Print this pro forma"><span style="font-size:18px;">&#128424;</span> Print</button>
+          <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Download a PDF of this pro forma"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+          <button class="btn-outline-heavy" onclick="pfSave()" title="Save this pro forma to your dashboard">Save Pro Forma</button>
         </div>
       </div>
 
@@ -1283,7 +1303,10 @@
       <div class="pf-accordion-panel" id="pfPanel_purchase">
         <div class="pf-panel-grid-3">
           <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Purchase Price</span></div>
+            <div class="pf-label-row">
+              <span class="pf-label-text">Purchase Price</span>
+              <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Defaults to 1.2&times; the asking price since asking is typically a starting price. Adjust based on your actual offer.</span></span>
+            </div>
             <div class="pf-input-wrap">
               <span class="pf-input-prefix">$</span>
               <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pf2_purchasePrice" value="" placeholder="0" oninput="pfFormatCurrencyInput(this);(function(){var la=document.getElementById('pf2_loanAmount');if(la)la.dataset.manual='0';pfCalc();})()">
@@ -1635,7 +1658,7 @@
       <!-- Section 4: Actions + Disclaimer -->
       <div style="display:flex;gap:8px;margin-bottom:16px;" class="pf-print-hide">
         <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Download a PDF of this pro forma"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
-        <button class="btn-ghost btn-sm" onclick="pfSave()">Save Pro Forma</button>
+        <button class="btn-outline-heavy" onclick="pfSave()" title="Save this pro forma to your dashboard">Save Pro Forma</button>
       </div>
       <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:16px;line-height:1.7;">
         This pro forma is for informational and illustrative purposes only and should not be relied upon as a guarantee, representation, or warranty of future performance or results. The projections, assumptions, and estimates included in this pro forma are based on current market conditions and other factors that may change in the future, which could affect the accuracy of the projections. Actual results may vary significantly from the projections, and there is no assurance that the investment will achieve the returns projected in this pro forma. The investment involves various risks and uncertainties that may affect the outcome of the investment. Before making any investment decisions, it is important to consult with a professional financial advisor and conduct thorough due diligence. This pro forma does not constitute an offer to sell or a solicitation of an offer to buy any securities or interests in real estate investments.<br><br>
@@ -2869,8 +2892,34 @@
         var loanCostPct = (_listingsRow && _listingsRow.loan_cost_pct != null) ? _listingsRow.loan_cost_pct / 100 : 0.005;
         var estCosts = price ? price * (closingCostPct + loanCostPct) : 0;
         var equity = (arv && price) ? arv - price - estCosts : null;
-        var capRate = (listing.properties && listing.properties.estimated_cap_rate) || null;
-        var monthlyRent = (listing.properties && listing.properties.estimated_rent) || null;
+        // Est. Monthly Rent: prefer rent_range_low/high from _listingsRow, fall back to legacy column
+        var monthlyRent = null;
+        if (_listingsRow && _listingsRow.rent_range_low != null && _listingsRow.rent_range_high != null) {
+          monthlyRent = Math.round((Number(_listingsRow.rent_range_low) + Number(_listingsRow.rent_range_high)) / 2);
+        } else if (_listingsRow && _listingsRow.rent_range_low != null) {
+          monthlyRent = Number(_listingsRow.rent_range_low);
+        } else if (_listingsRow && _listingsRow.rent_range_high != null) {
+          monthlyRent = Number(_listingsRow.rent_range_high);
+        } else if (listing.properties && listing.properties.estimated_rent) {
+          monthlyRent = Number(listing.properties.estimated_rent);
+        }
+        // Est. Cap Rate: compute from rent + price + expense defaults (display-only; pfCalc is source of truth)
+        var capRate = null;
+        if (monthlyRent && price && _listingsRow) {
+          var lsOv = _listingsRow;
+          var ovAnnInc = monthlyRent * 12 + (lsOv.other_monthly_income ? Number(lsOv.other_monthly_income) * 12 : 0);
+          var ovVacPct  = lsOv.vacancy_pct     != null ? lsOv.vacancy_pct / 100      : 0.05;
+          var ovPmPct   = lsOv.pm_pct          != null ? lsOv.pm_pct / 100           : 0.08;
+          var ovRepPct  = lsOv.repair_cost_pct != null ? lsOv.repair_cost_pct / 100  : 0.05;
+          var ovTaxPct  = lsOv.property_tax_pct!= null ? lsOv.property_tax_pct / 100 : 0.012;
+          var ovIns     = lsOv.est_insurance_annual     != null ? Number(lsOv.est_insurance_annual)     : 1200;
+          var ovFlood   = lsOv.est_flood_insurance_annual != null ? Number(lsOv.est_flood_insurance_annual) : 0;
+          var ovEgi     = ovAnnInc * (1 - ovVacPct);
+          var ovNoi     = ovEgi - (ovEgi * ovPmPct) - (ovEgi * ovRepPct) - (price * ovTaxPct) - ovIns - ovFlood;
+          capRate = price > 0 ? ovNoi / price * 100 : null;
+        } else if (listing.properties && listing.properties.estimated_cap_rate) {
+          capRate = Number(listing.properties.estimated_cap_rate);
+        }
 
         financialEl.innerHTML =
           '<div class="financial-row"><span class="financial-label">Asking Price</span><span class="financial-value accent">' + (Portal.fc(price) || '&mdash;') + '</span></div>' +
@@ -3203,9 +3252,12 @@
       // Store on listing for pfReset() to use
       listing._ls = ls;
 
-      // Populate editable purchase price (defaults to asking price)
+      // Populate editable purchase price (defaults to asking price × 1.2, rounded to nearest $100)
       var ppEl = document.getElementById('pf2_purchasePrice');
-      if (ppEl) ppEl.value = pp ? Number(pp).toLocaleString('en-US') : '';
+      if (ppEl) {
+        var ppDefault = pp ? Math.round(pp * 1.2 / 100) * 100 : 0;
+        ppEl.value = ppDefault ? ppDefault.toLocaleString('en-US') : '';
+      }
       // List Price = asking price (the portal-facing price)
       document.getElementById('pfro_listPrice').textContent = Portal.fc(pp);
 
@@ -3642,6 +3694,12 @@
         ['pf2_costOfSale',     ls.cost_of_sale_pct       || 6.5]
       ];
       fieldMap.forEach(function(p) { var el = document.getElementById(p[0]); if (el) el.value = p[1]; });
+      // Reset purchase price to 1.2× asking, rounded to nearest $100
+      var ppResetEl = document.getElementById('pf2_purchasePrice');
+      if (ppResetEl) {
+        var ppReset = listing.asking_price ? Math.round(listing.asking_price * 1.2 / 100) * 100 : 0;
+        ppResetEl.value = ppReset ? ppReset.toLocaleString('en-US') : '';
+      }
       var ltEl = document.getElementById('pf2_loanType');
       if (ltEl) {
         Array.from(ltEl.options).forEach(function(o) { o.selected = (o.value === '30yr_fixed'); });
