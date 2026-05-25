@@ -803,6 +803,30 @@
     @media (max-width:480px) {
       .pf-panel-grid-4, .pf-panel-grid-3, .pf-panel-grid-2 { grid-template-columns:1fr; }
     }
+    /* === FIX & FLIP CALCULATOR === */
+    .flip-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .flip-section-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+    .flip-full-row { margin-bottom:20px; }
+    .flip-financing-wrap { overflow:hidden; transition:max-height 0.2s ease; max-height:600px; }
+    .flip-financing-wrap.collapsed { max-height:0; }
+    .flip-toggle-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .flip-toggle-pill { padding:7px 20px; border:none; background:var(--surface); color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; }
+    .flip-toggle-pill.active { background:#4fc3f7; color:#0f172a; }
+    .flip-breakdown-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:28px; }
+    .flip-bd-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); font-size:14px; }
+    .flip-bd-row:last-child { border-bottom:none; }
+    .flip-bd-label { color:var(--text-muted); display:flex; align-items:center; gap:4px; }
+    .flip-bd-value { font-weight:600; }
+    .flip-bd-row.flip-bd-deduct .flip-bd-label { color:#ef4444; }
+    .flip-bd-row.flip-bd-deduct .flip-bd-value { color:#ef4444; }
+    .flip-bd-row.flip-bd-sum { border-top:2px solid var(--border); margin-top:4px; padding-top:12px; }
+    .flip-bd-row.flip-bd-sum .flip-bd-label { font-weight:800; color:var(--text); font-size:15px; }
+    .flip-bd-row.flip-bd-sum .flip-bd-value { font-size:15px; font-weight:800; }
+    .flip-bd-financed-only { }
+    @media (max-width:600px) {
+      .flip-kpi-row { grid-template-columns:repeat(2,1fr); }
+      .flip-section-grid { grid-template-columns:1fr; }
+    }
     /* === V2 LAYOUT === */
     [data-theme="light"] { --bg: #f8fafc; }
 
@@ -1075,6 +1099,7 @@
     <div class="pill-nav" id="dealTabs">
       <button class="tab-btn active" data-tab="overview">Overview</button>
       <button class="tab-btn" data-tab="proforma">Pro Forma</button>
+      <button class="tab-btn" data-tab="flip">Fix &amp; Flip Calculator</button>
       <button class="tab-btn" data-tab="details">Property Details</button>
       <button class="tab-btn" data-tab="photos">Photos</button>
       <button class="tab-btn" data-tab="map">Map &amp; Comps</button>
@@ -1666,6 +1691,183 @@
       </div>
 
     </div><!-- end tab-proforma -->
+
+    <!-- FIX & FLIP CALCULATOR TAB -->
+    <div id="tab-flip" class="tab-content">
+
+      <!-- Title + action buttons (top bar) -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">Fix &amp; Flip Calculator</h2>
+          <p style="color:var(--text-muted);font-size:14px;">Model your flip scenario. Inputs prefill from property data — edit to run your own numbers.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
+          <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+          <button class="btn-outline-heavy" onclick="pfSave()" title="Save this flip analysis to your dashboard">Save Pro Forma</button>
+        </div>
+      </div>
+
+      <!-- KPI Tile Row -->
+      <div class="flip-kpi-row">
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="flip_kpi_netProfit" style="font-size:22px;">&mdash;</div>
+          <div class="pf-kpi-label">Net Profit</div>
+        </div>
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="flip_kpi_annualized">&mdash;</div>
+          <div class="pf-kpi-label">Annualized Return <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">ROI scaled to a 12-month period. A 6-month flip with 20% ROI equals 40% annualized — showing the true velocity of your capital.</span></span></div>
+        </div>
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="flip_kpi_roi">&mdash;</div>
+          <div class="pf-kpi-label">ROI</div>
+        </div>
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="flip_kpi_coc">&mdash;</div>
+          <div class="pf-kpi-label">Cash-on-Cash Return <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">For a flip with no rental income, Cash-on-Cash equals ROI. Both measure your return on invested cash.</span></span></div>
+        </div>
+      </div>
+
+      <!-- Section 1: Property Details -->
+      <div class="pro-forma-section-title">Property Details</div>
+      <div class="flip-section-grid">
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Purchase Price</span></div>
+          <div class="pf-input-wrap">
+            <span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_purchasePrice" placeholder="0" oninput="pfFormatCurrencyInput(this);flipOnPurchasePriceChange();flipCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">After Repair Value (ARV)</span></div>
+          <div class="pf-input-wrap">
+            <span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_arv" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Rehab Cost</span></div>
+          <div class="pf-input-wrap">
+            <span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_rehabCost" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Holding Time (Months)</span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input" id="flip_holdMonths" placeholder="6" min="0" step="1" oninput="flipCalc();">
+          </div>
+        </div>
+      </div>
+
+      <!-- Cash / Financed Toggle -->
+      <div class="pf-toggle-row flip-full-row">
+        <span style="font-size:13px;font-weight:600;color:var(--text-muted);margin-right:10px;">Financing</span>
+        <div class="flip-toggle-pills">
+          <button class="flip-toggle-pill" id="flipPillCash" onclick="flipSetMode('cash')" type="button">Cash</button>
+          <button class="flip-toggle-pill active" id="flipPillFinanced" onclick="flipSetMode('financed')" type="button">Financed</button>
+        </div>
+        <input type="radio" name="flip_financing" id="flip_financing_cash" value="cash" style="display:none;">
+        <input type="radio" name="flip_financing" id="flip_financing_financed" value="financed" checked style="display:none;">
+      </div>
+
+      <!-- Section 2: Financing & Costs (collapsible) -->
+      <div id="flipFinancingWrap" class="flip-financing-wrap">
+        <div class="pro-forma-section-title">Financing &amp; Costs</div>
+        <div class="flip-section-grid">
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Down Payment</span></div>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_downPayment" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Loan Interest Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Hard money lenders typically charge 8&ndash;12% for short-term flip loans. Interest is calculated as interest-only over the hold period.</span></span></span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="flip_loanRate" value="8.5" min="0" step="0.25" oninput="flipCalc();">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Closing Costs</span></div>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_closingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Monthly Carrying Costs <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Estimated monthly costs while holding the property: taxes, insurance, HOA, utilities. Defaults to property estimates; edit to adjust.</span></span></span></div>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_monthlyCarry" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Selling Costs -->
+      <div class="pro-forma-section-title" style="margin-top:8px;">Selling Costs</div>
+      <div class="flip-full-row" style="max-width:300px;">
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Selling Costs % <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Agent commissions + closing costs at sale. Typically 6&ndash;8% of ARV in Florida.</span></span></span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input has-suffix" id="flip_sellingCostPct" value="8.0" min="0" step="0.5" oninput="flipCalc();">
+            <span class="pf-input-suffix">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profit Breakdown -->
+      <div class="pro-forma-section-title" style="margin-top:8px;">Profit Breakdown</div>
+      <div class="flip-breakdown-card">
+        <div class="flip-bd-row">
+          <span class="flip-bd-label">After Repair Value (ARV)</span>
+          <span class="flip-bd-value" id="flipbd_arv">&mdash;</span>
+        </div>
+        <div class="flip-bd-row flip-bd-deduct">
+          <span class="flip-bd-label">- Purchase Price</span>
+          <span class="flip-bd-value" id="flipbd_purchase">&mdash;</span>
+        </div>
+        <div class="flip-bd-row flip-bd-deduct">
+          <span class="flip-bd-label">- Rehab Cost</span>
+          <span class="flip-bd-value" id="flipbd_rehab">&mdash;</span>
+        </div>
+        <div class="flip-bd-row flip-bd-deduct">
+          <span class="flip-bd-label">- Closing Costs</span>
+          <span class="flip-bd-value" id="flipbd_closing">&mdash;</span>
+        </div>
+        <div class="flip-bd-row flip-bd-deduct flip-bd-financed-only" id="flipbd_holdRow">
+          <span class="flip-bd-label">- Total Holding Cost</span>
+          <span class="flip-bd-value" id="flipbd_holding">&mdash;</span>
+        </div>
+        <div class="flip-bd-row flip-bd-deduct flip-bd-financed-only" id="flipbd_interestRow">
+          <span class="flip-bd-label">- Loan Interest Cost</span>
+          <span class="flip-bd-value" id="flipbd_interest">&mdash;</span>
+        </div>
+        <div class="flip-bd-row flip-bd-deduct">
+          <span class="flip-bd-label">- Selling Costs</span>
+          <span class="flip-bd-value" id="flipbd_selling">&mdash;</span>
+        </div>
+        <div class="flip-bd-row flip-bd-sum">
+          <span class="flip-bd-label">= Net Profit</span>
+          <span class="flip-bd-value" id="flipbd_netProfit">&mdash;</span>
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);">
+          Total Cash Invested: <strong id="flipbd_cashInvested" style="color:var(--text);">&mdash;</strong>
+          <span class="pf-tip" tabindex="0" style="margin-left:4px;">?<span class="pf-tip-text">Total cash you put in: down payment (or full purchase price if cash), rehab, closing costs, and holding costs. This is the denominator for ROI and Cash-on-Cash.</span></span>
+        </div>
+      </div>
+
+      <!-- Bottom action row -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
+        <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+        <button class="btn-outline-heavy" onclick="pfSave()">Save Pro Forma</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:8px;line-height:1.7;">This calculator is for informational and illustrative purposes only. Projections are estimates based on inputs provided and do not constitute investment advice. Consult a qualified financial advisor before making investment decisions.</div>
+
+    </div><!-- end tab-flip -->
 
     <!-- PROPERTY DETAILS TAB -->
     <div id="tab-details" class="tab-content">
@@ -2655,7 +2857,7 @@
           btn.classList.add('active');
           document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
           // Hide map on Pro Forma and Property Details tabs
-          var hideMapTabs = ['proforma', 'details', 'photos'];
+          var hideMapTabs = ['proforma', 'flip', 'details', 'photos'];
           var dealBody = document.querySelector('.deal-body-v2');
           if (dealBody) dealBody.classList.toggle('map-hidden', hideMapTabs.indexOf(btn.dataset.tab) !== -1);
           // Comp markers: add when Map & Comps tab active, remove otherwise
@@ -2673,6 +2875,15 @@
           }
         });
       });
+
+      // Activate tab from URL param ?tab=flip|proforma|details|photos|map
+      (function() {
+        var tabParam = new URLSearchParams(window.location.search).get('tab');
+        if (tabParam) {
+          var targetBtn = document.querySelector('.tab-btn[data-tab="' + tabParam + '"]');
+          if (targetBtn) targetBtn.click();
+        }
+      })();
 
       // Load listing data
       var result = await Portal.supabase
@@ -3253,6 +3464,9 @@
       // Store on listing for pfReset() to use
       listing._ls = ls;
 
+      // Initialize Fix & Flip Calculator defaults
+      flipInitDefaults(ls);
+
       // Populate editable purchase price (defaults to asking price × 1.2, rounded to nearest $100)
       var ppEl = document.getElementById('pf2_purchasePrice');
       if (ppEl) {
@@ -3713,6 +3927,12 @@
     }
 
     async function pfSave() {
+      // Branch to flip save if Fix & Flip tab is active
+      var activeTabBtn = document.querySelector('.tab-btn.active');
+      if (activeTabBtn && activeTabBtn.dataset.tab === 'flip') {
+        return pfSaveFlip();
+      }
+
       try {
         // 1. Confirm logged in
         var session = await Portal.getSession();
@@ -3828,6 +4048,12 @@
     }
 
     async function pfGeneratePDF() {
+      // Branch to flip PDF if the Fix & Flip tab is active
+      var activeTabBtn = document.querySelector('.tab-btn.active');
+      if (activeTabBtn && activeTabBtn.dataset.tab === 'flip') {
+        return pfGenerateFlipPDF();
+      }
+
       var { jsPDF } = window.jspdf;
 
       // Helper: read DOM value, return '-' if missing (ASCII only)
@@ -4036,6 +4262,487 @@
       var safe = raw.replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
       pdf.save(safe);
     }
+
+    // ===== FIX & FLIP CALCULATOR FUNCTIONS =====
+
+    // Helper: read a currency-formatted text input as a float number
+    function flipNum(id) {
+      var el = document.getElementById(id);
+      if (!el) return 0;
+      return parseFloat(el.value.replace(/,/g, '')) || 0;
+    }
+
+    // Helper: format currency for KPI display
+    function flipFc(n) { return Portal.fc(Math.round(n)); }
+
+    // Set a KPI tile value + color class
+    function flipSetKpi(id, displayVal, state) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = displayVal;
+      // state: 'positive' | 'neutral' | 'negative'
+      el.style.color = state === 'positive' ? '#22c55e' : (state === 'negative' ? '#ef4444' : '#94a3b8');
+    }
+
+    // Initialize inputs from property + listings data
+    function flipInitDefaults(ls) {
+      ls = ls || {};
+      var pp  = property.current_market_value || null;
+      var arv = property.estimated_arv || null;
+      var rehab = property.estimated_repairs_flip || null;
+      var holdMonths = property.estimated_hold_months || null;
+
+      // Purchase Price
+      var ppEl = document.getElementById('flip_purchasePrice');
+      if (ppEl && pp) ppEl.value = Math.round(pp).toLocaleString('en-US');
+
+      // ARV
+      var arvEl = document.getElementById('flip_arv');
+      if (arvEl && arv) arvEl.value = Math.round(arv).toLocaleString('en-US');
+
+      // Rehab Cost
+      var rehabEl = document.getElementById('flip_rehabCost');
+      if (rehabEl && rehab) rehabEl.value = Math.round(rehab).toLocaleString('en-US');
+
+      // Holding Time
+      var holdEl = document.getElementById('flip_holdMonths');
+      if (holdEl && holdMonths) holdEl.value = holdMonths;
+
+      // Closing Costs default: 2% of purchase price
+      var closingEl = document.getElementById('flip_closingCosts');
+      if (closingEl && pp) closingEl.value = Math.round(pp * 0.02).toLocaleString('en-US');
+
+      // Down Payment default: 25% of purchase price
+      var dpEl = document.getElementById('flip_downPayment');
+      if (dpEl && pp) dpEl.value = Math.round(pp * 0.25).toLocaleString('en-US');
+
+      // Monthly Carrying Costs default
+      var carryEl = document.getElementById('flip_monthlyCarry');
+      if (carryEl && pp) {
+        var effectivePP = pp;
+        // Try to compute from listings row data
+        var annTax     = ls.property_tax_pct ? effectivePP * (ls.property_tax_pct / 100) : effectivePP * 0.012;
+        var annIns     = ls.est_insurance_annual ? Number(ls.est_insurance_annual) : 1200;
+        var annFlood   = ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0;
+        var hoaMonthly = (property.hoa_amount && (property.hoa_frequency || '').toLowerCase() !== 'annual') ? (property.hoa_amount || 0) : (property.hoa_amount ? Math.round(property.hoa_amount / 12) : 0);
+        var monthlyBaseCosts = (annTax + annIns + annFlood) / 12 + hoaMonthly;
+        // Fallback: 0.5% of purchase price per month
+        if (!monthlyBaseCosts || monthlyBaseCosts < 100) monthlyBaseCosts = effectivePP * 0.005;
+        carryEl.value = Math.round(monthlyBaseCosts).toLocaleString('en-US');
+      }
+
+      flipCalc();
+    }
+
+    // Recompute Down Payment and Closing Costs when Purchase Price changes
+    function flipOnPurchasePriceChange() {
+      var pp = flipNum('flip_purchasePrice');
+      if (!pp) return;
+      var dpEl = document.getElementById('flip_downPayment');
+      if (dpEl) { dpEl.value = Math.round(pp * 0.25).toLocaleString('en-US'); }
+      var closingEl = document.getElementById('flip_closingCosts');
+      if (closingEl) { closingEl.value = Math.round(pp * 0.02).toLocaleString('en-US'); }
+    }
+
+    // Toggle Cash / Financed mode
+    function flipSetMode(mode) {
+      var isCash = mode === 'cash';
+      // Update pill buttons
+      var pillCash     = document.getElementById('flipPillCash');
+      var pillFinanced = document.getElementById('flipPillFinanced');
+      if (pillCash)     pillCash.classList.toggle('active', isCash);
+      if (pillFinanced) pillFinanced.classList.toggle('active', !isCash);
+      // Update hidden radio
+      var radioCash     = document.getElementById('flip_financing_cash');
+      var radioFinanced = document.getElementById('flip_financing_financed');
+      if (radioCash)     radioCash.checked = isCash;
+      if (radioFinanced) radioFinanced.checked = !isCash;
+      // Collapse/expand financing section
+      var wrap = document.getElementById('flipFinancingWrap');
+      if (wrap) wrap.classList.toggle('collapsed', isCash);
+      flipCalc();
+    }
+
+    // Main calculator
+    function flipCalc() {
+      var pp      = flipNum('flip_purchasePrice');
+      var arv     = flipNum('flip_arv');
+      var rehab   = flipNum('flip_rehabCost');
+      var months  = parseInt((document.getElementById('flip_holdMonths') || {}).value, 10) || 0;
+      var isCash  = !!(document.getElementById('flip_financing_cash') && document.getElementById('flip_financing_cash').checked);
+      var dp      = isCash ? pp : flipNum('flip_downPayment');
+      var rate    = isCash ? 0 : (parseFloat((document.getElementById('flip_loanRate') || {}).value) || 0);
+      var closing = flipNum('flip_closingCosts');
+      var monthlyCarry = isCash ? 0 : flipNum('flip_monthlyCarry');
+      var sellPct = ((parseFloat((document.getElementById('flip_sellingCostPct') || {}).value) || 0)) / 100;
+
+      // Interest-only loan cost
+      var loanAmt = isCash ? 0 : Math.max(0, pp - dp);
+      var monthlyRate = rate / 100 / 12;
+      var interestCost = (!isCash && monthlyRate > 0 && months > 0) ? loanAmt * monthlyRate * months : 0;
+
+      var totalHoldingCost = monthlyCarry * months;
+      var sellingCostDollars = arv * sellPct;
+      var totalProjectCost  = pp + rehab + closing + totalHoldingCost + interestCost + sellingCostDollars;
+      var netProfit = arv - totalProjectCost;
+
+      var cashInvested = (isCash ? pp : dp) + closing + rehab + totalHoldingCost + interestCost;
+      var roi       = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
+      var coc       = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
+      var annualized = months > 0 ? roi * (12 / months) : null;
+
+      // KPI tiles
+      flipSetKpi('flip_kpi_netProfit', flipFc(netProfit), netProfit > 0 ? 'positive' : (netProfit < 0 ? 'negative' : 'neutral'));
+      flipSetKpi('flip_kpi_annualized', annualized !== null ? annualized.toFixed(1) + '%' : '&mdash;',
+        annualized === null ? 'neutral' : (annualized >= 25 ? 'positive' : (annualized >= 10 ? 'neutral' : 'negative')));
+      flipSetKpi('flip_kpi_roi', roi.toFixed(1) + '%', roi >= 20 ? 'positive' : (roi >= 10 ? 'neutral' : 'negative'));
+      flipSetKpi('flip_kpi_coc', coc.toFixed(1) + '%', coc >= 20 ? 'positive' : (coc >= 10 ? 'neutral' : 'negative'));
+
+      // Breakdown rows
+      function setBD(id, val, asPositive) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = flipFc(val);
+      }
+      setBD('flipbd_arv',      arv);
+      setBD('flipbd_purchase', pp);
+      setBD('flipbd_rehab',    rehab);
+      setBD('flipbd_closing',  closing);
+      setBD('flipbd_holding',  totalHoldingCost);
+      setBD('flipbd_interest', interestCost);
+      setBD('flipbd_selling',  sellingCostDollars);
+
+      // Net profit row color
+      var npEl = document.getElementById('flipbd_netProfit');
+      if (npEl) {
+        npEl.textContent = flipFc(netProfit);
+        npEl.style.color = netProfit >= 0 ? '#22c55e' : '#ef4444';
+      }
+      var npLabelRow = npEl && npEl.closest('.flip-bd-row');
+      if (npLabelRow) {
+        var npLabel = npLabelRow.querySelector('.flip-bd-label');
+        if (npLabel) npLabel.style.color = netProfit >= 0 ? '#22c55e' : '#ef4444';
+      }
+
+      // Cash invested
+      var ciEl = document.getElementById('flipbd_cashInvested');
+      if (ciEl) ciEl.textContent = flipFc(cashInvested);
+
+      // Show/hide financed-only rows
+      var holdRow     = document.getElementById('flipbd_holdRow');
+      var interestRow = document.getElementById('flipbd_interestRow');
+      if (holdRow)     holdRow.style.display     = isCash ? 'none' : '';
+      if (interestRow) interestRow.style.display  = isCash ? 'none' : '';
+    }
+
+    // Save flip analysis to investor_saved_proformas
+    async function pfSaveFlip() {
+      try {
+        var session = await Portal.getSession();
+        if (!session || !session.user) {
+          Portal.toast('Sign in to save your flip analysis.', 'info');
+          return;
+        }
+        var puRes = await Portal.supabase
+          .from('portal_users')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!puRes.data || !puRes.data.id) {
+          Portal.toast('Could not resolve your portal profile.', 'error');
+          return;
+        }
+        var portalUserId = puRes.data.id;
+
+        var isCash = !!(document.getElementById('flip_financing_cash') && document.getElementById('flip_financing_cash').checked);
+        var pp     = flipNum('flip_purchasePrice');
+        var arv    = flipNum('flip_arv');
+        var rehab  = flipNum('flip_rehabCost');
+        var months = parseInt((document.getElementById('flip_holdMonths') || {}).value, 10) || 0;
+        var dp     = isCash ? pp : flipNum('flip_downPayment');
+        var rate   = isCash ? 0 : (parseFloat((document.getElementById('flip_loanRate') || {}).value) || 0);
+        var closing = flipNum('flip_closingCosts');
+        var monthlyCarry = isCash ? 0 : flipNum('flip_monthlyCarry');
+        var sellPct = (parseFloat((document.getElementById('flip_sellingCostPct') || {}).value) || 0);
+
+        // Recompute outputs for the saved row
+        var loanAmt = isCash ? 0 : Math.max(0, pp - dp);
+        var monthlyRate = rate / 100 / 12;
+        var interestCost = (!isCash && monthlyRate > 0 && months > 0) ? loanAmt * monthlyRate * months : 0;
+        var totalHoldingCost = monthlyCarry * months;
+        var sellingCostDollars = arv * (sellPct / 100);
+        var totalProjectCost  = pp + rehab + closing + totalHoldingCost + interestCost + sellingCostDollars;
+        var netProfit = arv - totalProjectCost;
+        var cashInvested = (isCash ? pp : dp) + closing + rehab + totalHoldingCost + interestCost;
+        var roi = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
+        var annualized = months > 0 ? roi * (12 / months) : 0;
+
+        var shortAddr = (property && property.address) ? property.address : 'Flip Analysis';
+        var now = new Date();
+        var stamp = now.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        var name = shortAddr + ' - Flip - ' + stamp;
+
+        var insertRes = await Portal.supabase
+          .from('investor_saved_proformas')
+          .insert({
+            user_id:     portalUserId,
+            listing_id:  (listing && listing.listing_id) ? listing.listing_id : null,
+            property_id: (property && property.id) ? property.id : null,
+            name:        name,
+            inputs: {
+              mode:             'flip',
+              purchase_price:   pp,
+              arv:              arv,
+              rehab_cost:       rehab,
+              hold_months:      months,
+              financing:        isCash ? 'cash' : 'financed',
+              down_payment:     dp,
+              loan_rate:        rate,
+              closing_costs:    closing,
+              monthly_carry:    monthlyCarry,
+              selling_cost_pct: sellPct
+            },
+            outputs: {
+              net_profit:        netProfit,
+              annualized_return: annualized,
+              roi:               roi,
+              cash_on_cash:      roi,
+              total_project_cost: totalProjectCost,
+              cash_invested:     cashInvested,
+              breakdown: {
+                arv:      arv,
+                purchase: pp,
+                rehab:    rehab,
+                closing:  closing,
+                holding:  totalHoldingCost,
+                interest: interestCost,
+                selling:  sellingCostDollars,
+                net:      netProfit
+              }
+            },
+            archived: false
+          })
+          .select('id')
+          .single();
+
+        if (insertRes.error) {
+          console.error('pfSaveFlip insert error:', insertRes.error);
+          Portal.toast('Could not save flip analysis. Try again.', 'error');
+          return;
+        }
+        Portal.toast('Flip analysis saved to your dashboard.', 'success');
+      } catch (e) {
+        console.error('pfSaveFlip error:', e);
+        Portal.toast('Could not save flip analysis. Try again.', 'error');
+      }
+    }
+
+    // Generate flip-shaped PDF
+    async function pfGenerateFlipPDF() {
+      var { jsPDF } = window.jspdf;
+
+      // Read current computed values from DOM
+      function kdv(id) {
+        var el = document.getElementById(id);
+        return el ? (el.textContent || '').trim() : '-';
+      }
+
+      var isCash   = !!(document.getElementById('flip_financing_cash') && document.getElementById('flip_financing_cash').checked);
+      var pp       = flipNum('flip_purchasePrice');
+      var arv      = flipNum('flip_arv');
+      var rehab    = flipNum('flip_rehabCost');
+      var months   = parseInt((document.getElementById('flip_holdMonths') || {}).value, 10) || 0;
+      var rate     = parseFloat((document.getElementById('flip_loanRate') || {}).value) || 0;
+      var closing  = flipNum('flip_closingCosts');
+      var dp       = flipNum('flip_downPayment');
+      var monthlyCarry = flipNum('flip_monthlyCarry');
+      var sellPct  = parseFloat((document.getElementById('flip_sellingCostPct') || {}).value) || 0;
+
+      var addr = (property && property.address)
+        ? [property.address, property.city, property.state, property.zip].filter(Boolean).join(', ')
+        : 'Fix & Flip Analysis';
+
+      // Palette
+      var TEAL    = [14, 116, 144];
+      var NAVY    = [15, 23, 42];
+      var MUTED   = [100, 116, 139];
+      var GREEN   = [34, 197, 94];
+      var RED     = [239, 68, 68];
+      var BORDER  = [203, 213, 225];
+      var BAND_BG = [241, 245, 249];
+      var TILE_BG = [248, 250, 252];
+
+      var pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+      var W = pdf.internal.pageSize.getWidth();
+      var H = pdf.internal.pageSize.getHeight();
+      var M = 36;
+      var contentW = W - 2 * M;
+      var y;
+
+      function drawBrandStrip(pageNum, pageTotal) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor.apply(pdf, NAVY);
+        pdf.text('Direct Off Market', M, M);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf, MUTED);
+        pdf.text(addr, M, M + 12);
+        pdf.text('Page ' + pageNum + ' of ' + pageTotal, W - M, M + 12, { align: 'right' });
+        pdf.setDrawColor.apply(pdf, BORDER);
+        pdf.setLineWidth(0.5);
+        pdf.line(M, M + 18, W - M, M + 18);
+      }
+
+      function drawFooter() {
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf, MUTED);
+        var today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+        pdf.text('Generated ' + today + ' - For informational and illustrative purposes only. Not investment advice.', M, H - 18);
+      }
+
+      y = M + 36;
+
+      // Title
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(20);
+      pdf.setTextColor.apply(pdf, NAVY);
+      pdf.text('Fix & Flip Analysis', M, y);
+      y += 18;
+
+      // KPI tile row
+      function drawKpiRow(items, height, valueSize) {
+        var gap   = 10;
+        var tileW = (contentW - gap * (items.length - 1)) / items.length;
+        items.forEach(function(it, i) {
+          var x = M + i * (tileW + gap);
+          pdf.setDrawColor.apply(pdf, BORDER);
+          pdf.setFillColor.apply(pdf, TILE_BG);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(x, y, tileW, height, 6, 6, 'FD');
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(valueSize);
+          var valColor = it.positive ? TEAL : (it.negative ? RED : MUTED);
+          pdf.setTextColor.apply(pdf, valColor);
+          pdf.text(it.value || '-', x + tileW / 2, y + height * 0.55, { align: 'center' });
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor.apply(pdf, MUTED);
+          pdf.text(it.label.toUpperCase(), x + tileW / 2, y + height - 8, { align: 'center' });
+        });
+        y += height + 12;
+      }
+
+      var netProfitVal = kdv('flip_kpi_netProfit');
+      var annVal       = kdv('flip_kpi_annualized');
+      var roiVal       = kdv('flip_kpi_roi');
+      var cocVal       = kdv('flip_kpi_coc');
+      var netNum       = flipNum('flip_arv') - (flipNum('flip_purchasePrice') + flipNum('flip_rehabCost') + flipNum('flip_closingCosts'));
+
+      drawKpiRow([
+        { label: 'Net Profit',         value: netProfitVal, positive: parseFloat(netProfitVal.replace(/[^0-9.-]/g,'')) >= 0 },
+        { label: 'Annualized Return',  value: annVal,       positive: parseFloat(annVal) >= 25, negative: parseFloat(annVal) < 10 && annVal !== '-' },
+        { label: 'ROI',               value: roiVal,       positive: parseFloat(roiVal) >= 20, negative: parseFloat(roiVal) < 10 },
+        { label: 'Cash-on-Cash Return',value: cocVal,       positive: parseFloat(cocVal) >= 20, negative: parseFloat(cocVal) < 10 }
+      ], 60, 18);
+
+      y += 6;
+
+      // Section banner helper
+      function drawSectionBanner(title, estimatedH) {
+        var bottomLimit = H - M - 30;
+        if (estimatedH && (y + estimatedH > bottomLimit)) {
+          pdf.addPage();
+          y = M + 36;
+        }
+        pdf.setFillColor.apply(pdf, BAND_BG);
+        pdf.rect(M, y, contentW, 22, 'F');
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor.apply(pdf, TEAL);
+        pdf.text(title.toUpperCase(), M + 10, y + 15);
+        y += 22;
+      }
+
+      // Data row helper
+      function drawRow(label, value, kind) {
+        var rowH = 18;
+        var isDeduction = kind === 'deduction';
+        var isSum       = kind === 'sum';
+        var isHighlight = kind === 'highlight';
+        if (isHighlight) {
+          pdf.setFillColor(232, 246, 252);
+          pdf.rect(M, y, contentW, rowH, 'F');
+        }
+        pdf.setFont('helvetica', (isSum || isHighlight) ? 'bold' : 'normal');
+        pdf.setFontSize(10);
+        var labelColor = isDeduction ? RED : NAVY;
+        var valueColor = isDeduction ? RED : (isSum || isHighlight ? TEAL : NAVY);
+        var prefix     = isDeduction ? '- ' : (isSum ? '= ' : '');
+        pdf.setTextColor.apply(pdf, labelColor);
+        pdf.text(prefix + label, M + 12, y + 13);
+        pdf.setTextColor.apply(pdf, valueColor);
+        pdf.text(value || '-', W - M - 12, y + 13, { align: 'right' });
+        pdf.setDrawColor.apply(pdf, BORDER);
+        pdf.setLineWidth(0.3);
+        pdf.line(M, y + rowH, W - M, y + rowH);
+        y += rowH;
+      }
+
+      // Project Inputs section
+      drawSectionBanner('Project Inputs', 200);
+      drawRow('Purchase Price',   flipFc(pp),   'normal');
+      drawRow('After Repair Value (ARV)', flipFc(arv), 'normal');
+      drawRow('Rehab Cost',       flipFc(rehab), 'normal');
+      drawRow('Holding Time',     months + ' month' + (months !== 1 ? 's' : ''), 'normal');
+      drawRow('Financing Mode',   isCash ? 'Cash' : 'Financed', 'normal');
+      if (!isCash) {
+        drawRow('Down Payment',         flipFc(dp),          'normal');
+        drawRow('Loan Interest Rate',   rate.toFixed(2) + '%', 'normal');
+        drawRow('Monthly Carry',        flipFc(monthlyCarry), 'normal');
+      }
+      drawRow('Closing Costs',     flipFc(closing), 'normal');
+      drawRow('Selling Costs %',   sellPct.toFixed(1) + '%', 'normal');
+      y += 8;
+
+      // Profit Breakdown section
+      var loanAmt2       = isCash ? 0 : Math.max(0, pp - dp);
+      var mRate2         = rate / 100 / 12;
+      var interestCost2  = (!isCash && mRate2 > 0 && months > 0) ? loanAmt2 * mRate2 * months : 0;
+      var holdingCost2   = monthlyCarry * months;
+      var sellingDollars = arv * (sellPct / 100);
+      var netProfitNum   = arv - (pp + rehab + closing + holdingCost2 + interestCost2 + sellingDollars);
+      var cashInv        = (isCash ? pp : dp) + closing + rehab + holdingCost2 + interestCost2;
+
+      drawSectionBanner('Profit Breakdown', 250);
+      drawRow('After Repair Value (ARV)', flipFc(arv),          'normal');
+      drawRow('Purchase Price',           flipFc(pp),           'deduction');
+      drawRow('Rehab Cost',               flipFc(rehab),        'deduction');
+      drawRow('Closing Costs',            flipFc(closing),      'deduction');
+      if (!isCash) {
+        drawRow('Total Holding Cost',     flipFc(holdingCost2),  'deduction');
+        drawRow('Loan Interest Cost',     flipFc(interestCost2), 'deduction');
+      }
+      drawRow('Selling Costs',            flipFc(sellingDollars), 'deduction');
+      drawRow('Net Profit',               flipFc(netProfitNum),   'sum');
+      y += 4;
+      drawRow('Total Cash Invested',      flipFc(cashInv),        'highlight');
+
+      // Brand strip + footer on every page
+      var pageCount = pdf.internal.getNumberOfPages();
+      for (var p = 1; p <= pageCount; p++) {
+        pdf.setPage(p);
+        drawBrandStrip(p, pageCount);
+        drawFooter();
+      }
+
+      // Save
+      var raw  = 'Fix and Flip Analysis - ' + addr + '.pdf';
+      var safe = raw.replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+      pdf.save(safe);
+    }
+
+    // ===== END FIX & FLIP CALCULATOR =====
 
     function renderPropertyDetails() {
       function fv(v) { return (v != null && v !== '' && v !== false && v !== 'false') ? String(v) : null; }
