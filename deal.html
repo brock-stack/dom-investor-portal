@@ -805,7 +805,7 @@
     }
 
     /* === PRO FORMAS (NEW TAB) === */
-    .proforma-mode-toggle-wrap { position:sticky; top:56px; z-index:10; background:var(--bg); padding:12px 0 10px; margin-bottom:20px; border-bottom:1px solid var(--border); }
+    .proforma-mode-toggle-wrap { position:sticky; top:0; z-index:60; background:var(--bg); background-color:var(--bg); padding:12px 16px 10px; margin:0 -16px 0 -16px; border-bottom:1px solid var(--border); box-shadow:0 2px 6px rgba(0,0,0,0.25); }
     .proforma-mode-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
     .proforma-mode-pill { padding:8px 22px; border:none; background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; white-space:nowrap; }
     .proforma-mode-pill.active { background:#4fc3f7; color:#0f172a; }
@@ -818,7 +818,7 @@
     .brrrr-breakdown-sep { border:none; border-top:2px solid var(--border); margin:12px 0; }
 
     /* === FIX & FLIP CALCULATOR === */
-    .flip-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .flip-kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:28px; overflow:hidden; }
     .flip-section-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
     .flip-full-row { margin-bottom:20px; }
     .flip-financing-wrap { overflow:hidden; transition:max-height 0.2s ease; max-height:600px; }
@@ -1721,7 +1721,7 @@
       <!-- Hold Subview -->
       <div id="proformas_subview_hold" class="proforma-subview active">
       <!-- Hold Subview Heading -->
-      <div style="margin-bottom:20px;">
+      <div style="margin-bottom:20px;padding-top:16px;">
         <div class="pro-forma-section-title" style="font-size:16px;font-weight:800;color:var(--text);text-transform:none;letter-spacing:0;margin-bottom:4px;">Hold <span style="font-weight:500;font-size:14px;">(Buy &amp; Rent)</span></div>
         <p style="color:var(--text-muted);font-size:14px;margin:0;">Long-term rental analysis. Acquire as-is or with light rehab, hold for cash flow + appreciation.</p>
       </div>
@@ -2271,7 +2271,7 @@
       <!-- Flip Subview -->
       <div id="proformas_subview_flip" class="proforma-subview">
       <!-- Flip Subview Heading -->
-      <div style="margin-bottom:20px;">
+      <div style="margin-bottom:20px;padding-top:16px;">
         <div class="pro-forma-section-title" style="font-size:16px;font-weight:800;color:var(--text);text-transform:none;letter-spacing:0;margin-bottom:4px;">Flip <span style="font-weight:500;font-size:14px;">(Buy, Rehab, Sell)</span></div>
         <p style="color:var(--text-muted);font-size:14px;margin:0;">Fix-and-flip analysis. Project cost in, exit at ARV, profit and annualized return.</p>
       </div>
@@ -2455,7 +2455,7 @@
       <div id="proformas_subview_brrrr" class="proforma-subview">
 
       <!-- BRRRR Section Heading -->
-      <div style="margin-bottom:20px;">
+      <div style="margin-bottom:20px;padding-top:16px;">
         <div class="pro-forma-section-title" style="font-size:16px;font-weight:800;color:var(--text);text-transform:none;letter-spacing:0;margin-bottom:4px;">BRRRR <span style="font-weight:500;font-size:14px;">(Buy, Rehab, Rent, Refinance, Repeat)</span></div>
         <p style="color:var(--text-muted);font-size:14px;margin:0;">Recycle your capital. Rehab the property, rent it out, refinance to pull cash back out, repeat on the next deal.</p>
       </div>
@@ -3688,6 +3688,8 @@
           if (pill) pill.classList.toggle('active', m === mode);
         });
       }
+      // Expose globally so inline onclick handlers can reach it
+      window.setProformasMode = setProformasMode;
 
       // URL param routing: ?tab= and ?mode= for the new Pro Formas tab
       (function() {
