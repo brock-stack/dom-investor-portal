@@ -1529,7 +1529,7 @@
           container.innerHTML = '<div class="empty-state-inline">No saved pro formas yet. Open any deal and run the pro forma calculator to save it here.</div>';
           return;
         }
-        var html = '<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Mode</th><th>Property</th><th>Date Saved</th><th>Return</th><th>Actions</th></tr></thead><tbody>';
+        var html = '<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Mode</th><th>Property</th><th>Date Saved</th><th>Actions</th></tr></thead><tbody>';
         rows.forEach(function(row) {
           var addr = row.name || '-';
           var date = row.created_at ? new Date(row.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-';
@@ -1540,9 +1540,6 @@
             : mode === 'brrrr' ? '<span style="background:#0e7490;color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;">&#9854; BRRRR</span>'
             : '<span style="background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;">&#127968; Hold</span>';
           var isInf = out2.is_infinite_return === true;
-          var returnVal = mode === 'flip' ? (out2.roi != null ? Number(out2.roi).toFixed(1) + '% ROI' : '-')
-            : mode === 'brrrr' ? (isInf ? '&#9854; Infinite' : (out2.post_refi_coc != null ? Number(out2.post_refi_coc).toFixed(1) + '% CoC' : '-'))
-            : (out2.coc_return != null ? Number(out2.coc_return).toFixed(1) + '% CoC' : (out2.cap_rate != null ? Number(out2.cap_rate).toFixed(1) + '% Cap' : '-'));
           var pfMode = (mode === 'flip' || mode === 'brrrr') ? mode : 'hold';
           var viewLink = row.listing_id ? '/deal.html?id=' + row.listing_id + '&tab=proforma&mode=' + pfMode : '#';
           var dispName = (row.name || '-') + (isInf ? ' <span title="Infinite Return">&#9854;</span>' : '');
@@ -1550,7 +1547,6 @@
             '<td>' + badge + '</td>' +
             '<td>' + dispName + '</td>' +
             '<td>' + date + '</td>' +
-            '<td>' + returnVal + '</td>' +
             '<td style="display:flex;gap:8px;align-items:center;">' +
               '<a href="' + viewLink + '" class="fav-view-link">View</a>' +
               '<button class="btn-danger-sm" onclick="deleteProforma(\'' + row.id + '\')">Delete</button>' +
