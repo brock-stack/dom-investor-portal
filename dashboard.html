@@ -1518,19 +1518,39 @@
           container.innerHTML = '<div class="empty-state-inline">No saved pro formas yet. Open any deal and run the pro forma calculator to save it here.</div>';
           return;
         }
-        var html = '<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Property</th><th>Date Saved</th><th>CoC Return</th><th>Cap Rate</th><th>Actions</th></tr></thead><tbody>';
+        var html = '<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Mode</th><th>Property</th><th>Date Saved</th><th>Return</th><th>Actions</th></tr></thead><tbody>';
         rows.forEach(function(row) {
-          var addr = row.name || '-';
-          var date = row.created_at ? new Date(row.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-';
+          var inp = row.inputs || {};
           var out = row.outputs || {};
-          var coc = out.coc_return != null ? (Number(out.coc_return).toFixed(1) + '%') : '-';
-          var cap = out.cap_rate != null ? (Number(out.cap_rate).toFixed(1) + '%') : '-';
-          var viewLink = row.listing_id ? '/deal.html?id=' + row.listing_id : '#';
+          var mode = inp.mode || 'hold';
+          // Mode badge
+          var modeBadge;
+          if (mode === 'flip') {
+            modeBadge = '<span style="background:#0e7490;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">&#128296; Flip</span>';
+          } else if (mode === 'brrrr') {
+            modeBadge = '<span style="background:#0e7490;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">&#9854; BRRRR</span>';
+          } else {
+            modeBadge = '<span style="background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">&#127968; Hold</span>';
+          }
+          var isInf = out.is_infinite_return === true;
+          var addr = (row.name || '-') + (isInf ? ' <span title="Infinite Return">&#9854;</span>' : '');
+          var date = row.created_at ? new Date(row.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '-';
+          // Return metric: mode-dependent
+          var returnVal;
+          if (mode === 'flip') {
+            returnVal = out.roi != null ? Number(out.roi).toFixed(1) + '% ROI' : '-';
+          } else if (mode === 'brrrr') {
+            returnVal = isInf ? '&#9854; Infinite CoC' : (out.post_refi_coc != null ? Number(out.post_refi_coc).toFixed(1) + '% CoC' : '-');
+          } else {
+            returnVal = out.coc_return != null ? (Number(out.coc_return).toFixed(1) + '% CoC') : (out.cap_rate != null ? Number(out.cap_rate).toFixed(1) + '% Cap' : '-');
+          }
+          var pfMode = (mode === 'flip' || mode === 'brrrr') ? mode : 'hold';
+          var viewLink = row.listing_id ? '/deal.html?id=' + row.listing_id + '&proforma=' + pfMode : '#';
           html += '<tr>' +
+            '<td>' + modeBadge + '</td>' +
             '<td>' + addr + '</td>' +
             '<td>' + date + '</td>' +
-            '<td>' + coc + '</td>' +
-            '<td>' + cap + '</td>' +
+            '<td>' + returnVal + '</td>' +
             '<td style="display:flex;gap:8px;align-items:center;">' +
               '<a href="' + viewLink + '" class="fav-view-link">View</a>' +
               '<button class="btn-danger-sm" onclick="deleteProforma(\'' + row.id + '\')">Delete</button>' +
