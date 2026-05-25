@@ -1755,7 +1755,7 @@
         <div class="form-group">
           <div class="pf-label-row"><span class="pf-label-text">Holding Time (Months)</span></div>
           <div class="pf-input-wrap">
-            <input type="number" class="pro-forma-input" id="flip_holdMonths" placeholder="6" min="0" step="1" oninput="flipCalc();">
+            <input type="number" class="pro-forma-input" id="flip_holdMonths" value="6" placeholder="6" min="0" step="1" oninput="flipCalc();">
           </div>
         </div>
       </div>
@@ -1810,9 +1810,9 @@
       <div class="pro-forma-section-title" style="margin-top:8px;">Selling Costs</div>
       <div class="flip-full-row" style="max-width:300px;">
         <div class="form-group">
-          <div class="pf-label-row"><span class="pf-label-text">Selling Costs % <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Agent commissions + closing costs at sale. Typically 6&ndash;8% of ARV in Florida.</span></span></span></div>
+          <div class="pf-label-row"><span class="pf-label-text">Selling Costs % <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">DOM standard is 6.5% (3% buyer agent + 2.5% listing + 1% closing). Adjust if your scenario differs &mdash; e.g. DOM lists for 2% would total 5.5%.</span></span></span></div>
           <div class="pf-input-wrap">
-            <input type="number" class="pro-forma-input has-suffix" id="flip_sellingCostPct" value="8.0" min="0" step="0.5" oninput="flipCalc();">
+            <input type="number" class="pro-forma-input has-suffix" id="flip_sellingCostPct" value="6.5" min="0" step="0.5" oninput="flipCalc();">
             <span class="pf-input-suffix">%</span>
           </div>
         </div>
