@@ -4352,954 +4352,520 @@
     }
 
     async function pfGeneratePDF() {
-      // Branch to flip PDF if the Fix & Flip tab is active
-      var activeTabBtn = document.querySelector('.tab-btn.active');
-      if (activeTabBtn && activeTabBtn.dataset.tab === 'flip') {
-        return pfGenerateFlipPDF();
-      }
+      // Branch to flip PDF if flip mode active
+      if (_proformasMode === 'flip')  return pfGenerateFlipPDF();
+      if (_proformasMode === 'brrrr') return pfsGenerateBrrrrPDF();
 
       var { jsPDF } = window.jspdf;
+      var NAVY=[15,23,42], TEAL=[14,116,144], RED=[220,38,38], MUTED=[100,116,139];
+      var BORDER=[203,213,225], BAND_BG=[241,245,249], TILE_BG=[248,250,252];
+      var WHITE=[255,255,255];
+      var pdf = new jsPDF({ unit:'pt', format:'letter', orientation:'portrait' });
+      var W=pdf.internal.pageSize.getWidth(), H=pdf.internal.pageSize.getHeight();
+      var M=36, cW=W-2*M; // 612 wide, 540 content
+      var y=0;
 
-      // Helper: read DOM value, return '-' if missing (ASCII only)
-      function dom(id) {
-        var el = document.getElementById(id);
-        return el ? (el.textContent || '').trim() : '-';
-      }
-
-      // Build address + filename
-      var addr = (property && property.address)
-        ? [property.address, property.city, property.state, property.zip].filter(Boolean).join(', ')
+      var addr = (property&&property.address)
+        ? [property.address,property.city,property.state,property.zip].filter(Boolean).join(', ')
         : 'Pro Forma';
 
-      // Palette (RGB arrays for apply())
-      var TEAL    = [14, 116, 144];   // #0e7490
-      var NAVY    = [15, 23, 42];     // #0f172a
-      var MUTED   = [100, 116, 139];  // #64748b
-      var RED     = [220, 38, 38];    // #dc2626
-      var BORDER  = [203, 213, 225];  // #cbd5e1
-      var BAND_BG = [241, 245, 249];  // #f1f5f9
-      var TILE_BG = [248, 250, 252];  // #f8fafc
-
-      // Document
-      var pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
-      var W = pdf.internal.pageSize.getWidth();  // 612
-      var H = pdf.internal.pageSize.getHeight(); // 792
-      var M = 36; // page margin
-      var contentW = W - 2 * M; // 540
-      var y; // current draw cursor
-
-      // ---- Brand strip (top of every page — drawn in final loop) ----
-      function drawBrandStrip(pageNum, pageTotal) {
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        pdf.setTextColor.apply(pdf, NAVY);
-        pdf.text('Direct Off Market', M, M);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        pdf.setTextColor.apply(pdf, MUTED);
-        pdf.text(addr, M, M + 12);
-        pdf.text('Page ' + pageNum + ' of ' + pageTotal, W - M, M + 12, { align: 'right' });
-        pdf.setDrawColor.apply(pdf, BORDER);
-        pdf.setLineWidth(0.5);
-        pdf.line(M, M + 18, W - M, M + 18);
+      // Brand strip on every page
+      function drawBrand(strategy) {
+        // White bg for the strip area
+        pdf.setFillColor.apply(pdf,WHITE);
+        pdf.rect(0,0,W,M+22,'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+        pdf.setTextColor.apply(pdf,NAVY);
+        pdf.text('Direct Off Market', M, M-2);
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,MUTED);
+        pdf.text(strategy||'Pro Forma', W-M, M-2, {align:'right'});
+        // Teal hairline
+        pdf.setDrawColor.apply(pdf,TEAL); pdf.setLineWidth(1.5);
+        pdf.line(M, M+2, W-M, M+2);
+        // Reset draw color
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.5);
       }
 
-      // ---- Footer (bottom of every page — drawn in final loop) ----
       function drawFooter() {
-        pdf.setFont('helvetica', 'italic');
-        pdf.setFontSize(8);
-        pdf.setTextColor.apply(pdf, MUTED);
-        var today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
-        pdf.text('Generated ' + today + ' - For informational and illustrative purposes only. Not investment advice.', M, H - 18);
+        pdf.setFont('helvetica','italic'); pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf,MUTED);
+        var today = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+        pdf.text('Generated '+today+' \u2014 For informational and illustrative purposes only. Not investment advice.',
+          W/2, H-14, {align:'center'});
       }
 
-      // ---- Start page 1 ----
-      y = M + 36; // below brand strip
+      // Address + title block
+      function drawTitle(subtitle) {
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
+        pdf.setTextColor.apply(pdf,NAVY);
+        var addrLines = pdf.splitTextToSize(addr, cW);
+        pdf.text(addrLines, M, y);
+        y += addrLines.length * 22;
+        if (subtitle) {
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(11);
+          pdf.setTextColor.apply(pdf,MUTED);
+          pdf.text(subtitle, M, y); y += 18;
+        }
+        y += 6; // breathing room
+      }
 
-      // ---- Document title ----
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(20);
-      pdf.setTextColor.apply(pdf, NAVY);
-      pdf.text('Investment Pro Forma', M, y);
-      y += 18;
-
-      // ---- KPI tiles row helper ----
-      function drawKpiRow(items, height, valueSize) {
-        var gap = 10;
-        var tileW = (contentW - gap * (items.length - 1)) / items.length;
-        items.forEach(function(it, i) {
-          var x = M + i * (tileW + gap);
+      // KPI tile drawing
+      // items: [{label, value, color}]  color = TEAL|RED|NAVY array
+      function drawKpiTiles(items, tileH, valSize) {
+        var gap=10, tw=(cW-gap*(items.length-1))/items.length;
+        // Check page space
+        if (y + tileH > H-M-30) { pdf.addPage(); y = M+28; }
+        items.forEach(function(it,i) {
+          var x = M + i*(tw+gap);
+          // Tile card
+          pdf.setFillColor.apply(pdf, it.tileFill||TILE_BG);
           pdf.setDrawColor.apply(pdf, BORDER);
-          pdf.setFillColor.apply(pdf, TILE_BG);
           pdf.setLineWidth(0.5);
-          pdf.roundedRect(x, y, tileW, height, 6, 6, 'FD');
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(valueSize);
-          pdf.setTextColor.apply(pdf, TEAL);
-          pdf.text(it.value || '-', x + tileW / 2, y + height * 0.55, { align: 'center' });
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(9);
-          pdf.setTextColor.apply(pdf, MUTED);
-          pdf.text(it.label.toUpperCase(), x + tileW / 2, y + height - 8, { align: 'center' });
+          pdf.roundedRect(x, y, tw, tileH, 6, 6, 'FD');
+          // Label (top)
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(8);
+          pdf.setTextColor.apply(pdf,MUTED);
+          pdf.text((it.label||'').toUpperCase(), x+tw/2, y+14, {align:'center'});
+          // Value (center)
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(valSize||20);
+          pdf.setTextColor.apply(pdf, it.color||NAVY);
+          var valText = it.value||'-';
+          pdf.text(valText, x+tw/2, y+tileH*0.62, {align:'center'});
+          // Subscript caption
+          if (it.caption) {
+            pdf.setFont('helvetica','normal'); pdf.setFontSize(7);
+            pdf.setTextColor.apply(pdf,MUTED);
+            pdf.text(it.caption, x+tw/2, y+tileH-8, {align:'center'});
+          }
         });
-        y += height + 12;
+        y += tileH + 14;
       }
 
-      // Primary KPI row
-      drawKpiRow([
-        { label: 'Cap Rate',     value: dom('gauge_capRate_val') },
-        { label: 'Cash-on-Cash', value: dom('gauge_coc_val') },
-        { label: 'DSCR',         value: dom('gauge_dscr_val') }
-      ], 60, 22);
-
-      // Secondary money tile row
-      drawKpiRow([
-        { label: 'Day 1 Equity',              value: dom('r2_day1Equity') },
-        { label: 'Monthly Cash Flow (Yr 1)',  value: dom('r2_monthlyCF') },
-        { label: 'Annual Cash Flow',          value: dom('r2_annualCF') }
-      ], 48, 16);
-
-      y += 6; // extra breathing room before first section
-
-      // ---- Section banner helper ----
-      // If estimatedH given and section won't fit, start a new page first
-      function drawSectionBanner(title, estimatedH) {
-        var bottomLimit = H - M - 30;
-        if (estimatedH && (y + estimatedH > bottomLimit)) {
-          pdf.addPage();
-          y = M + 36;
-        }
-        pdf.setFillColor.apply(pdf, BAND_BG);
-        pdf.rect(M, y, contentW, 22, 'F');
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        pdf.setTextColor.apply(pdf, TEAL);
-        pdf.text(title.toUpperCase(), M + 10, y + 15);
-        y += 22;
+      // Section banner
+      function drawBanner(title, estH) {
+        if (estH && y+estH > H-M-30) { pdf.addPage(); y = M+28; }
+        pdf.setFillColor.apply(pdf,NAVY);
+        pdf.rect(M, y, cW, 20, 'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+        pdf.setTextColor.apply(pdf,WHITE);
+        pdf.text(title.toUpperCase(), M+10, y+14);
+        y += 20;
       }
 
-      // ---- Data row helper ----
-      // kind: 'normal' | 'deduction' | 'sum' | 'highlight'
+      // Data row (label left, value right)
+      // kind: 'normal' | 'deduction' | 'sum' | 'highlight' | 'sub'
       function drawRow(label, value, kind) {
-        var rowH = 18;
-        var isDeduction = kind === 'deduction';
-        var isSum       = kind === 'sum';
-        var isHighlight = kind === 'highlight';
+        var rH = kind==='sub' ? 14 : 17;
+        var fs = kind==='sub' ? 9 : (kind==='sum'||kind==='highlight' ? 11 : 10);
+        var bold = (kind==='sum'||kind==='highlight');
+        var isDed = kind==='deduction';
+        var isSum = kind==='sum';
+        var isHl  = kind==='highlight';
 
-        if (isHighlight) {
-          pdf.setFillColor(232, 246, 252); // very light teal tint
-          pdf.rect(M, y, contentW, rowH, 'F');
+        if (isHl) {
+          pdf.setFillColor(235,248,252);
+          pdf.rect(M, y, cW, rH, 'F');
         }
 
-        pdf.setFont('helvetica', (isSum || isHighlight) ? 'bold' : 'normal');
-        pdf.setFontSize(10);
+        pdf.setFont('helvetica', bold?'bold':'normal');
+        pdf.setFontSize(fs);
 
-        var labelColor = isDeduction ? RED : NAVY;
-        var valueColor = isDeduction ? RED : (isSum || isHighlight ? TEAL : NAVY);
-        var prefix     = isDeduction ? '- ' : (isSum ? '= ' : '');
+        var lc = isDed ? RED : NAVY;
+        var vc = isDed ? RED : (isSum || isHl ? TEAL : NAVY);
+        var prefix = isDed ? '- ' : (isSum ? '= ' : '');
 
-        pdf.setTextColor.apply(pdf, labelColor);
-        pdf.text(prefix + label, M + 12, y + 13);
-        pdf.setTextColor.apply(pdf, valueColor);
-        pdf.text(value || '-', W - M - 12, y + 13, { align: 'right' });
+        pdf.setTextColor.apply(pdf, lc);
+        pdf.text(prefix + (label||''), M+6, y+rH-4);
+        pdf.setTextColor.apply(pdf, vc);
+        pdf.text(value||'-', W-M-6, y+rH-4, {align:'right'});
 
-        // thin divider under each row
-        pdf.setDrawColor.apply(pdf, BORDER);
-        pdf.setLineWidth(0.3);
-        pdf.line(M, y + rowH, W - M, y + rowH);
-
-        y += rowH;
+        // thin divider
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.2);
+        pdf.line(M, y+rH, W-M, y+rH);
+        y += rH;
       }
 
-      // ---- Acquisition Summary ----
-      // 7 rows x 18 + banner 22 + spacing ~= 160pt
-      drawSectionBanner('Acquisition Summary', 160);
-      drawRow('Purchase Price',         dom('r2_purchasePrice'),    'normal');
-      drawRow('Closing Costs',          dom('r2_closingCosts'),     'normal');
-      drawRow('Loan Fees',              dom('r2_loanFees'),         'normal');
-      drawRow('Total Acquisition Cost', dom('r2_totalAcqCost'),     'sum');
-      drawRow('Down Payment',           dom('r2_downPayment'),      'normal');
-      drawRow('Initial Investment',     dom('r2_initialInvestment'),'sum');
-      drawRow('Day 1 Equity',           dom('r2_day1Equity'),       'highlight');
-      y += 8;
-
-      // ---- Annual Income & Expenses ----
-      // 12 rows x 18 + banner 22 + spacing ~= 250pt
-      drawSectionBanner('Annual Income & Expenses', 250);
-      drawRow('Gross Rental Income',  dom('r2_grossIncome'),  'normal');
-      drawRow('Vacancy Loss',         dom('r2_vacancyLoss'),  'deduction');
-      drawRow('Effective Gross Income',dom('r2_egi'),         'sum');
-      drawRow('Property Tax',         dom('r2_propTax'),      'deduction');
-      drawRow('Insurance',            dom('r2_insurance'),    'deduction');
-      drawRow('HOA',                  dom('r2_hoa'),          'deduction');
-      drawRow('Repair & Maintenance', dom('r2_repairs'),      'deduction');
-      drawRow('Property Management',  dom('r2_pm'),           'deduction');
-      drawRow('Net Operating Income', dom('r2_noi'),          'sum');
-      drawRow('Annual Debt Service',  dom('r2_debtService'),  'deduction');
-      drawRow('Annual Cash Flow',     dom('r2_annualCF'),     'sum');
-      drawRow('Monthly Cash Flow',    dom('r2_monthlyCF'),    'highlight');
-      y += 8;
-
-      // ---- Exit Analysis ----
-      // 9 rows x 18 + banner 22 + spacing ~= 195pt
-      drawSectionBanner('Exit Analysis (' + dom('r2_holdLabel') + ' yr)', 195);
-      drawRow('Est. Market Value at Sale',   dom('r2_saleValue'),    'normal');
-      drawRow('Cost of Sale',               dom('r2_costOfSale'),   'deduction');
-      drawRow('Remaining Loan Balance',     dom('r2_loanBal'),      'deduction');
-      drawRow('Est. Proceeds at Sale',      dom('r2_saleProceeds'), 'sum');
-      drawRow('Total Cash Flow During Hold',dom('r2_totalCFHold'),  'normal');
-      drawRow('Est. Total Return',          dom('r2_totalReturn'),  'sum');
-      drawRow('Est. Annualized Return',     dom('r2_annReturn'),    'highlight');
-      drawRow('Equity Multiple',            dom('r2_eqMultiple'),   'normal');
-      drawRow('IRR',                        dom('r2_irr'),          'normal');
-
-      // ---- Brand strip + footer on every page (after all content drawn) ----
-      var pageCount = pdf.internal.getNumberOfPages();
-      for (var p = 1; p <= pageCount; p++) {
-        pdf.setPage(p);
-        drawBrandStrip(p, pageCount);
-        drawFooter();
+      // 2-column grid row (label1:val1 | label2:val2)
+      function drawGridRow(l1, v1, l2, v2) {
+        var rH=16, half=cW/2-5;
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,MUTED);
+        pdf.text(l1||'', M+4, y+rH-4);
+        pdf.text(l2||'', M+cW/2+4, y+rH-4);
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,NAVY);
+        pdf.text(v1||'-', M+half-2, y+rH-4, {align:'right'});
+        if (l2) pdf.text(v2||'-', W-M-2, y+rH-4, {align:'right'});
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.2);
+        pdf.line(M, y+rH, W-M, y+rH);
+        y += rH;
       }
 
-      // ---- Sanitize filename + save ----
-      var raw  = 'Pro Forma - ' + addr + '.pdf';
-      var safe = raw.replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+      function numFromText(str) {
+        if (!str) return null;
+        var n = parseFloat(String(str).replace(/[^0-9.\-]/g,''));
+        return isFinite(n) ? n : null;
+      }
+      function colorForNumber(n, posThresh, negThresh) {
+        if (n===null) return MUTED;
+        if (n >= (posThresh||0)) return TEAL;
+        if (n <= (negThresh||0)) return RED;
+        return NAVY;
+      }
+
+      var strategy = 'Pro Forma \u2014 Hold Strategy';
+      y = M + 28;
+
+      // ── Page 1 ────────────────────────────────────────────────────────────
+      // Title block
+      drawTitle('Long-term rental investment analysis');
+
+      // Primary KPI tiles (Cap Rate / CoC / DSCR)
+      function domV(id) { var el=document.getElementById(id); return el?(el.textContent||'').trim():'-'; }
+
+      var crRaw=numFromText(domV('gauge_capRate_val'));
+      var cocRaw=numFromText(domV('gauge_coc_val'));
+      var dscrRaw=numFromText(domV('gauge_dscr_val'));
+
+      drawKpiTiles([
+        { label:'Cap Rate', value:domV('gauge_capRate_val'),
+          color: crRaw===null?MUTED:(crRaw>=7?TEAL:(crRaw>=4?NAVY:RED)),
+          caption: crRaw!==null?(crRaw>=7?'Strong':'Review'):'' },
+        { label:'Cash-on-Cash', value:domV('gauge_coc_val'),
+          color: cocRaw===null?MUTED:(cocRaw>=8?TEAL:(cocRaw>=4?NAVY:RED)),
+          caption: cocRaw!==null?(cocRaw>=8?'Strong':'Review'):'' },
+        { label:'DSCR', value:domV('gauge_dscr_val'),
+          color: dscrRaw===null?MUTED:(dscrRaw>=1.08?TEAL:(dscrRaw>=1.0?[180,100,0]:RED)),
+          caption: dscrRaw!==null?(dscrRaw>=1.08?'Positive coverage':dscrRaw>=1.0?'Near breakeven':'Negative coverage'):'' }
+      ], 72, 22);
+
+      // Secondary tiles (Day 1 Equity / Monthly CF / Annual CF)
+      function parseSign(str) {
+        if (!str) return null;
+        var n=numFromText(str); return isFinite(n)?n:null;
+      }
+      var eq=parseSign(domV('r2_day1Equity')), mcf=parseSign(domV('r2_monthlyCF')), acf=parseSign(domV('r2_annualCF'));
+      drawKpiTiles([
+        { label:'Day 1 Equity', value:domV('r2_day1Equity'),
+          color: eq===null?MUTED:(eq>=0?TEAL:RED) },
+        { label:'Monthly Cash Flow (Yr 1)', value:domV('r2_monthlyCF'),
+          color: mcf===null?MUTED:(mcf>=0?TEAL:RED) },
+        { label:'Annual Cash Flow', value:domV('r2_annualCF'),
+          color: acf===null?MUTED:(acf>=0?TEAL:RED) }
+      ], 56, 16);
+
+      y += 4;
+
+      // ── Acquisition Summary ────────────────────────────────────────────────
+      drawBanner('Acquisition Summary', 180);
+      drawRow('Purchase Price', domV('r2_purchasePrice'), 'normal');
+      drawRow('Closing Costs', domV('r2_closingCosts'), 'deduction');
+      drawRow('Loan Fees', domV('r2_loanFees'), 'deduction');
+      drawRow('Total Acquisition Cost', domV('r2_totalAcqCost'), 'sum');
+      drawRow('Down Payment', domV('r2_downPayment'), 'normal');
+      drawRow('Initial Investment', domV('r2_initialInvestment'), 'highlight');
+      drawRow('Day 1 Equity', domV('r2_day1Equity'), 'normal');
+      y += 6;
+
+      // ── Annual Income & Expenses ───────────────────────────────────────────
+      drawBanner('Annual Income & Expenses', 260);
+      drawRow('Gross Rental Income', domV('r2_grossIncome'), 'normal');
+      drawRow('Vacancy Loss', domV('r2_vacancyLoss'), 'deduction');
+      drawRow('Effective Gross Income', domV('r2_egi'), 'sum');
+      drawRow('Property Tax', domV('r2_propTax'), 'deduction');
+      drawRow('Insurance', domV('r2_insurance'), 'deduction');
+      drawRow('HOA', domV('r2_hoa'), 'deduction');
+      drawRow('Repair & Maintenance', domV('r2_repairs'), 'deduction');
+      drawRow('Property Management', domV('r2_pm'), 'deduction');
+      drawRow('Net Operating Income', domV('r2_noi'), 'sum');
+      drawRow('Annual Debt Service', domV('r2_debtService'), 'deduction');
+      drawRow('Annual Cash Flow', domV('r2_annualCF'), 'sum');
+      drawRow('Monthly Cash Flow', domV('r2_monthlyCF'), 'highlight');
+      y += 6;
+
+      // ── Exit Analysis ──────────────────────────────────────────────────────
+      var holdLbl = domV('r2_holdLabel');
+      drawBanner('Exit Analysis (' + holdLbl + ' yr)', 200);
+      drawRow('Est. Market Value at Sale', domV('r2_saleValue'), 'normal');
+      drawRow('Cost of Sale', domV('r2_costOfSale'), 'deduction');
+      drawRow('Remaining Loan Balance', domV('r2_loanBal'), 'deduction');
+      drawRow('Est. Proceeds at Sale', domV('r2_saleProceeds'), 'sum');
+      drawRow('Total Cash Flow During Hold', domV('r2_totalCFHold'), 'normal');
+      drawRow('Est. Total Return', domV('r2_totalReturn'), 'sum');
+      // Annualized return — larger, color-coded
+      y += 4;
+      var annR = numFromText(domV('r2_annReturn'));
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(13);
+      pdf.setTextColor.apply(pdf, annR===null?MUTED:(annR>=10?TEAL:(annR>=5?NAVY:RED)));
+      pdf.text('Est. Annualized Return', M+6, y+14);
+      pdf.text(domV('r2_annReturn'), W-M-6, y+14, {align:'right'});
+      y += 20;
+      drawRow('Equity Multiple', domV('r2_eqMultiple'), 'normal');
+      drawRow('IRR', domV('r2_irr'), 'normal');
+
+      // ── Brand strip + footer on all pages ─────────────────────────────────
+      var pgc = pdf.internal.getNumberOfPages();
+      for (var p=1; p<=pgc; p++) { pdf.setPage(p); drawBrand(strategy); drawFooter(); }
+
+      var safe = ('Pro Forma - '+addr+'.pdf').replace(/[/\\\\:*?"<>|]/g,'-').replace(/\\s+/g,' ').trim();
       pdf.save(safe);
     }
 
-    // ===== FIX & FLIP CALCULATOR FUNCTIONS =====
 
-    // Helper: read a currency-formatted text input as a float number
-    function flipNum(id) {
-      var el = document.getElementById(id);
-      if (!el) return 0;
-      return parseFloat(el.value.replace(/,/g, '')) || 0;
-    }
-
-    // Helper: format currency for KPI display
-    function flipFc(n) { return Portal.fc(Math.round(n)); }
-
-    // Set a KPI tile value + color class
-    function flipSetKpi(id, displayVal, state) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      el.innerHTML = displayVal;
-      // state: 'positive' | 'neutral' | 'negative'
-      el.style.color = state === 'positive' ? '#22c55e' : (state === 'negative' ? '#ef4444' : '#94a3b8');
-    }
-
-    // Initialize inputs from property + listings data
-    function flipInitDefaults(ls) {
-      ls = ls || {};
-      var pp  = property.current_market_value || null;
-      var arv = property.estimated_arv || null;
-      var rehab = property.estimated_repairs_flip || null;
-      var holdMonths = property.estimated_hold_months || null;
-
-      // Purchase Price
-      var ppEl = document.getElementById('flip_purchasePrice');
-      if (ppEl && pp) ppEl.value = Math.round(pp).toLocaleString('en-US');
-
-      // ARV
-      var arvEl = document.getElementById('flip_arv');
-      if (arvEl && arv) arvEl.value = Math.round(arv).toLocaleString('en-US');
-
-      // Rehab Cost
-      var rehabEl = document.getElementById('flip_rehabCost');
-      if (rehabEl && rehab) rehabEl.value = Math.round(rehab).toLocaleString('en-US');
-
-      // Holding Time
-      var holdEl = document.getElementById('flip_holdMonths');
-      if (holdEl && holdMonths) holdEl.value = holdMonths;
-
-      // Closing Costs default: 2% of purchase price
-      var closingEl = document.getElementById('flip_closingCosts');
-      if (closingEl && pp) closingEl.value = Math.round(pp * 0.02).toLocaleString('en-US');
-
-      // Down Payment default: 25% of purchase price
-      var dpEl = document.getElementById('flip_downPayment');
-      if (dpEl && pp) dpEl.value = Math.round(pp * 0.25).toLocaleString('en-US');
-
-      // Monthly Carrying Costs default
-      var carryEl = document.getElementById('flip_monthlyCarry');
-      if (carryEl && pp) {
-        var effectivePP = pp;
-        // Try to compute from listings row data
-        var annTax     = ls.property_tax_pct ? effectivePP * (ls.property_tax_pct / 100) : effectivePP * 0.012;
-        var annIns     = ls.est_insurance_annual ? Number(ls.est_insurance_annual) : 1200;
-        var annFlood   = ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0;
-        var hoaMonthly = (property.hoa_amount && (property.hoa_frequency || '').toLowerCase() !== 'annual') ? (property.hoa_amount || 0) : (property.hoa_amount ? Math.round(property.hoa_amount / 12) : 0);
-        var monthlyBaseCosts = (annTax + annIns + annFlood) / 12 + hoaMonthly;
-        // Fallback: 0.5% of purchase price per month
-        if (!monthlyBaseCosts || monthlyBaseCosts < 100) monthlyBaseCosts = effectivePP * 0.005;
-        carryEl.value = Math.round(monthlyBaseCosts).toLocaleString('en-US');
-      }
-
-      flipCalc();
-    }
-
-    // Recompute Down Payment and Closing Costs when Purchase Price changes
-    function flipOnPurchasePriceChange() {
-      var pp = flipNum('flip_purchasePrice');
-      if (!pp) return;
-      var dpEl = document.getElementById('flip_downPayment');
-      if (dpEl) { dpEl.value = Math.round(pp * 0.25).toLocaleString('en-US'); }
-      var closingEl = document.getElementById('flip_closingCosts');
-      if (closingEl) { closingEl.value = Math.round(pp * 0.02).toLocaleString('en-US'); }
-    }
-
-    // Toggle Cash / Financed mode
-    function flipSetMode(mode) {
-      var isCash = mode === 'cash';
-      // Update pill buttons
-      var pillCash     = document.getElementById('flipPillCash');
-      var pillFinanced = document.getElementById('flipPillFinanced');
-      if (pillCash)     pillCash.classList.toggle('active', isCash);
-      if (pillFinanced) pillFinanced.classList.toggle('active', !isCash);
-      // Update hidden radio
-      var radioCash     = document.getElementById('flip_financing_cash');
-      var radioFinanced = document.getElementById('flip_financing_financed');
-      if (radioCash)     radioCash.checked = isCash;
-      if (radioFinanced) radioFinanced.checked = !isCash;
-      // Collapse/expand financing section
-      var wrap = document.getElementById('flipFinancingWrap');
-      if (wrap) wrap.classList.toggle('collapsed', isCash);
-      flipCalc();
-    }
-
-    // Main calculator
-    function flipCalc() {
-      var pp      = flipNum('flip_purchasePrice');
-      var arv     = flipNum('flip_arv');
-      var rehab   = flipNum('flip_rehabCost');
-      var months  = parseInt((document.getElementById('flip_holdMonths') || {}).value, 10) || 0;
-      var isCash  = !!(document.getElementById('flip_financing_cash') && document.getElementById('flip_financing_cash').checked);
-      var dp      = isCash ? pp : flipNum('flip_downPayment');
-      var rate    = isCash ? 0 : (parseFloat((document.getElementById('flip_loanRate') || {}).value) || 0);
-      var closing = flipNum('flip_closingCosts');
-      var monthlyCarry = isCash ? 0 : flipNum('flip_monthlyCarry');
-      var sellPct = ((parseFloat((document.getElementById('flip_sellingCostPct') || {}).value) || 0)) / 100;
-
-      // Interest-only loan cost
-      var loanAmt = isCash ? 0 : Math.max(0, pp - dp);
-      var monthlyRate = rate / 100 / 12;
-      var interestCost = (!isCash && monthlyRate > 0 && months > 0) ? loanAmt * monthlyRate * months : 0;
-
-      var totalHoldingCost = monthlyCarry * months;
-      var sellingCostDollars = arv * sellPct;
-      var totalProjectCost  = pp + rehab + closing + totalHoldingCost + interestCost + sellingCostDollars;
-      var netProfit = arv - totalProjectCost;
-
-      var cashInvested = (isCash ? pp : dp) + closing + rehab + totalHoldingCost + interestCost;
-      var roi       = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
-      var coc       = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
-      var annualized = months > 0 ? roi * (12 / months) : null;
-
-      // KPI tiles
-      flipSetKpi('flip_kpi_netProfit', flipFc(netProfit), netProfit > 0 ? 'positive' : (netProfit < 0 ? 'negative' : 'neutral'));
-      flipSetKpi('flip_kpi_annualized', annualized !== null ? annualized.toFixed(1) + '%' : '&mdash;',
-        annualized === null ? 'neutral' : (annualized >= 25 ? 'positive' : (annualized >= 10 ? 'neutral' : 'negative')));
-      flipSetKpi('flip_kpi_roi', roi.toFixed(1) + '%', roi >= 20 ? 'positive' : (roi >= 10 ? 'neutral' : 'negative'));
-      flipSetKpi('flip_kpi_coc', coc.toFixed(1) + '%', coc >= 20 ? 'positive' : (coc >= 10 ? 'neutral' : 'negative'));
-
-      // Breakdown rows
-      function setBD(id, val, asPositive) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = flipFc(val);
-      }
-      setBD('flipbd_arv',      arv);
-      setBD('flipbd_purchase', pp);
-      setBD('flipbd_rehab',    rehab);
-      setBD('flipbd_closing',  closing);
-      setBD('flipbd_holding',  totalHoldingCost);
-      setBD('flipbd_interest', interestCost);
-      setBD('flipbd_selling',  sellingCostDollars);
-
-      // Net profit row color
-      var npEl = document.getElementById('flipbd_netProfit');
-      if (npEl) {
-        npEl.textContent = flipFc(netProfit);
-        npEl.style.color = netProfit >= 0 ? '#22c55e' : '#ef4444';
-      }
-      var npLabelRow = npEl && npEl.closest('.flip-bd-row');
-      if (npLabelRow) {
-        var npLabel = npLabelRow.querySelector('.flip-bd-label');
-        if (npLabel) npLabel.style.color = netProfit >= 0 ? '#22c55e' : '#ef4444';
-      }
-
-      // Cash invested
-      var ciEl = document.getElementById('flipbd_cashInvested');
-      if (ciEl) ciEl.textContent = flipFc(cashInvested);
-
-      // Show/hide financed-only rows
-      var holdRow     = document.getElementById('flipbd_holdRow');
-      var interestRow = document.getElementById('flipbd_interestRow');
-      if (holdRow)     holdRow.style.display     = isCash ? 'none' : '';
-      if (interestRow) interestRow.style.display  = isCash ? 'none' : '';
-    }
-
-    // Save flip analysis to investor_saved_proformas
-    async function pfSaveFlip() {
-      try {
-        var session = await Portal.getSession();
-        if (!session || !session.user) {
-          Portal.toast('Sign in to save your flip analysis.', 'info');
-          return;
-        }
-        var puRes = await Portal.supabase
-          .from('portal_users')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        if (!puRes.data || !puRes.data.id) {
-          Portal.toast('Could not resolve your portal profile.', 'error');
-          return;
-        }
-        var portalUserId = puRes.data.id;
-
-        var isCash = !!(document.getElementById('flip_financing_cash') && document.getElementById('flip_financing_cash').checked);
-        var pp     = flipNum('flip_purchasePrice');
-        var arv    = flipNum('flip_arv');
-        var rehab  = flipNum('flip_rehabCost');
-        var months = parseInt((document.getElementById('flip_holdMonths') || {}).value, 10) || 0;
-        var dp     = isCash ? pp : flipNum('flip_downPayment');
-        var rate   = isCash ? 0 : (parseFloat((document.getElementById('flip_loanRate') || {}).value) || 0);
-        var closing = flipNum('flip_closingCosts');
-        var monthlyCarry = isCash ? 0 : flipNum('flip_monthlyCarry');
-        var sellPct = (parseFloat((document.getElementById('flip_sellingCostPct') || {}).value) || 0);
-
-        // Recompute outputs for the saved row
-        var loanAmt = isCash ? 0 : Math.max(0, pp - dp);
-        var monthlyRate = rate / 100 / 12;
-        var interestCost = (!isCash && monthlyRate > 0 && months > 0) ? loanAmt * monthlyRate * months : 0;
-        var totalHoldingCost = monthlyCarry * months;
-        var sellingCostDollars = arv * (sellPct / 100);
-        var totalProjectCost  = pp + rehab + closing + totalHoldingCost + interestCost + sellingCostDollars;
-        var netProfit = arv - totalProjectCost;
-        var cashInvested = (isCash ? pp : dp) + closing + rehab + totalHoldingCost + interestCost;
-        var roi = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
-        var annualized = months > 0 ? roi * (12 / months) : 0;
-
-        var shortAddr = (property && property.address) ? property.address : 'Flip Analysis';
-        var now = new Date();
-        var stamp = now.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-        var name = shortAddr + ' - Flip - ' + stamp;
-
-        var insertRes = await Portal.supabase
-          .from('investor_saved_proformas')
-          .insert({
-            user_id:     portalUserId,
-            listing_id:  (listing && listing.listing_id) ? listing.listing_id : null,
-            property_id: (property && property.id) ? property.id : null,
-            name:        name,
-            inputs: {
-              mode:             'flip',
-              purchase_price:   pp,
-              arv:              arv,
-              rehab_cost:       rehab,
-              hold_months:      months,
-              financing:        isCash ? 'cash' : 'financed',
-              down_payment:     dp,
-              loan_rate:        rate,
-              closing_costs:    closing,
-              monthly_carry:    monthlyCarry,
-              selling_cost_pct: sellPct
-            },
-            outputs: {
-              net_profit:        netProfit,
-              annualized_return: annualized,
-              roi:               roi,
-              cash_on_cash:      roi,
-              total_project_cost: totalProjectCost,
-              cash_invested:     cashInvested,
-              breakdown: {
-                arv:      arv,
-                purchase: pp,
-                rehab:    rehab,
-                closing:  closing,
-                holding:  totalHoldingCost,
-                interest: interestCost,
-                selling:  sellingCostDollars,
-                net:      netProfit
-              }
-            },
-            archived: false
-          })
-          .select('id')
-          .single();
-
-        if (insertRes.error) {
-          console.error('pfSaveFlip insert error:', insertRes.error);
-          Portal.toast('Could not save flip analysis. Try again.', 'error');
-          return;
-        }
-        Portal.toast('Flip analysis saved to your dashboard.', 'success');
-      } catch (e) {
-        console.error('pfSaveFlip error:', e);
-        Portal.toast('Could not save flip analysis. Try again.', 'error');
-      }
-    }
 
     // Generate flip-shaped PDF
     async function pfGenerateFlipPDF() {
+      var isCash=!!(document.getElementById('flip_financing_cash')&&document.getElementById('flip_financing_cash').checked);
+      var pp=flipNum('flip_purchasePrice'),arv=flipNum('flip_arv'),rehab=flipNum('flip_rehabCost');
+      var months=parseInt((document.getElementById('flip_holdMonths')||{}).value,10)||0;
+      var dp=isCash?pp:flipNum('flip_downPayment');
+      var rate=isCash?0:(parseFloat((document.getElementById('flip_loanRate')||{}).value)||0);
+      var closing=flipNum('flip_closingCosts'),carry=isCash?0:flipNum('flip_monthlyCarry');
+      var sellPct=parseFloat((document.getElementById('flip_sellingCostPct')||{}).value)||0;
+
       var { jsPDF } = window.jspdf;
+      var NAVY=[15,23,42], TEAL=[14,116,144], RED=[220,38,38], MUTED=[100,116,139];
+      var BORDER=[203,213,225], BAND_BG=[241,245,249], TILE_BG=[248,250,252];
+      var WHITE=[255,255,255];
+      var pdf = new jsPDF({ unit:'pt', format:'letter', orientation:'portrait' });
+      var W=pdf.internal.pageSize.getWidth(), H=pdf.internal.pageSize.getHeight();
+      var M=36, cW=W-2*M; // 612 wide, 540 content
+      var y=0;
 
-      // Read current computed values from DOM
-      function kdv(id) {
-        var el = document.getElementById(id);
-        return el ? (el.textContent || '').trim() : '-';
-      }
+      var addr = (property&&property.address)
+        ? [property.address,property.city,property.state,property.zip].filter(Boolean).join(', ')
+        : 'Pro Forma';
 
-      var isCash   = !!(document.getElementById('flip_financing_cash') && document.getElementById('flip_financing_cash').checked);
-      var pp       = flipNum('flip_purchasePrice');
-      var arv      = flipNum('flip_arv');
-      var rehab    = flipNum('flip_rehabCost');
-      var months   = parseInt((document.getElementById('flip_holdMonths') || {}).value, 10) || 0;
-      var rate     = parseFloat((document.getElementById('flip_loanRate') || {}).value) || 0;
-      var closing  = flipNum('flip_closingCosts');
-      var dp       = flipNum('flip_downPayment');
-      var monthlyCarry = flipNum('flip_monthlyCarry');
-      var sellPct  = parseFloat((document.getElementById('flip_sellingCostPct') || {}).value) || 0;
-
-      var addr = (property && property.address)
-        ? [property.address, property.city, property.state, property.zip].filter(Boolean).join(', ')
-        : 'Fix & Flip Analysis';
-
-      // Palette
-      var TEAL    = [14, 116, 144];
-      var NAVY    = [15, 23, 42];
-      var MUTED   = [100, 116, 139];
-      var GREEN   = [34, 197, 94];
-      var RED     = [239, 68, 68];
-      var BORDER  = [203, 213, 225];
-      var BAND_BG = [241, 245, 249];
-      var TILE_BG = [248, 250, 252];
-
-      var pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
-      var W = pdf.internal.pageSize.getWidth();
-      var H = pdf.internal.pageSize.getHeight();
-      var M = 36;
-      var contentW = W - 2 * M;
-      var y;
-
-      function drawBrandStrip(pageNum, pageTotal) {
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        pdf.setTextColor.apply(pdf, NAVY);
-        pdf.text('Direct Off Market', M, M);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        pdf.setTextColor.apply(pdf, MUTED);
-        pdf.text(addr, M, M + 12);
-        pdf.text('Page ' + pageNum + ' of ' + pageTotal, W - M, M + 12, { align: 'right' });
-        pdf.setDrawColor.apply(pdf, BORDER);
-        pdf.setLineWidth(0.5);
-        pdf.line(M, M + 18, W - M, M + 18);
+      // Brand strip on every page
+      function drawBrand(strategy) {
+        // White bg for the strip area
+        pdf.setFillColor.apply(pdf,WHITE);
+        pdf.rect(0,0,W,M+22,'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+        pdf.setTextColor.apply(pdf,NAVY);
+        pdf.text('Direct Off Market', M, M-2);
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,MUTED);
+        pdf.text(strategy||'Pro Forma', W-M, M-2, {align:'right'});
+        // Teal hairline
+        pdf.setDrawColor.apply(pdf,TEAL); pdf.setLineWidth(1.5);
+        pdf.line(M, M+2, W-M, M+2);
+        // Reset draw color
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.5);
       }
 
       function drawFooter() {
-        pdf.setFont('helvetica', 'italic');
-        pdf.setFontSize(8);
-        pdf.setTextColor.apply(pdf, MUTED);
-        var today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
-        pdf.text('Generated ' + today + ' - For informational and illustrative purposes only. Not investment advice.', M, H - 18);
+        pdf.setFont('helvetica','italic'); pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf,MUTED);
+        var today = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+        pdf.text('Generated '+today+' \u2014 For informational and illustrative purposes only. Not investment advice.',
+          W/2, H-14, {align:'center'});
       }
 
-      y = M + 36;
+      // Address + title block
+      function drawTitle(subtitle) {
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
+        pdf.setTextColor.apply(pdf,NAVY);
+        var addrLines = pdf.splitTextToSize(addr, cW);
+        pdf.text(addrLines, M, y);
+        y += addrLines.length * 22;
+        if (subtitle) {
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(11);
+          pdf.setTextColor.apply(pdf,MUTED);
+          pdf.text(subtitle, M, y); y += 18;
+        }
+        y += 6; // breathing room
+      }
 
-      // Title
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(20);
-      pdf.setTextColor.apply(pdf, NAVY);
-      pdf.text('Fix & Flip Analysis', M, y);
-      y += 18;
-
-      // KPI tile row
-      function drawKpiRow(items, height, valueSize) {
-        var gap   = 10;
-        var tileW = (contentW - gap * (items.length - 1)) / items.length;
-        items.forEach(function(it, i) {
-          var x = M + i * (tileW + gap);
+      // KPI tile drawing
+      // items: [{label, value, color}]  color = TEAL|RED|NAVY array
+      function drawKpiTiles(items, tileH, valSize) {
+        var gap=10, tw=(cW-gap*(items.length-1))/items.length;
+        // Check page space
+        if (y + tileH > H-M-30) { pdf.addPage(); y = M+28; }
+        items.forEach(function(it,i) {
+          var x = M + i*(tw+gap);
+          // Tile card
+          pdf.setFillColor.apply(pdf, it.tileFill||TILE_BG);
           pdf.setDrawColor.apply(pdf, BORDER);
-          pdf.setFillColor.apply(pdf, TILE_BG);
           pdf.setLineWidth(0.5);
-          pdf.roundedRect(x, y, tileW, height, 6, 6, 'FD');
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(valueSize);
-          var valColor = it.positive ? TEAL : (it.negative ? RED : MUTED);
-          pdf.setTextColor.apply(pdf, valColor);
-          pdf.text(it.value || '-', x + tileW / 2, y + height * 0.55, { align: 'center' });
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(9);
-          pdf.setTextColor.apply(pdf, MUTED);
-          pdf.text(it.label.toUpperCase(), x + tileW / 2, y + height - 8, { align: 'center' });
+          pdf.roundedRect(x, y, tw, tileH, 6, 6, 'FD');
+          // Label (top)
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(8);
+          pdf.setTextColor.apply(pdf,MUTED);
+          pdf.text((it.label||'').toUpperCase(), x+tw/2, y+14, {align:'center'});
+          // Value (center)
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(valSize||20);
+          pdf.setTextColor.apply(pdf, it.color||NAVY);
+          var valText = it.value||'-';
+          pdf.text(valText, x+tw/2, y+tileH*0.62, {align:'center'});
+          // Subscript caption
+          if (it.caption) {
+            pdf.setFont('helvetica','normal'); pdf.setFontSize(7);
+            pdf.setTextColor.apply(pdf,MUTED);
+            pdf.text(it.caption, x+tw/2, y+tileH-8, {align:'center'});
+          }
         });
-        y += height + 12;
+        y += tileH + 14;
       }
 
-      var netProfitVal = kdv('flip_kpi_netProfit');
-      var annVal       = kdv('flip_kpi_annualized');
-      var roiVal       = kdv('flip_kpi_roi');
-      var cocVal       = kdv('flip_kpi_coc');
-      var netNum       = flipNum('flip_arv') - (flipNum('flip_purchasePrice') + flipNum('flip_rehabCost') + flipNum('flip_closingCosts'));
+      // Section banner
+      function drawBanner(title, estH) {
+        if (estH && y+estH > H-M-30) { pdf.addPage(); y = M+28; }
+        pdf.setFillColor.apply(pdf,NAVY);
+        pdf.rect(M, y, cW, 20, 'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+        pdf.setTextColor.apply(pdf,WHITE);
+        pdf.text(title.toUpperCase(), M+10, y+14);
+        y += 20;
+      }
 
-      drawKpiRow([
-        { label: 'Net Profit',         value: netProfitVal, positive: parseFloat(netProfitVal.replace(/[^0-9.-]/g,'')) >= 0 },
-        { label: 'Annualized Return',  value: annVal,       positive: parseFloat(annVal) >= 25, negative: parseFloat(annVal) < 10 && annVal !== '-' },
-        { label: 'ROI',               value: roiVal,       positive: parseFloat(roiVal) >= 20, negative: parseFloat(roiVal) < 10 },
-        { label: 'Cash-on-Cash Return',value: cocVal,       positive: parseFloat(cocVal) >= 20, negative: parseFloat(cocVal) < 10 }
-      ], 60, 18);
+      // Data row (label left, value right)
+      // kind: 'normal' | 'deduction' | 'sum' | 'highlight' | 'sub'
+      function drawRow(label, value, kind) {
+        var rH = kind==='sub' ? 14 : 17;
+        var fs = kind==='sub' ? 9 : (kind==='sum'||kind==='highlight' ? 11 : 10);
+        var bold = (kind==='sum'||kind==='highlight');
+        var isDed = kind==='deduction';
+        var isSum = kind==='sum';
+        var isHl  = kind==='highlight';
 
+        if (isHl) {
+          pdf.setFillColor(235,248,252);
+          pdf.rect(M, y, cW, rH, 'F');
+        }
+
+        pdf.setFont('helvetica', bold?'bold':'normal');
+        pdf.setFontSize(fs);
+
+        var lc = isDed ? RED : NAVY;
+        var vc = isDed ? RED : (isSum || isHl ? TEAL : NAVY);
+        var prefix = isDed ? '- ' : (isSum ? '= ' : '');
+
+        pdf.setTextColor.apply(pdf, lc);
+        pdf.text(prefix + (label||''), M+6, y+rH-4);
+        pdf.setTextColor.apply(pdf, vc);
+        pdf.text(value||'-', W-M-6, y+rH-4, {align:'right'});
+
+        // thin divider
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.2);
+        pdf.line(M, y+rH, W-M, y+rH);
+        y += rH;
+      }
+
+      // 2-column grid row (label1:val1 | label2:val2)
+      function drawGridRow(l1, v1, l2, v2) {
+        var rH=16, half=cW/2-5;
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,MUTED);
+        pdf.text(l1||'', M+4, y+rH-4);
+        pdf.text(l2||'', M+cW/2+4, y+rH-4);
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,NAVY);
+        pdf.text(v1||'-', M+half-2, y+rH-4, {align:'right'});
+        if (l2) pdf.text(v2||'-', W-M-2, y+rH-4, {align:'right'});
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.2);
+        pdf.line(M, y+rH, W-M, y+rH);
+        y += rH;
+      }
+
+      function numFromText(str) {
+        if (!str) return null;
+        var n = parseFloat(String(str).replace(/[^0-9.\-]/g,''));
+        return isFinite(n) ? n : null;
+      }
+      function colorForNumber(n, posThresh, negThresh) {
+        if (n===null) return MUTED;
+        if (n >= (posThresh||0)) return TEAL;
+        if (n <= (negThresh||0)) return RED;
+        return NAVY;
+      }
+
+      var strategy = 'Pro Forma \u2014 Fix & Flip Strategy';
+
+      // Recompute for display
+      var loanAmt=isCash?0:Math.max(0,pp-dp);
+      var mr=rate/100/12;
+      var intCost=(!isCash&&mr>0&&months>0)?loanAmt*mr*months:0;
+      var holdCost=carry*months, sellDollars=arv*(sellPct/100);
+      var totalCost=pp+rehab+closing+holdCost+intCost+sellDollars;
+      var netProfit=arv-totalCost;
+      var cashInv=(isCash?pp:dp)+closing+rehab+holdCost+intCost;
+      var roi=cashInv>0?(netProfit/cashInv)*100:0;
+      var ann=months>0?roi*(12/months):0;
+      function fc(n){return Portal.fc(Math.round(n));}
+
+      y = M + 28;
+      drawTitle('Fix-and-flip project analysis');
+
+      // KPI tiles
+      drawKpiTiles([
+        { label:'Net Profit', value:fc(netProfit),
+          color: netProfit>=0?TEAL:RED,
+          caption: netProfit>=0?'Positive':'Negative' },
+        { label:'Annualized Return', value:ann.toFixed(1)+'%',
+          color: ann>=25?TEAL:(ann>=10?NAVY:RED),
+          caption: ann>=25?'Strong':ann>=10?'Moderate':'Weak' },
+        { label:'ROI', value:roi.toFixed(1)+'%',
+          color: roi>=20?TEAL:(roi>=10?NAVY:RED) },
+        { label:'Cash-on-Cash', value:roi.toFixed(1)+'%',
+          color: roi>=20?TEAL:(roi>=10?NAVY:RED) }
+      ], 72, 20);
+
+      y += 4;
+
+      // ── Project Inputs ─────────────────────────────────────────────────────
+      drawBanner('Project Inputs', 160);
+      drawGridRow('Purchase Price', fc(pp), 'After Repair Value (ARV)', fc(arv));
+      drawGridRow('Rehab Cost', fc(rehab), 'Holding Time', months+' months');
+      drawGridRow('Financing', isCash?'Cash':'Financed', 'Closing Costs', fc(closing));
+      drawGridRow('Selling Costs %', sellPct.toFixed(1)+'%', 'Selling Costs $', fc(sellDollars));
+      if (!isCash) {
+        drawGridRow('Down Payment', fc(dp), 'Loan Interest Rate', rate.toFixed(2)+'%');
+        drawGridRow('Monthly Carry', fc(carry), 'Interest Cost Total', fc(intCost));
+      }
       y += 6;
 
-      // Section banner helper
-      function drawSectionBanner(title, estimatedH) {
-        var bottomLimit = H - M - 30;
-        if (estimatedH && (y + estimatedH > bottomLimit)) {
-          pdf.addPage();
-          y = M + 36;
-        }
-        pdf.setFillColor.apply(pdf, BAND_BG);
-        pdf.rect(M, y, contentW, 22, 'F');
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(11);
-        pdf.setTextColor.apply(pdf, TEAL);
-        pdf.text(title.toUpperCase(), M + 10, y + 15);
-        y += 22;
-      }
-
-      // Data row helper
-      function drawRow(label, value, kind) {
-        var rowH = 18;
-        var isDeduction = kind === 'deduction';
-        var isSum       = kind === 'sum';
-        var isHighlight = kind === 'highlight';
-        if (isHighlight) {
-          pdf.setFillColor(232, 246, 252);
-          pdf.rect(M, y, contentW, rowH, 'F');
-        }
-        pdf.setFont('helvetica', (isSum || isHighlight) ? 'bold' : 'normal');
-        pdf.setFontSize(10);
-        var labelColor = isDeduction ? RED : NAVY;
-        var valueColor = isDeduction ? RED : (isSum || isHighlight ? TEAL : NAVY);
-        var prefix     = isDeduction ? '- ' : (isSum ? '= ' : '');
-        pdf.setTextColor.apply(pdf, labelColor);
-        pdf.text(prefix + label, M + 12, y + 13);
-        pdf.setTextColor.apply(pdf, valueColor);
-        pdf.text(value || '-', W - M - 12, y + 13, { align: 'right' });
-        pdf.setDrawColor.apply(pdf, BORDER);
-        pdf.setLineWidth(0.3);
-        pdf.line(M, y + rowH, W - M, y + rowH);
-        y += rowH;
-      }
-
-      // Project Inputs section
-      drawSectionBanner('Project Inputs', 200);
-      drawRow('Purchase Price',   flipFc(pp),   'normal');
-      drawRow('After Repair Value (ARV)', flipFc(arv), 'normal');
-      drawRow('Rehab Cost',       flipFc(rehab), 'normal');
-      drawRow('Holding Time',     months + ' month' + (months !== 1 ? 's' : ''), 'normal');
-      drawRow('Financing Mode',   isCash ? 'Cash' : 'Financed', 'normal');
+      // ── Profit Breakdown ───────────────────────────────────────────────────
+      drawBanner('Profit Breakdown', 200);
+      drawRow('After Repair Value (ARV)', fc(arv), 'normal');
+      drawRow('Purchase Price', fc(pp), 'deduction');
+      drawRow('Rehab Cost', fc(rehab), 'deduction');
+      drawRow('Closing Costs', fc(closing), 'deduction');
       if (!isCash) {
-        drawRow('Down Payment',         flipFc(dp),          'normal');
-        drawRow('Loan Interest Rate',   rate.toFixed(2) + '%', 'normal');
-        drawRow('Monthly Carry',        flipFc(monthlyCarry), 'normal');
+        drawRow('Total Holding Cost', fc(holdCost), 'deduction');
+        drawRow('Loan Interest Cost', fc(intCost), 'deduction');
       }
-      drawRow('Closing Costs',     flipFc(closing), 'normal');
-      drawRow('Selling Costs %',   sellPct.toFixed(1) + '%', 'normal');
-      y += 8;
+      drawRow('Selling Costs', fc(sellDollars), 'deduction');
+      y += 2;
+      // Net profit — large
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(14);
+      pdf.setTextColor.apply(pdf,netProfit>=0?TEAL:RED);
+      pdf.text('= Net Profit', M+6, y+18);
+      pdf.text(fc(netProfit), W-M-6, y+18, {align:'right'});
+      y += 24;
+      pdf.setDrawColor.apply(pdf,TEAL); pdf.setLineWidth(1); pdf.line(M, y, W-M, y); y += 8;
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+      pdf.setTextColor.apply(pdf,MUTED);
+      pdf.text('Total Cash Invested: '+fc(cashInv), M+6, y+12); y += 18;
 
-      // Profit Breakdown section
-      var loanAmt2       = isCash ? 0 : Math.max(0, pp - dp);
-      var mRate2         = rate / 100 / 12;
-      var interestCost2  = (!isCash && mRate2 > 0 && months > 0) ? loanAmt2 * mRate2 * months : 0;
-      var holdingCost2   = monthlyCarry * months;
-      var sellingDollars = arv * (sellPct / 100);
-      var netProfitNum   = arv - (pp + rehab + closing + holdingCost2 + interestCost2 + sellingDollars);
-      var cashInv        = (isCash ? pp : dp) + closing + rehab + holdingCost2 + interestCost2;
-
-      drawSectionBanner('Profit Breakdown', 250);
-      drawRow('After Repair Value (ARV)', flipFc(arv),          'normal');
-      drawRow('Purchase Price',           flipFc(pp),           'deduction');
-      drawRow('Rehab Cost',               flipFc(rehab),        'deduction');
-      drawRow('Closing Costs',            flipFc(closing),      'deduction');
-      if (!isCash) {
-        drawRow('Total Holding Cost',     flipFc(holdingCost2),  'deduction');
-        drawRow('Loan Interest Cost',     flipFc(interestCost2), 'deduction');
-      }
-      drawRow('Selling Costs',            flipFc(sellingDollars), 'deduction');
-      drawRow('Net Profit',               flipFc(netProfitNum),   'sum');
-      y += 4;
-      drawRow('Total Cash Invested',      flipFc(cashInv),        'highlight');
-
-      // Brand strip + footer on every page
-      var pageCount = pdf.internal.getNumberOfPages();
-      for (var p = 1; p <= pageCount; p++) {
-        pdf.setPage(p);
-        drawBrandStrip(p, pageCount);
-        drawFooter();
-      }
-
-      // Save
-      var raw  = 'Fix and Flip Analysis - ' + addr + '.pdf';
-      var safe = raw.replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+      // ── Brand strip + footer ───────────────────────────────────────────────
+      var pgc=pdf.internal.getNumberOfPages();
+      for(var p=1;p<=pgc;p++){pdf.setPage(p);drawBrand(strategy);drawFooter();}
+      var safe=('Fix and Flip Analysis - '+addr+'.pdf').replace(/[/\\\\:*?"<>|]/g,'-').replace(/\\s+/g,' ').trim();
       pdf.save(safe);
     }
 
-    // ===== END FIX & FLIP CALCULATOR =====
 
-
-    // ===== BRRRR CALCULATOR =====
-
-    function pfsBrrrrNum(id) {
-      var el = document.getElementById(id);
-      if (!el) return 0;
-      return parseFloat(el.value.replace(/,/g, '')) || 0;
-    }
-    function pfsBrrrrFc(n) { return Portal.fc(Math.round(n)); }
-    function pfsBrrrrMonthlyPI(principal, annRate, term) {
-      if (!principal || !annRate) return 0;
-      var r = annRate / 100 / 12;
-      if (term === '10yr_io') return principal * r;
-      var n = term === '15yr_fixed' ? 180 : 360;
-      return principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    }
-    function pfsBrrrrOnPPChange() {
-      var pp = pfsBrrrrNum('pfsBrrrr_purchasePrice');
-      if (!pp) return;
-      var dp = document.getElementById('pfsBrrrr_downPayment');
-      if (dp) dp.value = Math.round(pp * 0.25).toLocaleString('en-US');
-      var cl = document.getElementById('pfsBrrrr_closingCosts');
-      if (cl) cl.value = Math.round(pp * 0.02).toLocaleString('en-US');
-    }
-    function pfsBrrrrOnARVChange() {
-      var arv = pfsBrrrrNum('pfsBrrrr_arv');
-      var ltv = parseFloat((document.getElementById('pfsBrrrr_refiLTV') || {}).value) || 75;
-      var rc  = document.getElementById('pfsBrrrr_refiClosingCosts');
-      if (rc) rc.value = Math.round(arv * ltv / 100 * 0.02).toLocaleString('en-US');
-    }
-    function pfsBrrrrSetMode(mode) {
-      var isCash = mode === 'cash';
-      var pc = document.getElementById('pfsBrrrrPillCash'),   pf = document.getElementById('pfsBrrrrPillFinanced');
-      if (pc) pc.classList.toggle('active', isCash);
-      if (pf) pf.classList.toggle('active', !isCash);
-      var rc = document.getElementById('pfsBrrrr_financing_cash'), rf = document.getElementById('pfsBrrrr_financing_financed');
-      if (rc) rc.checked = isCash;
-      if (rf) rf.checked = !isCash;
-      var w = document.getElementById('pfsBrrrrFinancingWrap');
-      if (w) w.classList.toggle('collapsed', isCash);
-      pfsBrrrrCalc();
-    }
-    function pfsBrrrrInitDefaults(ls) {
-      ls = ls || {};
-      var pp    = property.current_market_value || null;
-      var arv   = property.estimated_arv || null;
-      var rehab = property.estimated_repairs_flip || null;
-      var months = property.estimated_hold_months || 6;
-      if (pp) {
-        var ppEl = document.getElementById('pfsBrrrr_purchasePrice'); if (ppEl) ppEl.value = Math.round(pp).toLocaleString('en-US');
-        var dpEl = document.getElementById('pfsBrrrr_downPayment');   if (dpEl) dpEl.value = Math.round(pp * 0.25).toLocaleString('en-US');
-        var clEl = document.getElementById('pfsBrrrr_closingCosts');  if (clEl) clEl.value = Math.round(pp * 0.02).toLocaleString('en-US');
-        var annTax   = ls.property_tax_pct ? pp * (ls.property_tax_pct / 100) : pp * 0.012;
-        var annIns   = ls.est_insurance_annual   ? Number(ls.est_insurance_annual)   : 1200;
-        var annFlood = ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0;
-        var hoa = (property.hoa_amount && (property.hoa_frequency || '').toLowerCase() !== 'annual')
-          ? (property.hoa_amount || 0)
-          : (property.hoa_amount ? Math.round(property.hoa_amount / 12) : 0);
-        var carryDef = (annTax + annIns + annFlood) / 12 + hoa;
-        if (!carryDef || carryDef < 100) carryDef = pp * 0.005;
-        var caEl = document.getElementById('pfsBrrrr_monthlyCarry'); if (caEl) caEl.value = Math.round(carryDef).toLocaleString('en-US');
-      }
-      if (arv) {
-        var arvEl = document.getElementById('pfsBrrrr_arv');             if (arvEl) arvEl.value = Math.round(arv).toLocaleString('en-US');
-        var rcEl  = document.getElementById('pfsBrrrr_refiClosingCosts'); if (rcEl)  rcEl.value  = Math.round(arv * 0.75 * 0.02).toLocaleString('en-US');
-      }
-      if (rehab) { var reEl = document.getElementById('pfsBrrrr_rehabCost'); if (reEl) reEl.value = Math.round(rehab).toLocaleString('en-US'); }
-      var mtrEl = document.getElementById('pfsBrrrr_monthsToRefi'); if (mtrEl) mtrEl.value = months;
-      // Rent from listings row
-      var rentMid = null;
-      if (ls.rent_range_low != null && ls.rent_range_high != null) rentMid = Math.round((Number(ls.rent_range_low) + Number(ls.rent_range_high)) / 2);
-      else if (ls.rent_range_low != null) rentMid = Number(ls.rent_range_low);
-      else if (property && property.estimated_rent) rentMid = Number(property.estimated_rent);
-      if (rentMid) { var rEl = document.getElementById('pfsBrrrr_monthlyRent'); if (rEl) rEl.value = Math.round(rentMid).toLocaleString('en-US'); }
-      var taxAnn = (property && property.taxes_annual) ? property.taxes_annual : (arv ? arv * 0.012 : 0);
-      var tEl = document.getElementById('pfsBrrrr_propTax'); if (tEl && taxAnn) tEl.value = Math.round(taxAnn).toLocaleString('en-US');
-      var insAnn = (ls.est_insurance_annual ? Number(ls.est_insurance_annual) : 0) + (ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0);
-      var iEl = document.getElementById('pfsBrrrr_insurance'); if (iEl && insAnn) iEl.value = Math.round(insAnn).toLocaleString('en-US');
-      pfsBrrrrCalc();
-    }
-    function pfsResetFlip() {
-      flipInitDefaults((listing && listing._ls) || {});
-    }
-    function pfsResetBrrrr() {
-      pfsBrrrrInitDefaults((listing && listing._ls) || {});
-    }
-    function pfsBrrrrCalc() {
-      var pp      = pfsBrrrrNum('pfsBrrrr_purchasePrice');
-      var arv     = pfsBrrrrNum('pfsBrrrr_arv');
-      var rehab   = pfsBrrrrNum('pfsBrrrr_rehabCost');
-      var months  = parseInt((document.getElementById('pfsBrrrr_monthsToRefi') || {}).value, 10) || 0;
-      var isCash  = !!(document.getElementById('pfsBrrrr_financing_cash') && document.getElementById('pfsBrrrr_financing_cash').checked);
-      var dp      = isCash ? pp : pfsBrrrrNum('pfsBrrrr_downPayment');
-      var acqRate = isCash ? 0 : (parseFloat((document.getElementById('pfsBrrrr_acqRate') || {}).value) || 0);
-      var closing = pfsBrrrrNum('pfsBrrrr_closingCosts');
-      var carry   = isCash ? 0 : pfsBrrrrNum('pfsBrrrr_monthlyCarry');
-      var refiLTV = (parseFloat((document.getElementById('pfsBrrrr_refiLTV') || {}).value) || 75) / 100;
-      var refiRate = parseFloat((document.getElementById('pfsBrrrr_refiRate') || {}).value) || 7.5;
-      var refiClose = pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
-      var refiTerm  = (document.getElementById('pfsBrrrr_refiTerm') || {}).value || '30yr_fixed';
-      var rent     = pfsBrrrrNum('pfsBrrrr_monthlyRent');
-      var propTax  = pfsBrrrrNum('pfsBrrrr_propTax');
-      var insAnn   = pfsBrrrrNum('pfsBrrrr_insurance');
-      var hoa      = pfsBrrrrNum('pfsBrrrr_hoaMonthly');
-      var vacPct   = (parseFloat((document.getElementById('pfsBrrrr_vacancyPct')  || {}).value) || 0) / 100;
-      var pmPct    = (parseFloat((document.getElementById('pfsBrrrr_pmPct')        || {}).value) || 0) / 100;
-      var repPct   = (parseFloat((document.getElementById('pfsBrrrr_repairsPct')   || {}).value) || 0) / 100;
-
-      if (!arv) {
-        ['pfsBrrrr_kpi_refiOut','pfsBrrrr_kpi_cashLeftIn','pfsBrrrr_kpi_monthlyCF','pfsBrrrr_kpi_coc',
-         'pfsBrrrrbd_totalCashIn','pfsBrrrrbd_refiOut','pfsBrrrrbd_cashLeftIn',
-         'pfsBrrrrbd_rent','pfsBrrrrbd_taxMo','pfsBrrrrbd_insMo','pfsBrrrrbd_hoa',
-         'pfsBrrrrbd_vacancy','pfsBrrrrbd_pm','pfsBrrrrbd_repairs','pfsBrrrrbd_debtService',
-         'pfsBrrrrbd_monthlyCF','pfsBrrrrbd_coc'].forEach(function(id) {
-          var el = document.getElementById(id); if (el) el.innerHTML = '&mdash;';
-        });
-        return;
-      }
-
-      var loanAmt   = isCash ? 0 : Math.max(0, pp - dp);
-      var acqMR     = acqRate / 100 / 12;
-      var acqInt    = (!isCash && acqMR > 0 && months > 0) ? loanAmt * acqMR * months : 0;
-      var holdCost  = carry * months;
-      var totalCashIn = (isCash ? pp : dp) + rehab + closing + holdCost + acqInt;
-      var refiLoanAmt = Math.round(arv * refiLTV);
-      if (!refiClose) refiClose = Math.round(refiLoanAmt * 0.02);
-      var refiOutCash  = refiLoanAmt - refiClose;
-      var cashLeftIn   = totalCashIn - refiOutCash;
-      var isInfinite   = cashLeftIn <= 0;
-      var debtSvc      = pfsBrrrrMonthlyPI(refiLoanAmt, refiRate, refiTerm);
-      var taxMo  = propTax / 12;
-      var insMo  = insAnn  / 12;
-      var monthlyCF = rent - taxMo - insMo - hoa - (rent * vacPct) - (rent * pmPct) - (rent * repPct) - debtSvc;
-      var annCF  = monthlyCF * 12;
-      var coc    = isInfinite ? null : (cashLeftIn > 0 ? (annCF / cashLeftIn) * 100 : 0);
-
-      // KPI tiles
-      var roEl = document.getElementById('pfsBrrrr_kpi_refiOut');
-      if (roEl) { roEl.innerHTML = pfsBrrrrFc(refiOutCash); roEl.style.color = refiOutCash > 0 ? '#22c55e' : '#94a3b8'; }
-
-      var tile  = document.getElementById('pfsBrrrr_tile_cashLeftIn');
-      var cliEl = document.getElementById('pfsBrrrr_kpi_cashLeftIn');
-      var lbl   = document.getElementById('pfsBrrrr_kpi_cashLeftIn_label');
-      if (cliEl && tile) {
-        if (isInfinite) {
-          tile.classList.add('brrrr-infinite-tile');
-          cliEl.innerHTML = pfsBrrrrFc(cashLeftIn) + '<span class="brrrr-infinite-glyph">&#9854;</span>';
-          cliEl.style.color = '#fff';
-          if (lbl) lbl.innerHTML = '<span class="brrrr-infinite-caption">All capital recovered.</span>';
-        } else {
-          tile.classList.remove('brrrr-infinite-tile');
-          cliEl.innerHTML = pfsBrrrrFc(cashLeftIn);
-          cliEl.style.color = cashLeftIn <= 50000 ? '#22c55e' : '#94a3b8';
-          if (lbl) lbl.innerHTML = 'Cash Left In <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Total cash in &minus; refi-out. &le;$0 = BRRRR holy grail.</span></span>';
-        }
-      }
-      var cfEl = document.getElementById('pfsBrrrr_kpi_monthlyCF');
-      if (cfEl) { cfEl.innerHTML = pfsBrrrrFc(monthlyCF); cfEl.style.color = monthlyCF >= 0 ? '#22c55e' : '#ef4444'; }
-      var cocEl = document.getElementById('pfsBrrrr_kpi_coc');
-      if (cocEl) {
-        if (isInfinite) { cocEl.innerHTML = '&#9854; INFINITE'; cocEl.style.color = '#4fc3f7'; cocEl.style.fontSize = '18px'; }
-        else { cocEl.innerHTML = coc !== null ? coc.toFixed(1) + '%' : '&mdash;'; cocEl.style.fontSize = ''; cocEl.style.color = coc === null ? '#94a3b8' : (coc >= 12 ? '#22c55e' : (coc >= 6 ? '#94a3b8' : '#ef4444')); }
-      }
-      // Breakdown
-      function setBD(id, val) { var el = document.getElementById(id); if (el) el.textContent = pfsBrrrrFc(val); }
-      setBD('pfsBrrrrbd_totalCashIn', totalCashIn);
-      setBD('pfsBrrrrbd_refiOut',     refiOutCash);
-      var bdcli = document.getElementById('pfsBrrrrbd_cashLeftIn');
-      if (bdcli) {
-        bdcli.textContent = pfsBrrrrFc(cashLeftIn);
-        bdcli.style.color = cashLeftIn <= 0 ? '#22c55e' : '#94a3b8';
-        var lr = bdcli.closest('.pfs-bd-row');
-        if (lr) { var ll = lr.querySelector('.pfs-bd-label'); if (ll) ll.style.color = cashLeftIn <= 0 ? '#22c55e' : ''; }
-      }
-      setBD('pfsBrrrrbd_rent',        rent);
-      setBD('pfsBrrrrbd_taxMo',       taxMo);
-      setBD('pfsBrrrrbd_insMo',       insMo);
-      setBD('pfsBrrrrbd_hoa',         hoa);
-      setBD('pfsBrrrrbd_vacancy',     rent * vacPct);
-      setBD('pfsBrrrrbd_pm',          rent * pmPct);
-      setBD('pfsBrrrrbd_repairs',     rent * repPct);
-      setBD('pfsBrrrrbd_debtService', debtSvc);
-      var bdmcf = document.getElementById('pfsBrrrrbd_monthlyCF');
-      if (bdmcf) {
-        bdmcf.textContent = pfsBrrrrFc(monthlyCF);
-        bdmcf.style.color = monthlyCF >= 0 ? '#22c55e' : '#ef4444';
-        var mr = bdmcf.closest('.pfs-bd-row');
-        if (mr) { var ml = mr.querySelector('.pfs-bd-label'); if (ml) ml.style.color = monthlyCF >= 0 ? '#22c55e' : '#ef4444'; }
-      }
-      var bdcoc = document.getElementById('pfsBrrrrbd_coc');
-      if (bdcoc) {
-        if (isInfinite) { bdcoc.innerHTML = '&#9854; INFINITE'; bdcoc.style.color = '#4fc3f7'; }
-        else { bdcoc.textContent = coc !== null ? coc.toFixed(1) + '%' : '—'; bdcoc.style.color = coc === null ? '#94a3b8' : (coc >= 12 ? '#22c55e' : (coc >= 6 ? '#94a3b8' : '#ef4444')); }
-      }
-    }
-
-    // BRRRR Save
-    async function pfsSaveBrrrr() {
-      try {
-        var session = await Portal.getSession();
-        if (!session || !session.user) { Portal.toast('Sign in to save your BRRRR analysis.', 'info'); return; }
-        var puRes = await Portal.supabase.from('portal_users').select('id').eq('user_id', session.user.id).maybeSingle();
-        if (!puRes.data || !puRes.data.id) { Portal.toast('Could not resolve your portal profile.', 'error'); return; }
-        var portalUserId = puRes.data.id;
-        var isCash   = !!(document.getElementById('pfsBrrrr_financing_cash') && document.getElementById('pfsBrrrr_financing_cash').checked);
-        var pp       = pfsBrrrrNum('pfsBrrrr_purchasePrice'), arv = pfsBrrrrNum('pfsBrrrr_arv'), rehab = pfsBrrrrNum('pfsBrrrr_rehabCost');
-        var months   = parseInt((document.getElementById('pfsBrrrr_monthsToRefi') || {}).value, 10) || 0;
-        var dp       = isCash ? pp : pfsBrrrrNum('pfsBrrrr_downPayment');
-        var acqRate  = isCash ? 0 : (parseFloat((document.getElementById('pfsBrrrr_acqRate') || {}).value) || 0);
-        var closing  = pfsBrrrrNum('pfsBrrrr_closingCosts'), carry = isCash ? 0 : pfsBrrrrNum('pfsBrrrr_monthlyCarry');
-        var refiLTV  = (parseFloat((document.getElementById('pfsBrrrr_refiLTV') || {}).value) || 75) / 100;
-        var refiRate = parseFloat((document.getElementById('pfsBrrrr_refiRate') || {}).value) || 7.5;
-        var refiClose= pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
-        var refiTerm = (document.getElementById('pfsBrrrr_refiTerm') || {}).value || '30yr_fixed';
-        var rent=pfsBrrrrNum('pfsBrrrr_monthlyRent'), propTax=pfsBrrrrNum('pfsBrrrr_propTax'), insAnn=pfsBrrrrNum('pfsBrrrr_insurance');
-        var hoa=pfsBrrrrNum('pfsBrrrr_hoaMonthly');
-        var vacPct=parseFloat((document.getElementById('pfsBrrrr_vacancyPct')||{}).value)||0;
-        var pmPct=parseFloat((document.getElementById('pfsBrrrr_pmPct')||{}).value)||0;
-        var repPct=parseFloat((document.getElementById('pfsBrrrr_repairsPct')||{}).value)||0;
-        var refiLoanAmt=Math.round(arv*refiLTV);
-        if(!refiClose) refiClose=Math.round(refiLoanAmt*0.02);
-        var refiOutCash=refiLoanAmt-refiClose;
-        var loanAmt=isCash?0:Math.max(0,pp-dp),acqMR=acqRate/100/12;
-        var acqInt=(!isCash&&acqMR>0&&months>0)?loanAmt*acqMR*months:0;
-        var holdCost=carry*months, totalCashIn=(isCash?pp:dp)+rehab+closing+holdCost+acqInt;
-        var cashLeftIn=totalCashIn-refiOutCash, isInfinite=cashLeftIn<=0;
-        var debtSvc=pfsBrrrrMonthlyPI(refiLoanAmt,refiRate,refiTerm);
-        var monthlyCF=rent-propTax/12-insAnn/12-hoa-(rent*vacPct/100)-(rent*pmPct/100)-(rent*repPct/100)-debtSvc;
-        var coc=isInfinite?null:(cashLeftIn>0?(monthlyCF*12/cashLeftIn*100):0);
-        var shortAddr=(property&&property.address)?property.address:'BRRRR';
-        var now=new Date(), stamp=now.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-        var res=await Portal.supabase.from('investor_saved_proformas').insert({
-          user_id:portalUserId,
-          listing_id:(listing&&listing.listing_id)?listing.listing_id:null,
-          property_id:(property&&property.id)?property.id:null,
-          name:shortAddr+' - BRRRR - '+stamp,
-          inputs:{mode:'brrrr',purchase_price:pp,arv:arv,rehab_cost:rehab,months_to_refi:months,financing:isCash?'cash':'financed',down_payment:dp,acq_rate:acqRate,closing_costs:closing,monthly_carry:carry,refi_ltv:refiLTV*100,refi_rate:refiRate,refi_closing_costs:refiClose,refi_term:refiTerm,monthly_rent:rent,prop_tax:propTax,insurance:insAnn,hoa_monthly:hoa,vacancy_pct:vacPct,pm_pct:pmPct,repairs_pct:repPct},
-          outputs:{refi_out_cash:refiOutCash,cash_left_in:cashLeftIn,post_refi_monthly_cf:monthlyCF,post_refi_coc:coc,is_infinite_return:isInfinite},
-          archived:false
-        }).select('id').single();
-        if(res.error){Portal.toast('Could not save BRRRR analysis. Try again.','error');return;}
-        Portal.toast('BRRRR analysis saved to your dashboard.','success');
-      } catch(e){Portal.toast('Could not save BRRRR analysis. Try again.','error');}
-    }
 
     // BRRRR PDF
     async function pfsGenerateBrrrrPDF() {
-      var {jsPDF} = window.jspdf;
       var isCash=!!(document.getElementById('pfsBrrrr_financing_cash')&&document.getElementById('pfsBrrrr_financing_cash').checked);
       var pp=pfsBrrrrNum('pfsBrrrr_purchasePrice'),arv=pfsBrrrrNum('pfsBrrrr_arv'),rehab=pfsBrrrrNum('pfsBrrrr_rehabCost');
       var months=parseInt((document.getElementById('pfsBrrrr_monthsToRefi')||{}).value,10)||0;
-      var dp=isCash?pp:pfsBrrrrNum('pfsBrrrr_downPayment'),acqRate=isCash?0:(parseFloat((document.getElementById('pfsBrrrr_acqRate')||{}).value)||0);
+      var dp=isCash?pp:pfsBrrrrNum('pfsBrrrr_downPayment');
+      var acqRate=isCash?0:(parseFloat((document.getElementById('pfsBrrrr_acqRate')||{}).value)||0);
       var closing=pfsBrrrrNum('pfsBrrrr_closingCosts'),carry=isCash?0:pfsBrrrrNum('pfsBrrrr_monthlyCarry');
       var refiLTV=(parseFloat((document.getElementById('pfsBrrrr_refiLTV')||{}).value)||75)/100;
       var refiRate=parseFloat((document.getElementById('pfsBrrrr_refiRate')||{}).value)||7.5;
@@ -5307,38 +4873,275 @@
       var refiTerm=(document.getElementById('pfsBrrrr_refiTerm')||{}).value||'30yr_fixed';
       var rent=pfsBrrrrNum('pfsBrrrr_monthlyRent'),propTax=pfsBrrrrNum('pfsBrrrr_propTax'),insAnn=pfsBrrrrNum('pfsBrrrr_insurance');
       var hoa=pfsBrrrrNum('pfsBrrrr_hoaMonthly');
-      var vacPct=parseFloat((document.getElementById('pfsBrrrr_vacancyPct')||{}).value)||0;
-      var pmPct=parseFloat((document.getElementById('pfsBrrrr_pmPct')||{}).value)||0;
-      var repPct=parseFloat((document.getElementById('pfsBrrrr_repairsPct')||{}).value)||0;
-      var refiLoanAmt=Math.round(arv*refiLTV);if(!refiClose)refiClose=Math.round(refiLoanAmt*0.02);
+      var vacPct=(parseFloat((document.getElementById('pfsBrrrr_vacancyPct')||{}).value)||0)/100;
+      var pmPct=(parseFloat((document.getElementById('pfsBrrrr_pmPct')||{}).value)||0)/100;
+      var repPct=(parseFloat((document.getElementById('pfsBrrrr_repairsPct')||{}).value)||0)/100;
+
+      var { jsPDF } = window.jspdf;
+      var NAVY=[15,23,42], TEAL=[14,116,144], RED=[220,38,38], MUTED=[100,116,139];
+      var BORDER=[203,213,225], BAND_BG=[241,245,249], TILE_BG=[248,250,252];
+      var WHITE=[255,255,255];
+      var pdf = new jsPDF({ unit:'pt', format:'letter', orientation:'portrait' });
+      var W=pdf.internal.pageSize.getWidth(), H=pdf.internal.pageSize.getHeight();
+      var M=36, cW=W-2*M; // 612 wide, 540 content
+      var y=0;
+
+      var addr = (property&&property.address)
+        ? [property.address,property.city,property.state,property.zip].filter(Boolean).join(', ')
+        : 'Pro Forma';
+
+      // Brand strip on every page
+      function drawBrand(strategy) {
+        // White bg for the strip area
+        pdf.setFillColor.apply(pdf,WHITE);
+        pdf.rect(0,0,W,M+22,'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+        pdf.setTextColor.apply(pdf,NAVY);
+        pdf.text('Direct Off Market', M, M-2);
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,MUTED);
+        pdf.text(strategy||'Pro Forma', W-M, M-2, {align:'right'});
+        // Teal hairline
+        pdf.setDrawColor.apply(pdf,TEAL); pdf.setLineWidth(1.5);
+        pdf.line(M, M+2, W-M, M+2);
+        // Reset draw color
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.5);
+      }
+
+      function drawFooter() {
+        pdf.setFont('helvetica','italic'); pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf,MUTED);
+        var today = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+        pdf.text('Generated '+today+' \u2014 For informational and illustrative purposes only. Not investment advice.',
+          W/2, H-14, {align:'center'});
+      }
+
+      // Address + title block
+      function drawTitle(subtitle) {
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
+        pdf.setTextColor.apply(pdf,NAVY);
+        var addrLines = pdf.splitTextToSize(addr, cW);
+        pdf.text(addrLines, M, y);
+        y += addrLines.length * 22;
+        if (subtitle) {
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(11);
+          pdf.setTextColor.apply(pdf,MUTED);
+          pdf.text(subtitle, M, y); y += 18;
+        }
+        y += 6; // breathing room
+      }
+
+      // KPI tile drawing
+      // items: [{label, value, color}]  color = TEAL|RED|NAVY array
+      function drawKpiTiles(items, tileH, valSize) {
+        var gap=10, tw=(cW-gap*(items.length-1))/items.length;
+        // Check page space
+        if (y + tileH > H-M-30) { pdf.addPage(); y = M+28; }
+        items.forEach(function(it,i) {
+          var x = M + i*(tw+gap);
+          // Tile card
+          pdf.setFillColor.apply(pdf, it.tileFill||TILE_BG);
+          pdf.setDrawColor.apply(pdf, BORDER);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(x, y, tw, tileH, 6, 6, 'FD');
+          // Label (top)
+          pdf.setFont('helvetica','normal'); pdf.setFontSize(8);
+          pdf.setTextColor.apply(pdf,MUTED);
+          pdf.text((it.label||'').toUpperCase(), x+tw/2, y+14, {align:'center'});
+          // Value (center)
+          pdf.setFont('helvetica','bold'); pdf.setFontSize(valSize||20);
+          pdf.setTextColor.apply(pdf, it.color||NAVY);
+          var valText = it.value||'-';
+          pdf.text(valText, x+tw/2, y+tileH*0.62, {align:'center'});
+          // Subscript caption
+          if (it.caption) {
+            pdf.setFont('helvetica','normal'); pdf.setFontSize(7);
+            pdf.setTextColor.apply(pdf,MUTED);
+            pdf.text(it.caption, x+tw/2, y+tileH-8, {align:'center'});
+          }
+        });
+        y += tileH + 14;
+      }
+
+      // Section banner
+      function drawBanner(title, estH) {
+        if (estH && y+estH > H-M-30) { pdf.addPage(); y = M+28; }
+        pdf.setFillColor.apply(pdf,NAVY);
+        pdf.rect(M, y, cW, 20, 'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(10);
+        pdf.setTextColor.apply(pdf,WHITE);
+        pdf.text(title.toUpperCase(), M+10, y+14);
+        y += 20;
+      }
+
+      // Data row (label left, value right)
+      // kind: 'normal' | 'deduction' | 'sum' | 'highlight' | 'sub'
+      function drawRow(label, value, kind) {
+        var rH = kind==='sub' ? 14 : 17;
+        var fs = kind==='sub' ? 9 : (kind==='sum'||kind==='highlight' ? 11 : 10);
+        var bold = (kind==='sum'||kind==='highlight');
+        var isDed = kind==='deduction';
+        var isSum = kind==='sum';
+        var isHl  = kind==='highlight';
+
+        if (isHl) {
+          pdf.setFillColor(235,248,252);
+          pdf.rect(M, y, cW, rH, 'F');
+        }
+
+        pdf.setFont('helvetica', bold?'bold':'normal');
+        pdf.setFontSize(fs);
+
+        var lc = isDed ? RED : NAVY;
+        var vc = isDed ? RED : (isSum || isHl ? TEAL : NAVY);
+        var prefix = isDed ? '- ' : (isSum ? '= ' : '');
+
+        pdf.setTextColor.apply(pdf, lc);
+        pdf.text(prefix + (label||''), M+6, y+rH-4);
+        pdf.setTextColor.apply(pdf, vc);
+        pdf.text(value||'-', W-M-6, y+rH-4, {align:'right'});
+
+        // thin divider
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.2);
+        pdf.line(M, y+rH, W-M, y+rH);
+        y += rH;
+      }
+
+      // 2-column grid row (label1:val1 | label2:val2)
+      function drawGridRow(l1, v1, l2, v2) {
+        var rH=16, half=cW/2-5;
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,MUTED);
+        pdf.text(l1||'', M+4, y+rH-4);
+        pdf.text(l2||'', M+cW/2+4, y+rH-4);
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf,NAVY);
+        pdf.text(v1||'-', M+half-2, y+rH-4, {align:'right'});
+        if (l2) pdf.text(v2||'-', W-M-2, y+rH-4, {align:'right'});
+        pdf.setDrawColor.apply(pdf,BORDER); pdf.setLineWidth(0.2);
+        pdf.line(M, y+rH, W-M, y+rH);
+        y += rH;
+      }
+
+      function numFromText(str) {
+        if (!str) return null;
+        var n = parseFloat(String(str).replace(/[^0-9.\-]/g,''));
+        return isFinite(n) ? n : null;
+      }
+      function colorForNumber(n, posThresh, negThresh) {
+        if (n===null) return MUTED;
+        if (n >= (posThresh||0)) return TEAL;
+        if (n <= (negThresh||0)) return RED;
+        return NAVY;
+      }
+
+      var strategy = 'Pro Forma \u2014 BRRRR Strategy';
+
+      // Compute
+      var refiLoanAmt=Math.round(arv*refiLTV);
+      if(!refiClose) refiClose=Math.round(refiLoanAmt*0.02);
       var refiOutCash=refiLoanAmt-refiClose;
-      var loanAmt=isCash?0:Math.max(0,pp-dp),acqMR=acqRate/100/12;
+      var loanAmt=isCash?0:Math.max(0,pp-dp);
+      var acqMR=acqRate/100/12;
       var acqInt=(!isCash&&acqMR>0&&months>0)?loanAmt*acqMR*months:0;
-      var holdCost=carry*months,totalCashIn=(isCash?pp:dp)+rehab+closing+holdCost+acqInt;
-      var cashLeftIn=totalCashIn-refiOutCash,isInfinite=cashLeftIn<=0;
+      var holdCost=carry*months;
+      var totalCashIn=(isCash?pp:dp)+rehab+closing+holdCost+acqInt;
+      var cashLeftIn=totalCashIn-refiOutCash;
+      var isInfinite=cashLeftIn<=0;
       var debtSvc=pfsBrrrrMonthlyPI(refiLoanAmt,refiRate,refiTerm);
-      var monthlyCF=rent-propTax/12-insAnn/12-hoa-(rent*vacPct/100)-(rent*pmPct/100)-(rent*repPct/100)-debtSvc;
-      var coc=isInfinite?null:(cashLeftIn>0?(monthlyCF*12/cashLeftIn*100):0);
-      var addr=(property&&property.address)?[property.address,property.city,property.state,property.zip].filter(Boolean).join(', '):'BRRRR Analysis';
-      var T=[14,116,144],N=[15,23,42],M=[100,116,139],R=[239,68,68],B=[203,213,225],BG=[241,245,249],TG=[248,250,252];
-      var pdf=new jsPDF({unit:'pt',format:'letter',orientation:'portrait'});
-      var W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),MG=36,cW=W-2*MG,y;
-      function dB(pg,tot){pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,N);pdf.text('Direct Off Market',MG,MG);pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,M);pdf.text(addr,MG,MG+12);pdf.text('Page '+pg+' of '+tot,W-MG,MG+12,{align:'right'});pdf.setDrawColor.apply(pdf,B);pdf.setLineWidth(0.5);pdf.line(MG,MG+18,W-MG,MG+18);}
-      function dF(){pdf.setFont('helvetica','italic');pdf.setFontSize(8);pdf.setTextColor.apply(pdf,M);pdf.text('Generated '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+' - For informational purposes only.',MG,H-18);}
-      y=MG+36;pdf.setFont('helvetica','bold');pdf.setFontSize(20);pdf.setTextColor.apply(pdf,N);pdf.text('BRRRR Analysis',MG,y);y+=18;
-      if(isInfinite){y+=6;pdf.setFillColor.apply(pdf,T);pdf.roundedRect(MG,y,cW,32,6,6,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor(255,255,255);pdf.text('INFINITE RETURN - All capital recovered. Every dollar of rent is pure return.',MG+12,y+13);pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.text('Cash Left In: '+pfsBrrrrFc(cashLeftIn),MG+12,y+25);y+=44;}
-      function dKR(items,h,vs){var gap=10,tw=(cW-gap*(items.length-1))/items.length;items.forEach(function(it,i){var x=MG+i*(tw+gap);pdf.setDrawColor.apply(pdf,B);pdf.setFillColor.apply(pdf,TG);pdf.setLineWidth(0.5);pdf.roundedRect(x,y,tw,h,6,6,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(vs);pdf.setTextColor.apply(pdf,it.neg?R:T);pdf.text(it.v||'-',x+tw/2,y+h*0.55,{align:'center'});pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,M);pdf.text(it.l.toUpperCase(),x+tw/2,y+h-8,{align:'center'});});y+=h+12;}
-      var cocDisp=isInfinite?'INFINITE':(coc!==null?coc.toFixed(1)+'%':'-');
-      dKR([{l:'Refi-Out Cash',v:pfsBrrrrFc(refiOutCash)},{l:'Cash Left In',v:pfsBrrrrFc(cashLeftIn),neg:cashLeftIn>0},{l:'Post-Refi Monthly CF',v:pfsBrrrrFc(monthlyCF),neg:monthlyCF<0},{l:'Post-Refi CoC',v:cocDisp,neg:!isInfinite&&coc!==null&&coc<6}],60,15);y+=6;
-      function dBn(t,est){var bot=H-MG-30;if(est&&y+est>bot){pdf.addPage();y=MG+36;}pdf.setFillColor.apply(pdf,BG);pdf.rect(MG,y,cW,22,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,T);pdf.text(t.toUpperCase(),MG+10,y+15);y+=22;}
-      function dR(lbl,val,kind){var rH=18,isDed=kind==='deduction',isSum=kind==='sum',isHl=kind==='highlight';if(isHl){pdf.setFillColor(232,246,252);pdf.rect(MG,y,cW,rH,'F');}pdf.setFont('helvetica',(isSum||isHl)?'bold':'normal');pdf.setFontSize(10);var lc=isDed?R:N,vc=isDed?R:(isSum||isHl?T:N),pr=isDed?'- ':(isSum?'= ':'');pdf.setTextColor.apply(pdf,lc);pdf.text(pr+lbl,MG+12,y+13);pdf.setTextColor.apply(pdf,vc);pdf.text(val||'-',W-MG-12,y+13,{align:'right'});pdf.setDrawColor.apply(pdf,B);pdf.setLineWidth(0.3);pdf.line(MG,y+rH,W-MG,y+rH);y+=rH;}
-      dBn('Project Inputs',220);dR('Purchase Price',pfsBrrrrFc(pp),'normal');dR('ARV',pfsBrrrrFc(arv),'normal');dR('Rehab Cost',pfsBrrrrFc(rehab),'normal');dR('Months to Refi',months+'','normal');dR('Financing',isCash?'Cash':'Financed','normal');if(!isCash){dR('Down Payment',pfsBrrrrFc(dp),'normal');dR('Acq. Rate',acqRate.toFixed(2)+'%','normal');}dR('Closing Costs',pfsBrrrrFc(closing),'normal');dR('Refi LTV',(refiLTV*100).toFixed(0)+'%','normal');dR('Refi Rate',refiRate.toFixed(2)+'%','normal');dR('Refi Loan Amount',pfsBrrrrFc(refiLoanAmt),'normal');y+=8;
-      dBn('Cash Recovery',100);dR('Total Cash Into Deal',pfsBrrrrFc(totalCashIn),'normal');dR('Refi-Out Cash',pfsBrrrrFc(refiOutCash),'deduction');dR('Cash Left In',pfsBrrrrFc(cashLeftIn),cashLeftIn<=0?'sum':'highlight');y+=8;
-      dBn('Post-Refi Monthly Operating',200);dR('Monthly Rent',pfsBrrrrFc(rent),'normal');dR('Property Tax / 12',pfsBrrrrFc(propTax/12),'deduction');dR('Insurance / 12',pfsBrrrrFc(insAnn/12),'deduction');dR('HOA',pfsBrrrrFc(hoa),'deduction');dR('Vacancy',pfsBrrrrFc(rent*vacPct/100),'deduction');dR('Property Management',pfsBrrrrFc(rent*pmPct/100),'deduction');dR('Repairs Reserve',pfsBrrrrFc(rent*repPct/100),'deduction');dR('Debt Service (P&I)',pfsBrrrrFc(debtSvc),'deduction');dR('Monthly CF Post-Refi',pfsBrrrrFc(monthlyCF),monthlyCF>=0?'sum':'highlight');y+=6;dR('Post-Refi CoC',cocDisp,'highlight');
-      var pgc=pdf.internal.getNumberOfPages();for(var p=1;p<=pgc;p++){pdf.setPage(p);dB(p,pgc);dF();}
-      var safe=('BRRRR Analysis - '+addr+'.pdf').replace(/[/\\:*?"<>|]/g,'-').replace(/\s+/g,' ').trim();
+      var taxMo=propTax/12, insMo=insAnn/12;
+      var monthlyCF=rent-taxMo-insMo-hoa-(rent*vacPct)-(rent*pmPct)-(rent*repPct)-debtSvc;
+      var annCF=monthlyCF*12;
+      var coc=isInfinite?null:(cashLeftIn>0?(annCF/cashLeftIn)*100:0);
+      function fc(n){return pfsBrrrrFc(n);}
+
+      y = M + 28;
+      drawTitle('Buy, Rehab, Rent, Refinance, Repeat \u2014 capital recycling analysis');
+
+      // KPI tiles
+      var INFINITE_TILE_BG=[14,116,144];
+      drawKpiTiles([
+        { label:'Refi-Out Cash', value:fc(refiOutCash),
+          color: refiOutCash>0?TEAL:MUTED },
+        { label:'Cash Left In',
+          value: isInfinite ? fc(cashLeftIn)+' \u221e' : fc(cashLeftIn),
+          color: isInfinite?WHITE:(cashLeftIn<=0?TEAL:MUTED),
+          tileFill: isInfinite?INFINITE_TILE_BG:TILE_BG,
+          caption: isInfinite?'All capital recovered.':'' },
+        { label:'Post-Refi Monthly CF', value:fc(monthlyCF),
+          color: monthlyCF>=0?TEAL:RED },
+        { label:'Post-Refi Cash-on-Cash',
+          value: isInfinite?'INFINITE':(coc!==null?coc.toFixed(1)+'%':'-'),
+          color: isInfinite?TEAL:(coc===null?MUTED:(coc>=12?TEAL:(coc>=6?NAVY:RED))) }
+      ], 72, 20);
+
+      // Infinite Return callout box
+      if (isInfinite) {
+        if (y+36 > H-M-30) { pdf.addPage(); y=M+28; }
+        pdf.setFillColor.apply(pdf,TEAL);
+        pdf.roundedRect(M, y, cW, 34, 6, 6, 'F');
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(11);
+        pdf.setTextColor.apply(pdf,WHITE);
+        pdf.text('\u221e INFINITE RETURN \u2014 All capital recovered. Every dollar of cash flow is pure return.', M+12, y+14);
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        pdf.text('Cash Left In: '+fc(cashLeftIn)+' \u00b7 Refi-Out exceeded total cash invested', M+12, y+26);
+        y += 42;
+      }
+
+      y += 4;
+
+      // ── Project Inputs ─────────────────────────────────────────────────────
+      drawBanner('Project Inputs', 160);
+      drawGridRow('Purchase Price', fc(pp), 'After Repair Value', fc(arv));
+      drawGridRow('Rehab Cost', fc(rehab), 'Months to Refi', months+'');
+      drawGridRow('Financing', isCash?'Cash':'Financed', 'Closing Costs', fc(closing));
+      drawGridRow('Refi LTV', (refiLTV*100).toFixed(0)+'%', 'Refi Rate', refiRate.toFixed(2)+'%');
+      drawGridRow('Refi Loan Amount', fc(refiLoanAmt), 'Refi Closing Costs', fc(refiClose));
+      if (!isCash) drawGridRow('Down Payment', fc(dp), 'Acq. Loan Rate', acqRate.toFixed(2)+'%');
+      y += 6;
+
+      // ── Cash Recovery ──────────────────────────────────────────────────────
+      drawBanner('Cash Recovery', 80);
+      drawRow('Total Cash Into Deal', fc(totalCashIn), 'normal');
+      drawRow('Refi-Out Cash (ARV x LTV - Closing)', fc(refiOutCash), 'deduction');
+      y += 2;
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
+      pdf.setTextColor.apply(pdf, cashLeftIn<=0?TEAL:NAVY);
+      pdf.text('= Cash Left In', M+6, y+16);
+      pdf.text(fc(cashLeftIn)+(isInfinite?' \u221e':''), W-M-6, y+16, {align:'right'});
+      y += 24;
+
+      // ── Post-Refi Monthly Operating ────────────────────────────────────────
+      drawBanner('Post-Refi Monthly Operating', 200);
+      drawRow('Monthly Rent', fc(rent), 'normal');
+      drawRow('Property Tax / 12', fc(taxMo), 'deduction');
+      drawRow('Insurance / 12', fc(insMo), 'deduction');
+      if (hoa>0) drawRow('HOA', fc(hoa), 'deduction');
+      drawRow('Vacancy Allowance', fc(rent*vacPct), 'deduction');
+      drawRow('Property Management', fc(rent*pmPct), 'deduction');
+      drawRow('Repairs Reserve', fc(rent*repPct), 'deduction');
+      drawRow('Monthly Debt Service (P&I)', fc(debtSvc), 'deduction');
+      y += 2;
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
+      pdf.setTextColor.apply(pdf, monthlyCF>=0?TEAL:RED);
+      pdf.text('= Monthly Cash Flow Post-Refi', M+6, y+16);
+      pdf.text(fc(monthlyCF), W-M-6, y+16, {align:'right'});
+      y += 22;
+      // CoC line
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
+      var cocDisp = isInfinite?'INFINITE':(coc!==null?coc.toFixed(1)+'%':'-');
+      var cocColor = isInfinite?TEAL:(coc===null?MUTED:(coc>=12?TEAL:(coc>=6?NAVY:RED)));
+      pdf.setTextColor.apply(pdf,NAVY); pdf.text('Post-Refi Cash-on-Cash:', M+6, y+14);
+      pdf.setTextColor.apply(pdf,cocColor); pdf.text(cocDisp, W-M-6, y+14, {align:'right'});
+      y += 20;
+
+      // ── Brand strip + footer ───────────────────────────────────────────────
+      var pgc=pdf.internal.getNumberOfPages();
+      for(var p=1;p<=pgc;p++){pdf.setPage(p);drawBrand(strategy);drawFooter();}
+      var safe=('BRRRR Analysis - '+addr+'.pdf').replace(/[/\\\\:*?"<>|]/g,'-').replace(/\\s+/g,' ').trim();
       pdf.save(safe);
     }
+
 
     // ===== END BRRRR CALCULATOR =====
 
