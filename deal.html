@@ -803,6 +803,57 @@
     @media (max-width:480px) {
       .pf-panel-grid-4, .pf-panel-grid-3, .pf-panel-grid-2 { grid-template-columns:1fr; }
     }
+
+    /* === PRO FORMAS TAB (NEW) === */
+    #tab-proformas { padding:0; }
+    .proformas-mode-toggle-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      background: var(--bg);
+      background-color: var(--bg);
+      padding: 14px 0 12px;
+      margin: 0;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.35);
+    }
+    .proformas-mode-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .proformas-mode-pill { padding:8px 22px; border:none; background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; white-space:nowrap; }
+    .proformas-mode-pill:hover { background:var(--surface-2); color:var(--text); }
+    .proformas-mode-pill.active { background:#4fc3f7; color:#0f172a; }
+    .proformas-subview { display:none; padding-top:20px; }
+    .proformas-subview.active { display:block; }
+    .pfs-kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px; overflow:hidden; max-width:100%; }
+    .brrrr-infinite-tile { background:#0e7490 !important; position:relative; }
+    .brrrr-infinite-tile .pf-kpi-value { color:#fff !important; }
+    .brrrr-infinite-glyph { position:absolute; top:8px; right:10px; font-size:16px; }
+    .brrrr-infinite-caption { font-size:11px; color:rgba(255,255,255,0.85); margin-top:4px; font-weight:500; }
+    .brrrr-breakdown-sep { border:none; border-top:2px solid var(--border); margin:12px 0; }
+    .pfs-btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+    .pfs-subview-heading { margin-bottom:20px; }
+    .pfs-subview-heading .pfs-title { font-size:16px; font-weight:800; color:var(--text); margin-bottom:4px; }
+    .pfs-subview-heading .pfs-desc { color:var(--text-muted); font-size:14px; margin:0; }
+    .pfs-section-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+    .pfs-full-row { margin-bottom:20px; }
+    .pfs-fin-wrap { overflow:hidden; transition:max-height 0.2s ease; max-height:600px; }
+    .pfs-fin-wrap.collapsed { max-height:0; }
+    .pfs-toggle-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .pfs-toggle-pill { padding:7px 20px; border:none; background:var(--surface); color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; }
+    .pfs-toggle-pill.active { background:#4fc3f7; color:#0f172a; }
+    .pfs-breakdown-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:28px; }
+    .pfs-bd-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); font-size:14px; }
+    .pfs-bd-row:last-child { border-bottom:none; }
+    .pfs-bd-label { color:var(--text-muted); }
+    .pfs-bd-value { font-weight:600; }
+    .pfs-bd-row.pfs-bd-deduct .pfs-bd-label { color:#ef4444; }
+    .pfs-bd-row.pfs-bd-deduct .pfs-bd-value { color:#ef4444; }
+    .pfs-bd-row.pfs-bd-sum .pfs-bd-label { font-weight:800; color:var(--text); font-size:15px; }
+    .pfs-bd-row.pfs-bd-sum .pfs-bd-value { font-size:15px; font-weight:800; }
+    @media (max-width:600px) {
+      .pfs-section-grid { grid-template-columns:1fr; }
+      .pfs-kpi-row { grid-template-columns:1fr 1fr; }
+    }
+
     /* === FIX & FLIP CALCULATOR === */
     .flip-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
     .flip-section-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
@@ -1099,7 +1150,7 @@
     <div class="pill-nav" id="dealTabs">
       <button class="tab-btn active" data-tab="overview">Overview</button>
       <button class="tab-btn" data-tab="proforma">Pro Forma</button>
-      <button class="tab-btn" data-tab="flip">Fix &amp; Flip Calculator</button>
+      <button class="tab-btn" data-tab="proformas">Pro Formas</button>
       <button class="tab-btn" data-tab="details">Property Details</button>
       <button class="tab-btn" data-tab="photos">Photos</button>
       <button class="tab-btn" data-tab="map">Map &amp; Comps</button>
@@ -1692,8 +1743,580 @@
 
     </div><!-- end tab-proforma -->
 
-    <!-- FIX & FLIP CALCULATOR TAB -->
-    <div id="tab-flip" class="tab-content">
+    <!-- PRO FORMAS NEW TAB -->
+    <div id="tab-proformas" class="tab-content">
+
+    <!-- Mode Toggle -->
+    <div class="proformas-mode-toggle-wrap">
+      <div class="proformas-mode-pills">
+        <button class="proformas-mode-pill active" id="pfsModePillHold" onclick="setProformasMode('hold')" type="button">&#127968; Hold</button>
+        <button class="proformas-mode-pill" id="pfsModePillFlip" onclick="setProformasMode('flip')" type="button">&#128296; Flip</button>
+        <button class="proformas-mode-pill" id="pfsModePillBrrrr" onclick="setProformasMode('brrrr')" type="button">&#9854; BRRRR</button>
+      </div>
+    </div>
+
+      <!-- Hold Subview -->
+      <div id="proformas_subview_hold" class="proformas-subview active">
+    <div class="pfs-subview-heading">
+      <div class="pfs-title">Hold <span style="font-weight:500;font-size:14px;">(Buy &amp; Rent)</span></div>
+      <p class="pfs-desc">Long-term rental analysis. Acquire as-is or with light rehab, hold for cash flow + appreciation.</p>
+    </div>
+
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;" class="pf-print-hide">
+        <div>
+          <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">Investment Pro Forma</h2>
+          <p style="color:var(--text-muted);font-size:14px;">Edit the highlighted fields to run your own numbers.</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-outline-heavy" onclick="pfsResetHold()" title="Reset all inputs to defaults">Reset to Defaults</button>
+          <button class="btn-outline-heavy" onclick="window.print()" title="Print this pro forma"><span style="font-size:18px;">&#128424;</span> Print</button>
+          <button class="btn-primary" onclick="pfsGenerateHoldPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Download a PDF of this pro forma"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+          <button class="btn-outline-heavy" onclick="pfsSaveHold()" title="Save this pro forma to your dashboard">Save Pro Forma</button>
+        </div>
+      </div>
+
+      <!-- Negative cash flow banner -->
+      <div id="pfsHold_pfNegBanner">&#9888; This property has negative cash flow at current assumptions. Adjust rent, down payment, or purchase price to explore break-even scenarios.</div>
+
+      <!-- What-If quick toggles -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;" class="pf-print-hide">
+        <button onclick="pfOpenLoanModal()" class="btn-secondary btn-sm">What if I got a loan?</button>
+        <button onclick="pfWhatIfCash()" class="btn-secondary btn-sm">What if I pay cash?</button>
+        <button onclick="pfOpenRentModal()" class="btn-secondary btn-sm">Adjust rent scenario</button>
+      </div>
+
+      <!-- What-If Modals -->
+      <!-- Loan Scenario Modal -->
+      <div id="pfLoanModal" onclick="if(event.target===this)pfCloseLoanModal()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,18,40,0.72);align-items:center;justify-content:center;">
+        <div style="background:var(--surface);border:2px solid #4fc3f7;border-radius:16px;padding:0;width:100%;max-width:420px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.2);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#4fc3f7;"></div>
+              <span style="font-size:15px;font-weight:700;color:#f0f4ff;">Loan Scenario</span>
+            </div>
+            <button onclick="pfCloseLoanModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#8a9bbf;line-height:1;padding:0 2px;">&times;</button>
+          </div>
+          <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Down Payment %</label>
+                <input type="number" id="wfDownPct" class="pro-forma-input" value="20" min="0" max="100" step="1" style="width:100%;" oninput="pfLoanModalCalc()">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Closing Costs %</label>
+                <input type="number" id="wfClosingCostPct" class="pro-forma-input" value="0.5" min="0" step="0.05" style="width:100%;" oninput="pfLoanModalCalc()">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Mortgage Rate %</label>
+                <input type="number" id="wfRate" class="pro-forma-input" value="6.5" min="0" step="0.125" style="width:100%;" oninput="pfLoanModalCalc()">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Loan Type</label>
+                <select id="wfLoanType" class="pro-forma-input" style="width:100%;">
+                  <option value="30yr_fixed" selected>30yr Fixed</option>
+                  <option value="15yr_fixed">15yr Fixed</option>
+                  <option value="5yr_io">5yr I/O</option>
+                  <option value="7yr_io">7yr I/O</option>
+                  <option value="10yr_io">10yr I/O</option>
+                </select>
+              </div>
+            </div>
+            <div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.18);border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Down Payment</div>
+                <div style="font-size:16px;font-weight:800;color:#4fc3f7;" id="wfDownAmt">&mdash;</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Loan Amount</div>
+                <div style="font-size:16px;font-weight:800;color:#4fc3f7;" id="wfLoanAmt">&mdash;</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:0 24px 20px;display:flex;gap:8px;">
+            <button onclick="pfCloseLoanModal()" class="btn-secondary" style="flex:1;">Cancel</button>
+            <button onclick="pfApplyLoanModal()" style="flex:1;background:#4fc3f7;color:#0f172a;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;">Apply to Calculator</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rent Scenario Modal -->
+      <div id="pfRentModal" onclick="if(event.target===this)pfCloseRentModal()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,18,40,0.72);align-items:center;justify-content:center;">
+        <div style="background:var(--surface);border:2px solid #4fc3f7;border-radius:16px;padding:0;width:100%;max-width:400px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.2);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#4fc3f7;"></div>
+              <span style="font-size:15px;font-weight:700;color:#f0f4ff;">Rent Scenario</span>
+            </div>
+            <button onclick="pfCloseRentModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#8a9bbf;line-height:1;padding:0 2px;">&times;</button>
+          </div>
+          <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Rent Low ($/mo)</label>
+              <input type="text" inputmode="numeric" id="pfsHold_wfRentLow" class="pro-forma-input" placeholder="$1,500" style="width:100%;" oninput="pfFormatCurrencyInput(this);pfRentModalCalc();">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Rent High ($/mo)</label>
+              <input type="text" inputmode="numeric" id="pfsHold_wfRentHigh" class="pro-forma-input" placeholder="$2,000" style="width:100%;" oninput="pfFormatCurrencyInput(this);pfRentModalCalc();">
+            </div>
+            <div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.18);border-radius:10px;padding:12px 16px;text-align:center;">
+              <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Avg Monthly Rent (used in calculator)</div>
+              <div style="font-size:22px;font-weight:800;color:#4fc3f7;" id="pfsHold_wfRentAvg">&mdash;</div>
+            </div>
+          </div>
+          <div style="padding:0 24px 20px;display:flex;gap:8px;">
+            <button onclick="pfCloseRentModal()" class="btn-secondary" style="flex:1;">Cancel</button>
+            <button onclick="pfApplyRentModal()" style="flex:1;background:#4fc3f7;color:#0f172a;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;">Apply to Calculator</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1: KPI Visual Dashboard -->
+      <!-- Top row: 3 visual widgets -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
+        <!-- Cap Rate Donut -->
+        <div class="pf-gauge-card" id="pfsHold_gauge_capRate_card">
+          <svg class="pf-gauge-svg" width="100" height="100" viewBox="0 0 100 100" id="pfsHold_gauge_capRate_svg">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="10"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#22c55e" stroke-width="10"
+              stroke-dasharray="0 239" stroke-dashoffset="60" stroke-linecap="round"
+              id="pfsHold_gauge_capRate_ring" style="transition:stroke-dasharray 0.5s,stroke 0.5s;transform:rotate(-90deg);transform-origin:50px 50px;"/>
+            <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="var(--text)" font-size="14" font-weight="800" font-family="Inter,sans-serif" id="pfsHold_gauge_capRate_val">&mdash;</text>
+          </svg>
+          <div class="pf-gauge-label">Cap Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">The ratio of net operating income (NOI) to total acquisition cost. As a pre-financing yield metric, cap rate removes the impact of debt.</span></span></div>
+        </div>
+        <!-- CoC Donut -->
+        <div class="pf-gauge-card" id="pfsHold_gauge_coc_card">
+          <svg class="pf-gauge-svg" width="100" height="100" viewBox="0 0 100 100" id="pfsHold_gauge_coc_svg">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="var(--border)" stroke-width="10"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#22c55e" stroke-width="10"
+              stroke-dasharray="0 239" stroke-dashoffset="60" stroke-linecap="round"
+              id="pfsHold_gauge_coc_ring" style="transition:stroke-dasharray 0.5s,stroke 0.5s;transform:rotate(-90deg);transform-origin:50px 50px;"/>
+            <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="var(--text)" font-size="14" font-weight="800" font-family="Inter,sans-serif" id="pfsHold_gauge_coc_val">&mdash;</text>
+          </svg>
+          <div class="pf-gauge-label">Cash-on-Cash Return</div>
+        </div>
+        <!-- DSCR Bar -->
+        <div class="pf-gauge-card" id="pfsHold_gauge_dscr_card">
+          <div class="pf-dscr-value" id="pfsHold_gauge_dscr_val">&mdash;</div>
+          <div class="pf-dscr-bar-wrap">
+            <div class="pf-dscr-bar-track" id="pfsHold_gauge_dscr_track">
+              <div class="pf-dscr-marker" id="pfsHold_gauge_dscr_marker" style="left:0%;"></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:2px;"><span>0x</span><span>1.0x</span><span>1.08x</span><span>2.0x</span></div>
+          <div class="pf-gauge-label" style="margin-top:6px;">DSCR</div>
+        </div>
+      </div>
+
+      <!-- Bottom row: 3 number cards with arrows -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="pfsHold_kpi_day1equity">&mdash;</div>
+          <div class="pf-kpi-label">Day 1 Equity <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Day 1 Equity is calculated by taking the Retail Price and subtracting the Total Acquisition Cost.</span></span></div>
+        </div>
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="pfsHold_kpi_monthlyCF">&mdash;</div>
+          <div class="pf-kpi-label">Est. Monthly Cash Flow (Yr 1) <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">The projected monthly profit after accounting for mortgage payments (if any), taxes, insurance, and all other operating expenses.</span></span></div>
+        </div>
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="pfsHold_kpi_annualCF">&mdash;</div>
+          <div class="pf-kpi-label">Est. Annual Cash Flow</div>
+        </div>
+      </div>
+
+      <!-- Section 2: Accordion Row -->
+      <div class="pf-accordion-row">
+        <button class="pf-accordion-pill active" id="pfsHold_pfPill_purchase" onclick="pfsHoldAccordionOpen('purchase')">Purchase &amp; Financing</button>
+        <button class="pf-accordion-pill" id="pfsHold_pfPill_income" onclick="pfsHoldAccordionOpen('income')">Income</button>
+        <button class="pf-accordion-pill" id="pfsHold_pfPill_expenses" onclick="pfsHoldAccordionOpen('expenses')">Expenses</button>
+        <button class="pf-accordion-pill" id="pfsHold_pfPill_assumptions" onclick="pfsHoldAccordionOpen('assumptions')">Assumptions</button>
+      </div>
+
+      <!-- Purchase & Financing Panel -->
+      <div class="pf-accordion-panel" id="pfsHold_pfPanel_purchase">
+        <div class="pf-panel-grid-3">
+          <div class="form-group">
+            <div class="pf-label-row">
+              <span class="pf-label-text">Purchase Price</span>
+              <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Defaults to 1.2&times; the asking price since asking is typically a starting price. Adjust based on your actual offer.</span></span>
+            </div>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsHold_purchasePrice" value="" placeholder="0" oninput="pfFormatCurrencyInput(this);(function(){var la=document.getElementById('pf2_loanAmount');if(la)la.dataset.manual='0';pfsHoldCalc();})()">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">List Price (Asking)</span></div>
+            <div class="pf-readonly" id="pfsHold_pfro_listPrice">&mdash;</div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Closing Costs %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Closing Costs are estimated by default at 0.50% of the purchase price. Actual closing costs may vary. Adjust as needed.</span></span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsHold_closingCostPct" value="0.50" min="0" step="0.05" oninput="pfsHoldCalc()">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="pf-toggle-row" style="grid-column:1/-1;">
+            <input type="checkbox" id="pfsHold_cashPurchase" onchange="pfsHoldToggleCash();pfsHoldCalc();">
+            <label for="pfsHold_cashPurchase" style="font-size:13px;cursor:pointer;">Cash Purchase (no financing)</label>
+          </div>
+          <!-- Financing fields (hidden when cash) -->
+          <div id="pfsHold_pfFinancingFields" style="grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Down Payment %</span></div>
+              <div class="pf-input-wrap">
+                <input type="number" class="pro-forma-input has-suffix" id="pfsHold_downPct" value="25" min="0" max="100" step="0.5" oninput="(function(){var la=document.getElementById('pf2_loanAmount');if(la)la.dataset.manual='0';pfsHoldCalc();})()">
+                <span class="pf-input-suffix">%</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Loan Fees %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Loan Fees are estimated by default at 0.50% of the loan amount. Actual fees may vary. Adjust as needed.</span></span></div>
+              <div class="pf-input-wrap">
+                <input type="number" class="pro-forma-input has-suffix" id="pfsHold_loanFeePct" value="0.50" min="0" step="0.05" oninput="pfsHoldCalc()">
+                <span class="pf-input-suffix">%</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Loan Amount</span></div>
+              <div class="pf-input-wrap">
+                <span class="pf-input-prefix">$</span>
+                <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsHold_loanAmount" value="" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsHoldLoanManualOverride();pfsHoldCalc()">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Loan Type</span></div>
+              <select class="pro-forma-input" id="pfsHold_loanType" onchange="pfsHoldCalc()">
+                <option value="30yr_fixed" selected>30 Year Fixed</option>
+                <option value="15yr_fixed">15 Year Fixed</option>
+                <option value="5yr_io">5 Year Fixed (I/O)</option>
+                <option value="7yr_io">7 Year Fixed (I/O)</option>
+                <option value="10yr_io">10 Year Fixed (I/O)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Mortgage Rate %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Adjust as needed. This is for illustrative purposes only; availability and borrower eligibility are not guaranteed.</span></span></div>
+              <div class="pf-input-wrap">
+                <input type="number" class="pro-forma-input has-suffix" id="pfsHold_mortgageRate" value="6.5" min="0" step="0.125" oninput="pfsHoldCalc()">
+                <span class="pf-input-suffix">%</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Monthly Payment (P&amp;I)</span></div>
+              <div class="pf-readonly" id="pfsHold_pfro_monthlyPayment">&mdash;</div>
+            </div>
+          </div><!-- end pfFinancingFields -->
+        </div>
+      </div>
+
+      <!-- Income Panel -->
+      <div class="pf-accordion-panel" id="pfsHold_pfPanel_income" style="display:none;">
+        <div class="pf-panel-grid-2">
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Rent Range Low</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Rent Range (Low) is determined by our team's market experience or by our team's rental analysis performed during underwriting. Always verify rent ranges on your own.</span></span></div>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">$</span>
+              <input type="number" class="pro-forma-input has-prefix" id="pfsHold_rentLow" value="0" min="0" oninput="pfsHoldCalc()">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Rent Range High</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Rent Range (High) is determined by our team's market experience or by our team's rental analysis performed during underwriting. Always verify rent ranges on your own.</span></span></div>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">$</span>
+              <input type="number" class="pro-forma-input has-prefix" id="pfsHold_rentHigh" value="0" min="0" oninput="pfsHoldCalc()">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Avg Monthly Rent</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Estimated monthly rent is based on adding the Rent (Low) and the Rent (High) numbers and dividing them by 2 to get the average. Always verify your own rental comps.</span></span></div>
+            <div class="pf-readonly" id="pfsHold_pfro_avgRent">&mdash;</div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Other Monthly Income</span></div>
+            <div class="pf-input-wrap">
+              <span class="pf-input-prefix">$</span>
+              <input type="number" class="pro-forma-input has-prefix" id="pfsHold_otherIncome" value="0" min="0" oninput="pfsHoldCalc()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expenses Panel -->
+      <div class="pf-accordion-panel" id="pfsHold_pfPanel_expenses" style="display:none;">
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:24px;align-items:start;">
+          <!-- LEFT: Fields in 2-col grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <!-- Property Tax -->
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Property Tax %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Estimated Property Tax is calculated at 1.20% of the Purchase Price. This is a rule of thumb and can vary by county. Always verify local millage rates.</span></span></div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:var(--text-muted);font-size:14px;">%</span>
+                <input type="number" class="pro-forma-input" id="pfsHold_propTaxPct" value="1.20" min="0" step="0.05" oninput="pfsHoldCalc()" style="width:80px;">
+              </div>
+              <div class="pf-hint" id="pf_taxHint"></div>
+            </div>
+            <!-- Annual Insurance -->
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Annual Insurance</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Insurance premiums are estimated and may differ based on age, location, etc. Actual premiums may differ.</span></span></div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:var(--text-muted);font-size:14px;">$</span>
+                <input type="number" class="pro-forma-input" id="pfsHold_insurance" value="0" min="0" oninput="pfsHoldCalc()" style="width:100px;">
+              </div>
+              <div id="pf_insuranceHint" style="font-size:11px;margin-top:4px;"></div>
+            </div>
+            <!-- PM Fee -->
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">PM Fee %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Calculated as (Rental Income + Other Income - Vacancy Loss) × Management Fee %. Any deals managed by My New Rental may be subject to lower fees.</span></span></div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:var(--text-muted);font-size:14px;">%</span>
+                <input type="number" class="pro-forma-input" id="pfsHold_pmPct" value="8" min="0" step="0.5" oninput="pfsHoldCalc()" style="width:80px;">
+              </div>
+            </div>
+            <!-- Vacancy -->
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Vacancy %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Vacancy Loss is preset to 5% and can vary one way or the other. No Vacancy Loss can be predicted accurately.</span></span></div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:var(--text-muted);font-size:14px;">%</span>
+                <input type="number" class="pro-forma-input" id="pfsHold_vacancyPct" value="5" min="0" step="0.5" oninput="pfsHoldCalc()" style="width:80px;">
+              </div>
+            </div>
+            <!-- Repair -->
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">Repair &amp; Maint %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">New homes with a standard warranty can have much lower repair and maintenance costs. This is only an estimate and actual expenses may vary.</span></span></div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:var(--text-muted);font-size:14px;">%</span>
+                <input type="number" class="pro-forma-input" id="pfsHold_repairPct" value="0.50" min="0" step="0.05" oninput="pfsHoldCalc()" style="width:80px;">
+              </div>
+            </div>
+            <!-- HOA -->
+            <div class="form-group">
+              <div class="pf-label-row"><span class="pf-label-text">HOA Monthly</span></div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="color:var(--text-muted);font-size:14px;">$</span>
+                <input type="number" class="pro-forma-input" id="pfsHold_hoaMonthly" value="0" min="0" oninput="pfsHoldCalc()" style="width:100px;">
+              </div>
+            </div>
+          </div>
+          <!-- RIGHT: Donut chart -->
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <canvas id="pfExpenseChart" style="max-width:260px;max-height:260px;width:100%;"></canvas>
+            <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;">Categories set to $0 are not shown</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assumptions Panel -->
+      <div class="pf-accordion-panel" id="pfsHold_pfPanel_assumptions" style="display:none;">
+        <div class="pf-panel-grid-4">
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Annual Rent Growth %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Future market appreciation data is modeled conservatively at a 3% annual increase. Adjust these numbers as needed to see future estimated projections.</span></span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsHold_rentGrowth" value="3" min="0" step="0.5" oninput="pfsHoldCalc()">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Annual Price Growth %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Future market appreciation data is modeled conservatively at a 3% annual increase. Adjust these numbers as needed to see future estimated projections.</span></span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsHold_priceGrowth" value="3" min="0" step="0.5" oninput="pfsHoldCalc()">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Annual Expense Increase %</span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsHold_expGrowth" value="3" min="0" step="0.5" oninput="pfsHoldCalc()">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Cost of Sale %</span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsHold_costOfSale" value="6.5" min="0" step="0.5" oninput="pfsHoldCalc()">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <div class="pf-label-row" style="margin-bottom:8px;"><span class="pf-label-text">Holding Period</span></div>
+            <div class="pf-tab-group">
+              <button class="pf-tab-btn" data-yr="1" onclick="pfsHoldSetHoldPeriod(1)">1 yr</button>
+              <button class="pf-tab-btn" data-yr="5" onclick="pfsHoldSetHoldPeriod(5)">5 yr</button>
+              <button class="pf-tab-btn" data-yr="7" onclick="pfsHoldSetHoldPeriod(7)">7 yr</button>
+              <button class="pf-tab-btn active" data-yr="10" onclick="pfsHoldSetHoldPeriod(10)">10 yr</button>
+              <button class="pf-tab-btn" data-yr="30" onclick="pfsHoldSetHoldPeriod(30)">30 yr</button>
+            </div>
+          </div>
+          <div style="grid-column:1/-1;" class="pf-print-hide">
+            <button class="btn-ghost btn-sm" onclick="pfsResetHold()" style="width:100%;">Reset to Defaults</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results (full width) -->
+      <div>
+
+        <!-- Acquisition Summary -->
+        <div class="pf-result-card">
+          <div class="pf-result-title">Acquisition Summary <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Total Acquisition Cost equals the purchase price of the property plus any closing costs and/or loan fees.</span></span></div>
+          <div class="pf-row"><span class="pf-rl">Purchase Price</span><span class="pf-rv" id="pfsHold_r2_purchasePrice">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">+ Closing Costs</span><span class="pf-rv" id="pfsHold_r2_closingCosts">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">+ Loan Fees</span><span class="pf-rv" id="pfsHold_r2_loanFees">&mdash;</span></div>
+          <div class="pf-row bold"><span class="pf-rl">= Total Acquisition Cost</span><span class="pf-rv" id="pfsHold_r2_totalAcqCost">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">Down Payment</span><span class="pf-rv" id="pfsHold_r2_downPayment">&mdash;</span></div>
+          <div class="pf-row bold hl">
+            <span class="pf-rl">= Initial Investment <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">The upfront cash required to purchase the home, including down payment, closing costs, and loan fees.</span></span></span>
+            <span class="pf-rv accent-v" id="pfsHold_r2_initialInvestment">&mdash;</span>
+          </div>
+          <div class="pf-row">
+            <span class="pf-rl">Day 1 Equity <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Day 1 Equity is calculated by taking the Retail Price and subtracting the Total Acquisition Cost.</span></span></span>
+            <span class="pf-rv" id="pfsHold_r2_day1Equity">&mdash;</span>
+          </div>
+        </div>
+
+        <!-- Annual Income & Expenses -->
+        <div class="pf-result-card">
+          <div class="pf-result-title">Annual Income &amp; Expenses</div>
+          <div class="pf-row"><span class="pf-rl">Gross Rental Income</span><span class="pf-rv" id="pfsHold_r2_grossIncome">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- Vacancy Loss</span><span class="pf-rv negative" id="pfsHold_r2_vacancyLoss">&mdash;</span></div>
+          <div class="pf-row bold"><span class="pf-rl">= Effective Gross Income</span><span class="pf-rv" id="pfsHold_r2_egi">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- Property Tax</span><span class="pf-rv negative" id="pfsHold_r2_propTax">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- Insurance</span><span class="pf-rv negative" id="pfsHold_r2_insurance">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- HOA</span><span class="pf-rv negative" id="pfsHold_r2_hoa">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- Repair &amp; Maintenance</span><span class="pf-rv negative" id="pfsHold_r2_repairs">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- Property Management</span><span class="pf-rv negative" id="pfsHold_r2_pm">&mdash;</span></div>
+          <div class="pf-row bold"><span class="pf-rl">= Net Operating Income</span><span class="pf-rv" id="pfsHold_r2_noi">&mdash;</span></div>
+          <div class="pf-row pf-indent" id="pfsHold_r2_debtRow"><span class="pf-rl">- Annual Debt Service</span><span class="pf-rv negative" id="pfsHold_r2_debtService">&mdash;</span></div>
+          <div class="pf-row bold"><span class="pf-rl">= Annual Cash Flow</span><span class="pf-rv" id="pfsHold_r2_annualCF">&mdash;</span></div>
+          <div class="pf-row bold hl"><span class="pf-rl">Monthly Cash Flow</span><span class="pf-rv" id="pfsHold_r2_monthlyCF">&mdash;</span></div>
+        </div>
+
+
+        <!-- Exit Analysis -->
+        <div class="pf-result-card">
+          <div class="pf-result-title">Exit Analysis (<span id="pfsHold_r2_holdLabel">10</span> yr)</div>
+          <div class="pf-row">
+            <span class="pf-rl">Est. Market Value at Sale <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">The projected market value at time of sale based on assumed annual appreciation rate over the holding period.</span></span></span>
+            <span class="pf-rv" id="pfsHold_r2_saleValue">&mdash;</span>
+          </div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- Cost of Sale</span><span class="pf-rv negative" id="pfsHold_r2_costOfSale">&mdash;</span></div>
+          <div class="pf-row pf-indent"><span class="pf-rl">- Remaining Loan Balance</span><span class="pf-rv negative" id="pfsHold_r2_loanBal">&mdash;</span></div>
+          <div class="pf-row bold">
+            <span class="pf-rl">= Est. Proceeds at Sale <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">The estimated net cash received from the sale after deducting selling costs, loan payoff, and other applicable closing expenses.</span></span></span>
+            <span class="pf-rv" id="pfsHold_r2_saleProceeds">&mdash;</span>
+          </div>
+          <div class="pf-row pf-indent"><span class="pf-rl">+ Total Cash Flow During Hold</span><span class="pf-rv" id="pfsHold_r2_totalCFHold">&mdash;</span></div>
+          <div class="pf-row bold hl">
+            <span class="pf-rl">= Est. Total Return <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">The projected profit over the selected time horizon. Includes cash flow earned during ownership and equity gained from home appreciation at sale.</span></span></span>
+            <span class="pf-rv" id="pfsHold_r2_totalReturn">&mdash;</span>
+          </div>
+          <div class="pf-row">
+            <span class="pf-rl">Est. Annualized Return % <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Converts the total return into an average annual return over the selected holding period.</span></span></span>
+            <span class="pf-rv" id="pfsHold_r2_annReturn">&mdash;</span>
+          </div>
+          <div class="pf-row"><span class="pf-rl">Equity Multiple</span><span class="pf-rv" id="pfsHold_r2_eqMultiple">&mdash;</span></div>
+          <div class="pf-row">
+            <span class="pf-rl">IRR (Internal Rate of Return)</span>
+            <span class="pf-rv" id="pfsHold_r2_irr">&mdash;</span>
+          </div>
+          <div id="pfExitFootnote" style="font-size:11px;color:var(--text-muted);margin-top:12px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;"></div>
+        </div>
+
+
+      </div>
+
+      <!-- Section 3: Three chart collapsibles side-by-side -->
+      <div class="pf-collapsibles-row pf-row-3col">
+
+        <!-- Equity Growth (collapsible) -->
+        <div class="pf-proj-wrap" id="pfEquityWrap">
+          <div class="pf-proj-collapse-header" onclick="pfsHoldToggleEquityCollapse()" id="pfsHold_pfEquityCollapseHeader">
+            Equity Growth (Yrs 1–10) <span id="pfsHold_pfEquityCollapseChevron" style="transform:rotate(-90deg);display:inline-block;transition:transform 0.3s;">&#9660;</span>
+          </div>
+          <div class="pf-proj-collapse-body collapsed" id="pfsHold_pfEquityCollapseBody" style="max-height:0;">
+            <div style="padding:12px 14px;">
+              <canvas id="pfEquityChart" style="height:240px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year-by-Year Breakdown (collapsible) -->
+        <div class="pf-proj-wrap" id="pfProjWrap">
+          <div class="pf-proj-collapse-header" onclick="pfToggleProjCollapse()" id="pfProjCollapseHeader">
+            Year-by-Year Breakdown <span id="pfProjCollapseChevron" style="transform:rotate(-90deg);display:inline-block;transition:transform 0.3s;">&#9660;</span>
+          </div>
+          <div class="pf-proj-collapse-body collapsed" id="pfProjCollapseBody" style="max-height:0;">
+            <div style="padding:12px 14px;">
+              <canvas id="pfProjChart" style="height:240px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Annual Cash Flow (collapsible) -->
+        <div class="pf-proj-wrap" id="pfCFWrap">
+          <div class="pf-proj-collapse-header" onclick="pfToggleCFCollapse()" id="pfCFCollapseHeader">
+            Annual Cash Flow <span id="pfCFCollapseChevron" style="transform:rotate(-90deg);display:inline-block;transition:transform 0.3s;">&#9660;</span>
+          </div>
+          <div class="pf-proj-collapse-body collapsed" id="pfCFCollapseBody" style="max-height:0;">
+            <div style="padding:12px 14px;">
+              <canvas id="pfCFChart" style="height:240px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end pf-row-3col -->
+
+      <!-- Projections Table (full-width collapsible) -->
+      <div class="pf-proj-wrap" id="pfsHold_pfTableWrap" style="margin-top:16px;">
+        <div class="pf-proj-collapse-header" onclick="pfToggleTableCollapse()" id="pfTableCollapseHeader">
+          Projections Table <span id="pfTableCollapseChevron" style="transform:rotate(-90deg);display:inline-block;transition:transform 0.3s;">&#9660;</span>
+        </div>
+        <div class="pf-proj-collapse-body collapsed" id="pfTableCollapseBody" style="max-height:0;">
+          <div style="overflow-x:auto;padding:16px;">
+            <table class="pf-proj-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Year 3</th>
+                  <th>Year 5</th>
+                  <th>Year 7</th>
+                  <th>Year 10</th>
+                </tr>
+              </thead>
+              <tbody id="pfProjBody">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Loading&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- end pfTableWrap -->
+
+      <!-- Section 4: Actions + Disclaimer -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;" class="pf-print-hide">
+        <button class="btn-primary" onclick="pfsGenerateHoldPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Download a PDF of this pro forma"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+        <button class="btn-outline-heavy" onclick="pfsSaveHold()" title="Save this pro forma to your dashboard">Save Pro Forma</button>
+      </div>
+
+      <!-- Hold Per-Mode Button Row -->
+      <div class="pfs-btn-row" style="margin-top:24px;">
+        <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
+        <button class="btn-primary" id="pfsHold_btnPDF" onclick="pfsGenerateHoldPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+        <button class="btn-outline-heavy" id="pfsHold_btnReset" onclick="pfsResetHold()">&#8635; Reset Defaults</button>
+        <button class="btn-outline-heavy" id="pfsHold_btnSave" onclick="pfsSaveHold()">Save Pro Forma</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:16px;line-height:1.7;">
+        This pro forma is for informational and illustrative purposes only and should not be relied upon as a guarantee, representation, or warranty of future performance or results. The projections, assumptions, and estimates included in this pro forma are based on current market conditions and other factors that may change in the future, which could affect the accuracy of the projections. Actual results may vary significantly from the projections, and there is no assurance that the investment will achieve the returns projected in this pro forma. The investment involves various risks and uncertainties that may affect the outcome of the investment. Before making any investment decisions, it is important to consult with a professional financial advisor and conduct thorough due diligence. This pro forma does not constitute an offer to sell or a solicitation of an offer to buy any securities or interests in real estate investments.<br><br>
+        <em>*A Leasing Fee will be charged from the Property Management team.</em>
+      </div>
+
+      </div><!-- end proformas_subview_hold -->
+
+      <!-- Flip Subview -->
+      <div id="proformas_subview_flip" class="proformas-subview">
+    <div class="pfs-subview-heading">
+      <div class="pfs-title">Flip <span style="font-weight:500;font-size:14px;">(Buy, Rehab, Sell)</span></div>
+      <p class="pfs-desc">Fix-and-flip analysis. Project cost in, exit at ARV, profit and annualized return.</p>
+    </div>
 
       <!-- Title + action buttons (top bar) -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
@@ -1703,27 +2326,27 @@
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
-          <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
-          <button class="btn-outline-heavy" onclick="pfSave()" title="Save this flip analysis to your dashboard">Save Pro Forma</button>
+          <button class="btn-primary" onclick="pfsGenerateFlipPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+          <button class="btn-outline-heavy" onclick="pfsSaveFlip()" title="Save this flip analysis to your dashboard">Save Pro Forma</button>
         </div>
       </div>
 
       <!-- KPI Tile Row -->
       <div class="flip-kpi-row">
         <div class="pf-kpi-card">
-          <div class="pf-kpi-value" id="flip_kpi_netProfit" style="font-size:22px;">&mdash;</div>
+          <div class="pf-kpi-value" id="pfsFlip_kpi_netProfit" style="font-size:22px;">&mdash;</div>
           <div class="pf-kpi-label">Net Profit</div>
         </div>
         <div class="pf-kpi-card">
-          <div class="pf-kpi-value" id="flip_kpi_annualized">&mdash;</div>
+          <div class="pf-kpi-value" id="pfsFlip_kpi_annualized">&mdash;</div>
           <div class="pf-kpi-label">Annualized Return <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">ROI scaled to a 12-month period. A 6-month flip with 20% ROI equals 40% annualized — showing the true velocity of your capital.</span></span></div>
         </div>
         <div class="pf-kpi-card">
-          <div class="pf-kpi-value" id="flip_kpi_roi">&mdash;</div>
+          <div class="pf-kpi-value" id="pfsFlip_kpi_roi">&mdash;</div>
           <div class="pf-kpi-label">ROI</div>
         </div>
         <div class="pf-kpi-card">
-          <div class="pf-kpi-value" id="flip_kpi_coc">&mdash;</div>
+          <div class="pf-kpi-value" id="pfsFlip_kpi_coc">&mdash;</div>
           <div class="pf-kpi-label">Cash-on-Cash Return <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">For a flip with no rental income, Cash-on-Cash equals ROI. Both measure your return on invested cash.</span></span></div>
         </div>
       </div>
@@ -1735,27 +2358,27 @@
           <div class="pf-label-row"><span class="pf-label-text">Purchase Price</span></div>
           <div class="pf-input-wrap">
             <span class="pf-input-prefix">$</span>
-            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_purchasePrice" placeholder="0" oninput="pfFormatCurrencyInput(this);flipOnPurchasePriceChange();flipCalc();">
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsFlip_purchasePrice" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsFlipOnPurchasePriceChange();pfsFlipCalc();">
           </div>
         </div>
         <div class="form-group">
           <div class="pf-label-row"><span class="pf-label-text">After Repair Value (ARV)</span></div>
           <div class="pf-input-wrap">
             <span class="pf-input-prefix">$</span>
-            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_arv" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsFlip_arv" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsFlipCalc();">
           </div>
         </div>
         <div class="form-group">
           <div class="pf-label-row"><span class="pf-label-text">Rehab Cost</span></div>
           <div class="pf-input-wrap">
             <span class="pf-input-prefix">$</span>
-            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_rehabCost" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsFlip_rehabCost" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsFlipCalc();">
           </div>
         </div>
         <div class="form-group">
           <div class="pf-label-row"><span class="pf-label-text">Holding Time (Months)</span></div>
           <div class="pf-input-wrap">
-            <input type="number" class="pro-forma-input" id="flip_holdMonths" value="6" placeholder="6" min="0" step="1" oninput="flipCalc();">
+            <input type="number" class="pro-forma-input" id="pfsFlip_holdMonths" value="6" placeholder="6" min="0" step="1" oninput="pfsFlipCalc();">
           </div>
         </div>
       </div>
@@ -1764,28 +2387,28 @@
       <div class="pf-toggle-row flip-full-row">
         <span style="font-size:13px;font-weight:600;color:var(--text-muted);margin-right:10px;">Financing</span>
         <div class="flip-toggle-pills">
-          <button class="flip-toggle-pill" id="flipPillCash" onclick="flipSetMode('cash')" type="button">Cash</button>
-          <button class="flip-toggle-pill active" id="flipPillFinanced" onclick="flipSetMode('financed')" type="button">Financed</button>
+          <button class="flip-toggle-pill" id="pfsFlipPillCash" onclick="pfsFlipSetMode('cash')" type="button">Cash</button>
+          <button class="flip-toggle-pill active" id="pfsFlipPillFinanced" onclick="pfsFlipSetMode('financed')" type="button">Financed</button>
         </div>
-        <input type="radio" name="flip_financing" id="flip_financing_cash" value="cash" style="display:none;">
-        <input type="radio" name="flip_financing" id="flip_financing_financed" value="financed" checked style="display:none;">
+        <input type="radio" name="pfsFlip_financing" id="pfsFlip_financing_cash" value="cash" style="display:none;">
+        <input type="radio" name="pfsFlip_financing" id="pfsFlip_financing_financed" value="financed" checked style="display:none;">
       </div>
 
       <!-- Section 2: Financing & Costs (collapsible) -->
-      <div id="flipFinancingWrap" class="flip-financing-wrap">
+      <div id="pfsFlipFinancingWrap" class="flip-financing-wrap">
         <div class="pro-forma-section-title">Financing &amp; Costs</div>
         <div class="flip-section-grid">
           <div class="form-group">
             <div class="pf-label-row"><span class="pf-label-text">Down Payment</span></div>
             <div class="pf-input-wrap">
               <span class="pf-input-prefix">$</span>
-              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_downPayment" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsFlip_downPayment" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsFlipCalc();">
             </div>
           </div>
           <div class="form-group">
             <div class="pf-label-row"><span class="pf-label-text">Loan Interest Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Hard money lenders typically charge 8&ndash;12% for short-term flip loans. Interest is calculated as interest-only over the hold period.</span></span></span></div>
             <div class="pf-input-wrap">
-              <input type="number" class="pro-forma-input has-suffix" id="flip_loanRate" value="8.5" min="0" step="0.25" oninput="flipCalc();">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsFlip_loanRate" value="8.5" min="0" step="0.25" oninput="pfsFlipCalc();">
               <span class="pf-input-suffix">%</span>
             </div>
           </div>
@@ -1793,14 +2416,14 @@
             <div class="pf-label-row"><span class="pf-label-text">Closing Costs</span></div>
             <div class="pf-input-wrap">
               <span class="pf-input-prefix">$</span>
-              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_closingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsFlip_closingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsFlipCalc();">
             </div>
           </div>
           <div class="form-group">
             <div class="pf-label-row"><span class="pf-label-text">Monthly Carrying Costs <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Estimated monthly costs while holding the property: taxes, insurance, HOA, utilities. Defaults to property estimates; edit to adjust.</span></span></span></div>
             <div class="pf-input-wrap">
               <span class="pf-input-prefix">$</span>
-              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="flip_monthlyCarry" placeholder="0" oninput="pfFormatCurrencyInput(this);flipCalc();">
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsFlip_monthlyCarry" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsFlipCalc();">
             </div>
           </div>
         </div>
@@ -1812,7 +2435,7 @@
         <div class="form-group">
           <div class="pf-label-row"><span class="pf-label-text">Selling Costs % <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">DOM standard is 6.5% (3% buyer agent + 2.5% listing + 1% closing). Adjust if your scenario differs &mdash; e.g. DOM lists for 2% would total 5.5%.</span></span></span></div>
           <div class="pf-input-wrap">
-            <input type="number" class="pro-forma-input has-suffix" id="flip_sellingCostPct" value="6.5" min="0" step="0.5" oninput="flipCalc();">
+            <input type="number" class="pro-forma-input has-suffix" id="pfsFlip_sellingCostPct" value="6.5" min="0" step="0.5" oninput="pfsFlipCalc();">
             <span class="pf-input-suffix">%</span>
           </div>
         </div>
@@ -1823,51 +2446,270 @@
       <div class="flip-breakdown-card">
         <div class="flip-bd-row">
           <span class="flip-bd-label">After Repair Value (ARV)</span>
-          <span class="flip-bd-value" id="flipbd_arv">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_arv">&mdash;</span>
         </div>
         <div class="flip-bd-row flip-bd-deduct">
           <span class="flip-bd-label">- Purchase Price</span>
-          <span class="flip-bd-value" id="flipbd_purchase">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_purchase">&mdash;</span>
         </div>
         <div class="flip-bd-row flip-bd-deduct">
           <span class="flip-bd-label">- Rehab Cost</span>
-          <span class="flip-bd-value" id="flipbd_rehab">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_rehab">&mdash;</span>
         </div>
         <div class="flip-bd-row flip-bd-deduct">
           <span class="flip-bd-label">- Closing Costs</span>
-          <span class="flip-bd-value" id="flipbd_closing">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_closing">&mdash;</span>
         </div>
-        <div class="flip-bd-row flip-bd-deduct flip-bd-financed-only" id="flipbd_holdRow">
+        <div class="flip-bd-row flip-bd-deduct flip-bd-financed-only" id="pfsFlipbd_holdRow">
           <span class="flip-bd-label">- Total Holding Cost</span>
-          <span class="flip-bd-value" id="flipbd_holding">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_holding">&mdash;</span>
         </div>
-        <div class="flip-bd-row flip-bd-deduct flip-bd-financed-only" id="flipbd_interestRow">
+        <div class="flip-bd-row flip-bd-deduct flip-bd-financed-only" id="pfsFlipbd_interestRow">
           <span class="flip-bd-label">- Loan Interest Cost</span>
-          <span class="flip-bd-value" id="flipbd_interest">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_interest">&mdash;</span>
         </div>
         <div class="flip-bd-row flip-bd-deduct">
           <span class="flip-bd-label">- Selling Costs</span>
-          <span class="flip-bd-value" id="flipbd_selling">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_selling">&mdash;</span>
         </div>
         <div class="flip-bd-row flip-bd-sum">
           <span class="flip-bd-label">= Net Profit</span>
-          <span class="flip-bd-value" id="flipbd_netProfit">&mdash;</span>
+          <span class="flip-bd-value" id="pfsFlipbd_netProfit">&mdash;</span>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);">
-          Total Cash Invested: <strong id="flipbd_cashInvested" style="color:var(--text);">&mdash;</strong>
+          Total Cash Invested: <strong id="pfsFlipbd_cashInvested" style="color:var(--text);">&mdash;</strong>
           <span class="pf-tip" tabindex="0" style="margin-left:4px;">?<span class="pf-tip-text">Total cash you put in: down payment (or full purchase price if cash), rehab, closing costs, and holding costs. This is the denominator for ROI and Cash-on-Cash.</span></span>
         </div>
       </div>
 
       <!-- Bottom action row -->
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <!-- Flip Per-Mode Button Row -->
+      <div class="pfs-btn-row">
         <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
-        <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
-        <button class="btn-outline-heavy" onclick="pfSave()">Save Pro Forma</button>
+        <button class="btn-primary" id="pfsFlip_btnPDF" onclick="pfsGenerateFlipPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+        <button class="btn-outline-heavy" id="pfsFlip_btnReset" onclick="pfsResetFlip()">&#8635; Reset Defaults</button>
+        <button class="btn-outline-heavy" id="pfsFlip_btnSave" onclick="pfsSaveFlip()">Save Pro Forma</button>
       </div>
       <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:8px;line-height:1.7;">This calculator is for informational and illustrative purposes only. Projections are estimates based on inputs provided and do not constitute investment advice. Consult a qualified financial advisor before making investment decisions.</div>
 
-    </div><!-- end tab-flip -->
+      </div><!-- end proformas_subview_flip -->
+
+      <!-- BRRRR Subview -->
+      <div id="proformas_subview_brrrr" class="proformas-subview">
+    <div class="pfs-subview-heading">
+      <div class="pfs-title">BRRRR <span style="font-weight:500;font-size:14px;">(Buy, Rehab, Rent, Refinance, Repeat)</span></div>
+      <p class="pfs-desc">Recycle your capital. Rehab, rent, refi to pull cash back out, repeat on the next deal.</p>
+    </div>
+
+      <!-- KPI Tiles -->
+      <div class="pfs-kpi-row">
+        <div class="pf-kpi-card" id="pfsBrrrr_tile_refiOut">
+          <div class="pf-kpi-value" id="pfsBrrrr_kpi_refiOut" style="font-size:22px;">&mdash;</div>
+          <div class="pf-kpi-label">Refi-Out Cash <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">ARV &times; Refi LTV &minus; Refi Closing Costs.</span></span></div>
+        </div>
+        <div class="pf-kpi-card" id="pfsBrrrr_tile_cashLeftIn">
+          <div class="pf-kpi-value" id="pfsBrrrr_kpi_cashLeftIn" style="font-size:22px;">&mdash;</div>
+          <div class="pf-kpi-label" id="pfsBrrrr_kpi_cashLeftIn_label">Cash Left In <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Total cash in &minus; Refi-Out. &le;$0 = BRRRR holy grail.</span></span></div>
+        </div>
+        <div class="pf-kpi-card">
+          <div class="pf-kpi-value" id="pfsBrrrr_kpi_monthlyCF" style="font-size:22px;">&mdash;</div>
+          <div class="pf-kpi-label">Post-Refi Monthly CF</div>
+        </div>
+        <div class="pf-kpi-card" id="pfsBrrrr_tile_coc">
+          <div class="pf-kpi-value" id="pfsBrrrr_kpi_coc">&mdash;</div>
+          <div class="pf-kpi-label">Post-Refi CoC <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Annual CF &divide; cash left in. &le;$0 cash = &#9854; INFINITE.</span></span></div>
+        </div>
+      </div>
+
+      <!-- Property Details -->
+      <div class="pro-forma-section-title">Property Details</div>
+      <div class="pfs-section-grid">
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Purchase Price</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_purchasePrice" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrOnPPChange();pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">After Repair Value (ARV)</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_arv" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrOnARVChange();pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Rehab Cost</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_rehabCost" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Months to Refi</span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input" id="pfsBrrrr_monthsToRefi" value="6" placeholder="6" min="0" step="1" oninput="pfsBrrrrCalc();">
+          </div>
+        </div>
+      </div>
+
+      <!-- Acquisition Toggle -->
+      <div class="pf-toggle-row pfs-full-row">
+        <span style="font-size:13px;font-weight:600;color:var(--text-muted);margin-right:10px;">Acquisition Financing</span>
+        <div class="pfs-toggle-pills">
+          <button class="pfs-toggle-pill" id="pfsBrrrrPillCash" onclick="pfsBrrrrSetMode('cash')" type="button">Cash</button>
+          <button class="pfs-toggle-pill active" id="pfsBrrrrPillFinanced" onclick="pfsBrrrrSetMode('financed')" type="button">Financed</button>
+        </div>
+        <input type="radio" name="pfsBrrrr_financing" id="pfsBrrrr_financing_cash" value="cash" style="display:none;">
+        <input type="radio" name="pfsBrrrr_financing" id="pfsBrrrr_financing_financed" value="financed" checked style="display:none;">
+      </div>
+
+      <!-- Acquisition Financing (collapsible) -->
+      <div id="pfsBrrrrFinancingWrap" class="pfs-fin-wrap">
+        <div class="pro-forma-section-title">Acquisition Financing</div>
+        <div class="pfs-section-grid">
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Down Payment</span></div>
+            <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_downPayment" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Acquisition Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Hard money rate during rehab.</span></span></span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_acqRate" value="8.5" min="0" step="0.25" oninput="pfsBrrrrCalc();">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Closing Costs</span></div>
+            <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_closingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Monthly Carrying Costs</span></div>
+            <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_monthlyCarry" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Refinance -->
+      <div class="pro-forma-section-title" style="margin-top:8px;">Refinance</div>
+      <div class="pfs-section-grid">
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Refi LTV <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Cash-out refi max typically 75% of ARV.</span></span></span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_refiLTV" value="75" min="0" max="100" step="1" oninput="pfsBrrrrOnARVChange();pfsBrrrrCalc();">
+            <span class="pf-input-suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Refi Rate</span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_refiRate" value="7.5" min="0" step="0.125" oninput="pfsBrrrrCalc();">
+            <span class="pf-input-suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Refi Closing Costs</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_refiClosingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Refi Loan Term</span></div>
+          <select class="pro-forma-input" id="pfsBrrrr_refiTerm" onchange="pfsBrrrrCalc();">
+            <option value="30yr_fixed" selected>30 Year Fixed</option>
+            <option value="15yr_fixed">15 Year Fixed</option>
+            <option value="10yr_io">10 Year I/O</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Rental Operations -->
+      <div class="pro-forma-section-title" style="margin-top:8px;">Rental Operations</div>
+      <div class="pfs-section-grid">
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Est. Monthly Rent</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_monthlyRent" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Annual Property Tax</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_propTax" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Annual Insurance</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_insurance" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">HOA Monthly</span></div>
+          <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_hoaMonthly" value="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Vacancy %</span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_vacancyPct" value="5" min="0" step="0.5" oninput="pfsBrrrrCalc();">
+            <span class="pf-input-suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Property Management %</span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_pmPct" value="8" min="0" step="0.5" oninput="pfsBrrrrCalc();">
+            <span class="pf-input-suffix">%</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pf-label-row"><span class="pf-label-text">Repairs &amp; Maint. %</span></div>
+          <div class="pf-input-wrap">
+            <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_repairsPct" value="0.5" min="0" step="0.25" oninput="pfsBrrrrCalc();">
+            <span class="pf-input-suffix">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profit Breakdown -->
+      <div class="pro-forma-section-title" style="margin-top:8px;">Profit Breakdown</div>
+      <div class="pfs-breakdown-card">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Cash Recovery</div>
+        <div class="pfs-bd-row"><span class="pfs-bd-label">Total Cash Into Deal</span><span class="pfs-bd-value" id="pfsBrrrrbd_totalCashIn">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Refi-Out Cash</span><span class="pfs-bd-value" id="pfsBrrrrbd_refiOut">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-sum"><span class="pfs-bd-label">= Cash Left In</span><span class="pfs-bd-value" id="pfsBrrrrbd_cashLeftIn">&mdash;</span></div>
+        <hr class="brrrr-breakdown-sep">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Post-Refi Monthly Operating</div>
+        <div class="pfs-bd-row"><span class="pfs-bd-label">Monthly Rent</span><span class="pfs-bd-value" id="pfsBrrrrbd_rent">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Property Tax / 12</span><span class="pfs-bd-value" id="pfsBrrrrbd_taxMo">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Insurance / 12</span><span class="pfs-bd-value" id="pfsBrrrrbd_insMo">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- HOA</span><span class="pfs-bd-value" id="pfsBrrrrbd_hoa">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Vacancy</span><span class="pfs-bd-value" id="pfsBrrrrbd_vacancy">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Property Mgmt</span><span class="pfs-bd-value" id="pfsBrrrrbd_pm">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Repairs Reserve</span><span class="pfs-bd-value" id="pfsBrrrrbd_repairs">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Debt Service (P&amp;I)</span><span class="pfs-bd-value" id="pfsBrrrrbd_debtService">&mdash;</span></div>
+        <div class="pfs-bd-row pfs-bd-sum"><span class="pfs-bd-label">= Monthly CF Post-Refi</span><span class="pfs-bd-value" id="pfsBrrrrbd_monthlyCF">&mdash;</span></div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;">
+          <strong>Post-Refi CoC: <span id="pfsBrrrrbd_coc" style="color:#4fc3f7;">&mdash;</span></strong>
+        </div>
+      </div>
+
+      <!-- BRRRR Per-Mode Button Row -->
+      <div class="pfs-btn-row">
+        <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
+        <button class="btn-primary" id="pfsBrrrr_btnPDF" onclick="pfsGenerateBrrrrPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+        <button class="btn-outline-heavy" id="pfsBrrrr_btnReset" onclick="pfsResetBrrrr()">&#8635; Reset Defaults</button>
+        <button class="btn-outline-heavy" id="pfsBrrrr_btnSave" onclick="pfsSaveBrrrr()">Save Pro Forma</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:8px;line-height:1.7;">For informational purposes only. Not investment advice.</div>
+      </div><!-- end proformas_subview_brrrr -->
+
+    </div><!-- end tab-proformas -->
 
     <!-- PROPERTY DETAILS TAB -->
     <div id="tab-details" class="tab-content">
@@ -2857,7 +3699,7 @@
           btn.classList.add('active');
           document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
           // Hide map on Pro Forma and Property Details tabs
-          var hideMapTabs = ['proforma', 'flip', 'details', 'photos'];
+          var hideMapTabs = ['proforma', 'proformas', 'details', 'photos'];
           var dealBody = document.querySelector('.deal-body-v2');
           if (dealBody) dealBody.classList.toggle('map-hidden', hideMapTabs.indexOf(btn.dataset.tab) !== -1);
           // Comp markers: add when Map & Comps tab active, remove otherwise
@@ -2876,13 +3718,41 @@
         });
       });
 
-      // Activate tab from URL param ?tab=flip|proforma|details|photos|map
+      // Pro Formas tab state
+      var _proformasMode = 'hold';
+
+      function setProformasMode(mode) {
+        var valid = ['hold','flip','brrrr'];
+        if (valid.indexOf(mode) === -1) mode = 'hold';
+        _proformasMode = mode;
+        ['hold','flip','brrrr'].forEach(function(m) {
+          var sv = document.getElementById('proformas_subview_' + m);
+          var pill = document.getElementById('pfsModePill' + m.charAt(0).toUpperCase() + m.slice(1));
+          if (sv) sv.classList.toggle('active', m === mode);
+          if (pill) pill.classList.toggle('active', m === mode);
+        });
+        // Scroll to top of tab content on mode switch
+        var tabEl = document.getElementById('tab-proformas');
+        if (tabEl) tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      // Expose globally for inline onclick handlers (CRITICAL - do not remove)
+      window.setProformasMode = setProformasMode;
+
+      // URL param routing
       (function() {
-        var tabParam = new URLSearchParams(window.location.search).get('tab');
+        var params = new URLSearchParams(window.location.search);
+        var tabParam = params.get('tab');
+        // Legacy ?tab=flip → Pro Formas tab in Flip mode
+        if (tabParam === 'flip') tabParam = 'proformas';
         if (tabParam) {
           var targetBtn = document.querySelector('.tab-btn[data-tab="' + tabParam + '"]');
           if (targetBtn) targetBtn.click();
         }
+        var modeParam = params.get('mode');
+        if (modeParam && tabParam === 'proformas') {
+          setProformasMode(modeParam);
+        }
+        if (params.get('tab') === 'flip') setProformasMode('flip');
       })();
 
       // Load listing data
@@ -3466,6 +4336,10 @@
 
       // Initialize Fix & Flip Calculator defaults
       flipInitDefaults(ls);
+      // Initialize Pro Formas new tab
+      pfsHoldInitDefaults(ls);
+      pfsFlipInitDefaults(ls);
+      pfsBrrrrInitDefaults(ls);
 
       // Populate editable purchase price (defaults to asking price × 1.2, rounded to nearest $100)
       var ppEl = document.getElementById('pf2_purchasePrice');
@@ -4743,6 +5617,1343 @@
     }
 
     // ===== END FIX & FLIP CALCULATOR =====
+
+
+    // ===== PRO FORMAS NEW TAB — JS =====
+
+    // Hold years state for new tab
+    var pfsHoldYears = 10;
+
+    // --- pfsHoldSetHoldPeriod / Toggle / Accordion / Reset support ---
+    function pfsHoldSetHoldPeriod(yr) {
+      pfsHoldYears = yr;
+      document.querySelectorAll('.pf-tab-btn').forEach(function(b) {
+        b.classList.toggle('active', parseInt(b.dataset.yr) === yr);
+      });
+      pfsHoldCalc();
+    }
+
+    function pfFormatCurrencyInput(el) {
+      var raw = el.value.replace(/[^0-9]/g, '');
+      el.value = raw ? Number(raw).toLocaleString('en-US') : '';
+    }
+
+    function pfsHoldLoanManualOverride() {
+      var el = document.getElementById('pfsHold_loanAmount');
+      if (el) el.dataset.manual = '1';
+    }
+
+    function pfsHoldToggleCash() {
+      var isCash = document.getElementById('pfsHold_cashPurchase') && document.getElementById('pfsHold_cashPurchase').checked;
+      var ff = document.getElementById('pfsHold_pfFinancingFields');
+      var dr = document.getElementById('r2_debtRow');
+      if (ff) ff.style.display = isCash ? 'none' : 'grid';
+      if (dr) dr.style.display = isCash ? 'none' : '';
+    }
+
+    function pfsHoldAccordionOpen(section) {
+      var sections = ['purchase', 'income', 'expenses', 'assumptions'];
+      var clickedPanel = document.getElementById('pfsHold_pfPanel_' + section);
+      var isCurrentlyOpen = clickedPanel && clickedPanel.style.display !== 'none';
+      sections.forEach(function(s) {
+        var panel = document.getElementById('pfsHold_pfPanel_' + s);
+        var pill = document.getElementById('pfsHold_pfPill_' + s);
+        var open = (s === section) && !isCurrentlyOpen;
+        if (panel) panel.style.display = open ? '' : 'none';
+        if (pill) {
+          pill.classList.toggle('active', open);
+          if (open) {
+            pill.style.borderBottomLeftRadius = '0';
+            pill.style.borderBottomRightRadius = '0';
+          } else {
+            pill.style.borderBottomLeftRadius = '';
+            pill.style.borderBottomRightRadius = '';
+          }
+        }
+      });
+      // Re-render expense chart when expenses panel opens (chart needs visible container)
+      if (section === 'expenses' && !isCurrentlyOpen) {
+        if (window._pfsHoldCharts && window._pfsHoldCharts.expense) {
+          window._pfsHoldCharts.expense.destroy();
+          window._pfsHoldCharts.expense = null;
+        }
+        setTimeout(function() { pfsHoldCalc(); }, 50);
+      }
+    }
+
+    function pfsHoldResetField(id) {
+      var defs = window._pf2Defaults || {};
+      var el = document.getElementById(id);
+      if (el && defs[id] !== undefined) {
+        el.value = defs[id];
+        pfsHoldCalc();
+      }
+    }
+
+    function pfsHoldReset() {
+      var ls = (listing && listing._ls) || {};
+      var fieldMap = [
+        ['pfsHold_downPct',        ls.down_payment_pct      || 25],
+        ['pfsHold_closingCostPct', ls.closing_cost_pct      || 0.50],
+        ['pfsHold_loanFeePct',     ls.loan_cost_pct         || 0.50],
+        ['pfsHold_mortgageRate',   ls.mortgage_rate_pct     || 6.5],
+        ['pfsHold_rentLow',        ls.rent_range_low        || 0],
+        ['pfsHold_rentHigh',       ls.rent_range_high       || 0],
+        ['pfsHold_otherIncome',    ls.other_monthly_income  || 0],
+        ['pfsHold_propTaxPct',     ls.property_tax_pct      || 1.20],
+        ['pfsHold_insurance',      ls.est_insurance_annual  || 0],
+        ['pfsHold_pmPct',          ls.pm_pct                || 8],
+        ['pfsHold_vacancyPct',     ls.vacancy_pct           || 5],
+        ['pfsHold_repairPct',      ls.repair_cost_pct       || 0.50],
+        ['pfsHold_hoaMonthly',     (function() {
+          var amt = property.hoa_amount || 0;
+          var freq = (property.hoa_frequency || 'monthly').toLowerCase();
+          return (freq === 'annual' || freq === 'yearly') ? Math.round(amt / 12) : amt;
+        })()],
+        ['pfsHold_rentGrowth',     ls.rent_appreciation_pct  || 3],
+        ['pfsHold_priceGrowth',    ls.price_appreciation_pct || 3],
+        ['pfsHold_expGrowth',      ls.expense_increase_pct   || 3],
+        ['pfsHold_costOfSale',     ls.cost_of_sale_pct       || 6.5]
+      ];
+      fieldMap.forEach(function(p) { var el = document.getElementById(p[0]); if (el) el.value = p[1]; });
+      // Reset purchase price to 1.2× asking, rounded to nearest $100
+      var ppResetEl = document.getElementById('pfsHold_purchasePrice');
+      if (ppResetEl) {
+        var ppReset = listing.asking_price ? Math.round(listing.asking_price * 1.2 / 100) * 100 : 0;
+        ppResetEl.value = ppReset ? ppReset.toLocaleString('en-US') : '';
+      }
+      var ltEl = document.getElementById('pfsHold_loanType');
+      if (ltEl) {
+        Array.from(ltEl.options).forEach(function(o) { o.selected = (o.value === '30yr_fixed'); });
+      }
+      var cashEl = document.getElementById('pfsHold_cashPurchase');
+      if (cashEl) { cashEl.checked = false; pfsHoldToggleCash(); }
+      pfsHoldSetHoldPeriod(10);
+      Portal.toast('Pro forma reset to defaults.', 'info');
+      pfsHoldCalc();
+    }
+
+    async function pfSave() {
+      // Branch to flip save if Fix & Flip tab is active
+      var activeTabBtn = document.querySelector('.tab-btn.active');
+      if (activeTabBtn && activeTabBtn.dataset.tab === 'flip') {
+        return pfSaveFlip();
+      }
+
+      try {
+        // 1. Confirm logged in
+        var session = await Portal.getSession();
+        if (!session || !session.user) {
+          Portal.toast('Sign in to save your pro forma.', 'info');
+          return;
+        }
+
+        // 2. Resolve portal_users.id from auth user id
+        var puRes = await Portal.supabase
+          .from('portal_users')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!puRes.data || !puRes.data.id) {
+          Portal.toast('Could not resolve your portal profile.', 'error');
+          return;
+        }
+        var portalUserId = puRes.data.id;
+
+        // 3. Collect inputs from all pf2_* fields
+        var inputIds = [
+          'pfsHold_purchasePrice','pfsHold_closingCostPct','pfsHold_cashPurchase','pfsHold_downPct',
+          'pfsHold_loanFeePct','pfsHold_loanAmount','pfsHold_loanType','pfsHold_mortgageRate',
+          'pfsHold_rentLow','pfsHold_rentHigh','pfsHold_otherIncome','pfsHold_vacancyPct',
+          'pfsHold_propTaxPct','pfsHold_insurance','pfsHold_hoaMonthly','pfsHold_repairPct','pfsHold_pmPct',
+          'pfsHold_rentGrowth','pfsHold_expGrowth','pfsHold_priceGrowth','pfsHold_costOfSale'
+        ];
+        var inputs = {};
+        inputIds.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          if (el.type === 'checkbox') inputs[id] = el.checked;
+          else inputs[id] = el.value;
+        });
+        // Also include the active hold period
+        if (typeof pfsHoldYears !== 'undefined') inputs.pfsHoldYears = pfsHoldYears;
+
+        // 4. Collect outputs (KPIs + bottom-line results)
+        function dom(id) {
+          var el = document.getElementById(id);
+          return el ? (el.textContent || '').trim() : null;
+        }
+        function pctNum(str) {
+          if (!str) return null;
+          var n = parseFloat(String(str).replace(/[^0-9.\-]/g, ''));
+          return isFinite(n) ? n : null;
+        }
+        var outputs = {
+          cap_rate:       pctNum(dom('gauge_capRate_val')),
+          coc_return:     pctNum(dom('gauge_coc_val')),
+          dscr:           (function(){ var s = dom('gauge_dscr_val'); var n = s ? parseFloat(s) : null; return isFinite(n) ? n : null; })(),
+          day1_equity:    dom('r2_day1Equity'),
+          monthly_cf:     dom('r2_monthlyCF'),
+          annual_cf:      dom('r2_annualCF'),
+          noi:            dom('r2_noi'),
+          total_acq_cost: dom('r2_totalAcqCost'),
+          initial_inv:    dom('r2_initialInvestment'),
+          debt_service:   dom('r2_debtService'),
+          hold_years:     dom('r2_holdLabel'),
+          sale_value:     dom('r2_saleValue'),
+          total_return:   dom('r2_totalReturn'),
+          ann_return:     dom('r2_annReturn'),
+          eq_multiple:    dom('r2_eqMultiple'),
+          irr:            dom('r2_irr')
+        };
+
+        // 5. Build name: short address + timestamp
+        var shortAddr = (property && property.address) ? property.address : 'Pro Forma';
+        var now = new Date();
+        var stamp = now.toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+        var name = shortAddr + ' - ' + stamp;
+
+        // 6. Insert row
+        var insertRes = await Portal.supabase
+          .from('investor_saved_proformas')
+          .insert({
+            user_id:     portalUserId,
+            listing_id:  (listing && listing.listing_id) ? listing.listing_id : null,
+            property_id: (property && property.id) ? property.id : null,
+            name:        name,
+            inputs:      inputs,
+            outputs:     outputs,
+            archived:    false
+          })
+          .select('id')
+          .single();
+
+        if (insertRes.error) {
+          console.error('pfSave insert error:', insertRes.error);
+          Portal.toast('Could not save pro forma. Try again.', 'error');
+          return;
+        }
+
+        Portal.toast('Pro forma saved to your dashboard.', 'success');
+      } catch (e) {
+        console.error('pfSave error:', e);
+        Portal.toast('Could not save pro forma. Try again.', 'error');
+      }
+    }
+
+
+
+    // --- pfsHoldCalc ---
+    function pfsHoldCalc() {
+      var pp  = pfv('pfsHold_purchasePrice') || listing.asking_price || 0;
+      var arv = property.estimated_arv || 0;
+      var isCash = !!(document.getElementById('pfsHold_cashPurchase') && document.getElementById('pfsHold_cashPurchase').checked);
+
+      // Acquisition
+      var downPct        = pfv('pfsHold_downPct') / 100;
+      var closingCostPct = pfv('pfsHold_closingCostPct') / 100;
+      var loanFeePct     = pfv('pfsHold_loanFeePct') / 100;
+      var downPayment    = pp * downPct;
+      // Loan amount: use manual override if user changed it, else calculate from down payment
+      var loanAmountEl   = document.getElementById('pfsHold_loanAmount');
+      var loanAmountCalc = isCash ? 0 : (pp - downPayment);
+      var loanAmount     = isCash ? 0 : (loanAmountEl && loanAmountEl.dataset.manual === '1' ? pfv('pfsHold_loanAmount') : loanAmountCalc);
+      // Auto-update loan amount field when not manually overridden
+      if (loanAmountEl && loanAmountEl.dataset.manual !== '1') loanAmountEl.value = loanAmountCalc ? Math.round(loanAmountCalc).toLocaleString('en-US') : '';
+      var closingCosts   = pp * closingCostPct;
+      var loanFees       = isCash ? 0 : (loanAmount * loanFeePct);
+      var totalAcqCost   = pp + closingCosts + loanFees;
+      var initialInv     = isCash ? (pp + closingCosts) : (downPayment + closingCosts + loanFees);
+      var day1Equity     = arv ? (arv - totalAcqCost) : null;
+
+      // Debt service
+      var loanType     = (document.getElementById('pfsHold_loanType') && document.getElementById('pfsHold_loanType').value) || '30yr_fixed';
+      var mortgageRate = pfv('pfsHold_mortgageRate') / 100;
+      var r            = mortgageRate / 12;
+      var monthlyPmt   = 0;
+      if (!isCash && loanAmount > 0 && mortgageRate > 0) {
+        var ioTypes = ['5yr_io','7yr_io','10yr_io'];
+        if (ioTypes.indexOf(loanType) !== -1) {
+          monthlyPmt = loanAmount * r;
+        } else {
+          var n = loanType === '15yr_fixed' ? 180 : 360;
+          monthlyPmt = loanAmount * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n) - 1);
+        }
+      }
+      var annualDebtSvc = monthlyPmt * 12;
+
+      // Income
+      var rentLow    = pfv('pfsHold_rentLow');
+      var rentHigh   = pfv('pfsHold_rentHigh');
+      var avgRent    = (rentLow + rentHigh) / 2;
+      var otherInc   = pfv('pfsHold_otherIncome');
+      var totalMonthlyInc = avgRent + otherInc;
+      var totalAnnInc = totalMonthlyInc * 12;
+
+      // Expenses
+      var propTaxPct   = pfv('pfsHold_propTaxPct') / 100;
+      var propertyTax  = property.taxes_annual || (pp * propTaxPct);
+      var insurance    = pfv('pfsHold_insurance');
+      var pmPct        = pfv('pfsHold_pmPct') / 100;
+      var vacPct       = pfv('pfsHold_vacancyPct') / 100;
+      var repairPct    = pfv('pfsHold_repairPct') / 100;
+      var hoaMonthly   = pfv('pfsHold_hoaMonthly');
+      var hoaAnnual    = hoaMonthly * 12;
+      var floodIns     = (listing.listings && listing.listings.est_flood_insurance_annual) || 0;
+
+      var vacancyLoss  = totalAnnInc * vacPct;
+      var egi          = totalAnnInc - vacancyLoss;
+      var repairMaint  = totalAnnInc * repairPct;
+      var propMgmt     = egi * pmPct;
+      var noi          = totalAnnInc - (propertyTax + insurance + floodIns + hoaAnnual + repairMaint + propMgmt + vacancyLoss);
+      var annualCF     = noi - annualDebtSvc;
+      var monthlyCF    = annualCF / 12;
+
+      // KPIs
+      var capRate  = pp > 0 ? noi / pp : 0; // Industry standard: NOI / Purchase Price (not total acq cost)
+      var coc      = initialInv  > 0 ? annualCF / initialInv : 0;
+      var dscr     = annualDebtSvc > 0 ? noi / annualDebtSvc : null;
+
+      // Exit
+      var priceGrowth  = pfv('pfsHold_priceGrowth') / 100;
+      var rentGrowth   = pfv('pfsHold_rentGrowth')  / 100;
+      var expGrowth    = pfv('pfsHold_expGrowth')   / 100;
+      var costOfSalePct= pfv('pfsHold_costOfSale')  / 100;
+      var holdYears    = pfsHoldYears;
+
+      var saleValue   = pp * Math.pow(1 + priceGrowth, holdYears);
+      var costOfSale  = saleValue * costOfSalePct;
+      var loanBal     = isCash ? 0 : pfRemainingBalance(loanAmount, mortgageRate, loanType, holdYears);
+      var saleProceeds= saleValue - costOfSale - loanBal;
+
+      // Year-by-year cumulative cash flow + IRR cashflow array
+      var totalCFHold = 0;
+      var irrCFs = [-initialInv];
+      for (var y = 1; y <= holdYears; y++) {
+        var rMult = Math.pow(1 + rentGrowth, y - 1);
+        var eMult = Math.pow(1 + expGrowth,  y - 1);
+        var yInc  = totalAnnInc * rMult;
+        var yVac  = yInc * vacPct;
+        var yEgi  = yInc - yVac;
+        var yFixd = (propertyTax + insurance + floodIns + hoaAnnual) * eMult;
+        var yNoi  = yInc - yFixd - (yInc * repairPct) - (yEgi * pmPct) - yVac;
+        var yCF   = yNoi - annualDebtSvc;
+        totalCFHold += yCF;
+        irrCFs.push(y < holdYears ? yCF : yCF + saleProceeds);
+      }
+
+      var totalReturn    = saleProceeds + totalCFHold;
+      var annualizedRet  = (initialInv > 0 && holdYears > 0 && totalReturn > 0)
+        ? Math.pow(totalReturn / initialInv, 1 / holdYears) - 1 : 0;
+      var equityMultiple = initialInv > 0 ? totalReturn / initialInv : 0;
+      var irr = pfIRR(irrCFs);
+
+      // ---- HELPERS ----
+      function fc(n) { return Portal.fc(Math.round(n)); }
+      function pct(n) { return isFinite(n) ? (n * 100).toFixed(1) + '%' : '\u2014'; }
+      function cfSpan(n)    { return '<span class="' + (n >= 0 ? 'positive' : 'negative') + '">' + fc(n) + '</span>'; }
+      function cfSpanPct(n) { return '<span class="' + (n >= 0 ? 'positive' : 'negative') + '">' + pct(n) + '</span>'; }
+      function set(id, html, isHtml) { var el = document.getElementById(id); if (el) { if (isHtml) el.innerHTML = html; else el.textContent = html; } }
+      function setH(id, html) { set(id, html, true); }
+
+      // KPI cards
+      setH('pfsHold_kpi_capRate',    cfSpanPct(capRate));
+      setH('pfsHold_kpi_coc',        cfSpanPct(coc));
+      set('pfsHold_kpi_dscr',        dscr !== null ? dscr.toFixed(2) + 'x' : (isCash ? 'N/A' : '\u2014'));
+      setH('pfsHold_kpi_day1equity', day1Equity !== null ? '<span class="' + (day1Equity >= 0 ? 'positive' : 'negative') + '">' + fc(day1Equity) + '</span>' : '\u2014');
+      setH('pfsHold_kpi_monthlyCF',  cfSpan(monthlyCF));
+      setH('pfsHold_kpi_annualCF',   cfSpan(annualCF));
+
+      // Readonly displays
+      // loan amount is now editable — don't overwrite unless manual override is off
+      if (isCash && document.getElementById('pfsHold_loanAmount')) { document.getElementById('pfsHold_loanAmount').value = '0'; }
+      set('pfsHold_pfro_monthlyPayment',isCash ? 'N/A' : fc(monthlyPmt));
+      set('pfsHold_pfro_avgRent',       fc(avgRent) + '/mo');
+      var taxHint = document.getElementById('pf_taxHint');
+      if (taxHint) taxHint.textContent = property.taxes_annual
+        ? 'Using actual taxes: ' + fc(property.taxes_annual) + '/yr'
+        : 'Estimated from tax rate \u2014 actual taxes not available';
+
+      // Acquisition Summary
+      set('pfsHold_r2_purchasePrice',   fc(pp));
+      set('pfsHold_r2_closingCosts',    fc(closingCosts));
+      set('pfsHold_r2_loanFees',        fc(loanFees));
+      set('pfsHold_r2_totalAcqCost',    fc(totalAcqCost));
+      set('pfsHold_r2_downPayment',     isCash ? 'N/A' : fc(downPayment));
+      set('pfsHold_r2_initialInvestment', fc(initialInv));
+      setH('pfsHold_r2_day1Equity', day1Equity !== null
+        ? '<span class="' + (day1Equity >= 0 ? 'positive' : 'negative') + '">' + fc(day1Equity) + '</span>'
+        : '\u2014');
+
+      // Income & Expenses
+      set('pfsHold_r2_grossIncome',  fc(totalAnnInc));
+      set('pfsHold_r2_vacancyLoss',  fc(vacancyLoss));
+      set('pfsHold_r2_egi',          fc(egi));
+      set('pfsHold_r2_propTax',      fc(propertyTax));
+      set('pfsHold_r2_insurance',    fc(insurance));
+      set('pfsHold_r2_hoa',          fc(hoaAnnual));
+      set('pfsHold_r2_repairs',      fc(repairMaint));
+      set('pfsHold_r2_pm',           fc(propMgmt));
+      setH('pfsHold_r2_noi',         '<span class="' + (noi >= 0 ? 'positive' : 'negative') + '">' + fc(noi) + '</span>');
+      set('pfsHold_r2_debtService',  isCash ? '\u2014' : fc(annualDebtSvc));
+      setH('pfsHold_r2_annualCF',    cfSpan(annualCF));
+      setH('pfsHold_r2_monthlyCF',   cfSpan(monthlyCF));
+
+      // Exit Analysis
+      set('pfsHold_r2_holdLabel',    holdYears);
+      set('pfsHold_r2_saleValue',    fc(saleValue));
+      set('pfsHold_r2_costOfSale',   fc(costOfSale));
+      set('pfsHold_r2_loanBal',      isCash ? '\u2014' : fc(loanBal));
+      setH('pfsHold_r2_saleProceeds',cfSpan(saleProceeds));
+      setH('pfsHold_r2_totalCFHold', cfSpan(totalCFHold));
+      setH('pfsHold_r2_totalReturn', cfSpan(totalReturn));
+      setH('pfsHold_r2_annReturn',   cfSpanPct(annualizedRet));
+      set('pfsHold_r2_eqMultiple',   isFinite(equityMultiple) ? equityMultiple.toFixed(2) + 'x' : '\u2014');
+      if (irr === null || !isFinite(irr) || Math.abs(irr) > 9.99) {
+        setH('pfsHold_r2_irr', '<span style="color:var(--text-muted)">N/A</span>');
+      } else {
+        setH('pfsHold_r2_irr', cfSpanPct(irr));
+      }
+      // Exit footnote
+      var fnEl = document.getElementById('pfExitFootnote');
+      if (fnEl) {
+        var rg = pfv('pfsHold_rentGrowth'); var eg = pfv('pfsHold_expGrowth'); var pg = pfv('pfsHold_priceGrowth');
+        fnEl.textContent = 'Projections assume ' + rg + '% annual rent growth, ' + eg + '% expense growth, and ' + pg + '% property appreciation. Actual results may vary.';
+      }
+
+      // Multi-year projections
+      pfRenderProjections(
+        totalAnnInc, annualDebtSvc,
+        propertyTax, insurance, floodIns, hoaAnnual,
+        repairPct, pmPct, vacPct,
+        pp, priceGrowth, rentGrowth, expGrowth,
+        loanAmount, mortgageRate, loanType, isCash
+      );
+
+      // Build chart data
+
+      // Equity growth Yrs 1-10
+      var egYears = [1,2,3,4,5,6,7,8,9,10];
+      var egValues = [], egBalances = [], egEquities = [];
+      egYears.forEach(function(yr) {
+        var yVal = pp * Math.pow(1 + priceGrowth, yr);
+        var yBal = isCash ? 0 : pfRemainingBalance(loanAmount, mortgageRate, loanType, yr);
+        egValues.push(Math.round(yVal));
+        egBalances.push(Math.round(yBal));
+        egEquities.push(Math.round(yVal - yBal));
+      });
+
+      // Projections mini chart [3,5,7,10]
+      var pmYears = [3,5,7,10];
+      var pmCFs = [], pmVals = [], pmEqs = [];
+      pmYears.forEach(function(yr) {
+        var rMult = Math.pow(1 + rentGrowth, yr - 1);
+        var eMult = Math.pow(1 + expGrowth,  yr - 1);
+        var yInc  = totalAnnInc * rMult;
+        var yVac  = yInc * vacPct;
+        var yEgi  = yInc - yVac;
+        var yFixd = (propertyTax + insurance + floodIns + hoaAnnual) * eMult;
+        var yNoi  = yInc - yFixd - (yInc * repairPct) - (yEgi * pmPct) - yVac;
+        var yCF   = yNoi - annualDebtSvc;
+        var yVal  = pp * Math.pow(1 + priceGrowth, yr);
+        var yBal  = isCash ? 0 : pfRemainingBalance(loanAmount, mortgageRate, loanType, yr);
+        pmCFs.push(Math.round(yCF));
+        pmVals.push(Math.round(yVal));
+        pmEqs.push(Math.round(yVal - yBal));
+      });
+
+      // Expense breakdown
+      var expBreakdown = [
+        { label: 'Taxes', value: propertyTax },
+        { label: 'Insurance', value: insurance },
+        { label: 'HOA', value: hoaAnnual },
+        { label: 'Repair', value: repairMaint },
+        { label: 'Mgmt', value: propMgmt },
+        { label: 'Debt Svc', value: annualDebtSvc }
+      ].filter(function(e) { return e.value > 0; });
+
+      pfUpdateCharts({
+        capRatePct: capRate * 100,
+        cocPct: coc * 100,
+        dscr: dscr,
+        isCash: isCash,
+        annualCF: annualCF,
+        monthlyCF: monthlyCF,
+        day1Equity: day1Equity,
+        equityGrowthData: { years: egYears, values: egValues, balances: egBalances, equities: egEquities },
+        projMiniData: { cfs: pmCFs, values: pmVals, equities: pmEqs },
+        expenseBreakdown: expBreakdown
+      });
+    }
+
+    function pfRenderProjections(annInc0, debtSvc, propTax0, ins0, flood0, hoa0, repairPct, pmPct, vacPct, pp0, priceGrowth, rentGrowth, expGrowth, loanAmt, rate, loanType, isCash) {
+      var years = [3, 5, 7, 10];
+      var costOfSalePct = (pfv('pfsHold_costOfSale') || 6.5) / 100;
+      var data = years.map(function(yr) {
+        var rMult = Math.pow(1 + rentGrowth, yr - 1);
+        var eMult = Math.pow(1 + expGrowth,  yr - 1);
+        var pMult = Math.pow(1 + priceGrowth, yr);
+        var yInc  = annInc0 * rMult;
+        var yVac  = yInc * vacPct;
+        var yEgi  = yInc - yVac;
+        var yFixd = (propTax0 + ins0 + flood0 + hoa0) * eMult;
+        var yNoi  = yInc - yFixd - (yInc * repairPct) - (yEgi * pmPct) - yVac;
+        var yCF   = yNoi - debtSvc;
+        var yVal  = pp0 * pMult;
+        var yBal  = isCash ? 0 : pfRemainingBalance(loanAmt, rate, loanType, yr);
+        var ySaleCost = yVal * costOfSalePct;
+        var yNetProceeds = yVal - ySaleCost - yBal;
+        return { rentMo: yInc / 12, noi: yNoi, cf: yCF, val: yVal, equity: yVal - yBal, saleCost: ySaleCost, netProceeds: yNetProceeds, yr: yr };
+      });
+
+      function fc(n) { return Portal.fc(Math.round(n)); }
+      function cc(n) { return n >= 0 ? 'positive' : 'negative'; }
+
+      var rows = [
+        { label: 'Monthly Rent',       fn: function(d) { return fc(d.rentMo) + '/mo'; }, cls: null },
+        { label: 'NOI (Annual)',        fn: function(d) { return fc(d.noi); },            cls: function(d) { return cc(d.noi); } },
+        { label: 'Cash Flow (Annual)',  fn: function(d) { return fc(d.cf); },             cls: function(d) { return cc(d.cf); } },
+        { label: 'Property Value',      fn: function(d) { return fc(d.val); },            cls: null },
+        { label: 'Equity',             fn: function(d) { return fc(d.equity); },          cls: function(d) { return cc(d.equity); } },
+        { label: 'Cost of Sale',       fn: function(d) { return '(' + fc(d.saleCost) + ')'; }, cls: function(d) { return 'negative'; } },
+        { label: 'Net Proceeds @ Sale', fn: function(d) { return fc(d.netProceeds); },         cls: function(d) { return cc(d.netProceeds); } }
+      ];
+
+      var tbody = document.getElementById('pfProjBody');
+      if (!tbody) return;
+      tbody.innerHTML = rows.map(function(row) {
+        return '<tr><td>' + row.label + '</td>' +
+          data.map(function(d) {
+            var cls = row.cls ? row.cls(d) : '';
+            return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + row.fn(d) + '</td>';
+          }).join('') + '</tr>';
+      }).join('');
+    }
+
+
+    // --- pfsFlip funcs ---
+    function pfsFlipCalc() {
+      var pp      = pfsFlipNum('pfsFlip_purchasePrice');
+      var arv     = pfsFlipNum('pfsFlip_arv');
+      var rehab   = pfsFlipNum('pfsFlip_rehabCost');
+      var months  = parseInt((document.getElementById('pfsFlip_holdMonths') || {}).value, 10) || 0;
+      var isCash  = !!(document.getElementById('pfsFlip_financing_cash') && document.getElementById('pfsFlip_financing_cash').checked);
+      var dp      = isCash ? pp : pfsFlipNum('pfsFlip_downPayment');
+      var rate    = isCash ? 0 : (parseFloat((document.getElementById('pfsFlip_loanRate') || {}).value) || 0);
+      var closing = pfsFlipNum('pfsFlip_closingCosts');
+      var monthlyCarry = isCash ? 0 : pfsFlipNum('pfsFlip_monthlyCarry');
+      var sellPct = ((parseFloat((document.getElementById('pfsFlip_sellingCostPct') || {}).value) || 0)) / 100;
+
+      // Interest-only loan cost
+      var loanAmt = isCash ? 0 : Math.max(0, pp - dp);
+      var monthlyRate = rate / 100 / 12;
+      var interestCost = (!isCash && monthlyRate > 0 && months > 0) ? loanAmt * monthlyRate * months : 0;
+
+      var totalHoldingCost = monthlyCarry * months;
+      var sellingCostDollars = arv * sellPct;
+      var totalProjectCost  = pp + rehab + closing + totalHoldingCost + interestCost + sellingCostDollars;
+      var netProfit = arv - totalProjectCost;
+
+      var cashInvested = (isCash ? pp : dp) + closing + rehab + totalHoldingCost + interestCost;
+      var roi       = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
+      var coc       = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
+      var annualized = months > 0 ? roi * (12 / months) : null;
+
+      // KPI tiles
+      pfsFlipSetKpi('pfsFlip_kpi_netProfit', pfsFlipFc(netProfit), netProfit > 0 ? 'positive' : (netProfit < 0 ? 'negative' : 'neutral'));
+      pfsFlipSetKpi('pfsFlip_kpi_annualized', annualized !== null ? annualized.toFixed(1) + '%' : '&mdash;',
+        annualized === null ? 'neutral' : (annualized >= 25 ? 'positive' : (annualized >= 10 ? 'neutral' : 'negative')));
+      pfsFlipSetKpi('pfsFlip_kpi_roi', roi.toFixed(1) + '%', roi >= 20 ? 'positive' : (roi >= 10 ? 'neutral' : 'negative'));
+      pfsFlipSetKpi('pfsFlip_kpi_coc', coc.toFixed(1) + '%', coc >= 20 ? 'positive' : (coc >= 10 ? 'neutral' : 'negative'));
+
+      // Breakdown rows
+      function setBD(id, val, asPositive) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = pfsFlipFc(val);
+      }
+      setBD('pfsFlipbd_arv',      arv);
+      setBD('pfsFlipbd_purchase', pp);
+      setBD('pfsFlipbd_rehab',    rehab);
+      setBD('pfsFlipbd_closing',  closing);
+      setBD('pfsFlipbd_holding',  totalHoldingCost);
+      setBD('pfsFlipbd_interest', interestCost);
+      setBD('pfsFlipbd_selling',  sellingCostDollars);
+
+      // Net profit row color
+      var npEl = document.getElementById('pfsFlipbd_netProfit');
+      if (npEl) {
+        npEl.textContent = pfsFlipFc(netProfit);
+        npEl.style.color = netProfit >= 0 ? '#22c55e' : '#ef4444';
+      }
+      var npLabelRow = npEl && npEl.closest('.flip-bd-row');
+      if (npLabelRow) {
+        var npLabel = npLabelRow.querySelector('.flip-bd-label');
+        if (npLabel) npLabel.style.color = netProfit >= 0 ? '#22c55e' : '#ef4444';
+      }
+
+      // Cash invested
+      var ciEl = document.getElementById('pfsFlipbd_cashInvested');
+      if (ciEl) ciEl.textContent = pfsFlipFc(cashInvested);
+
+      // Show/hide financed-only rows
+      var holdRow     = document.getElementById('pfsFlipbd_holdRow');
+      var interestRow = document.getElementById('pfsFlipbd_interestRow');
+      if (holdRow)     holdRow.style.display     = isCash ? 'none' : '';
+      if (interestRow) interestRow.style.display  = isCash ? 'none' : '';
+    }
+
+    // Save flip analysis to investor_saved_proformas
+    async function pfSaveFlip() {
+      try {
+        var session = await Portal.getSession();
+        if (!session || !session.user) {
+          Portal.toast('Sign in to save your flip analysis.', 'info');
+          return;
+        }
+        var puRes = await Portal.supabase
+          .from('portal_users')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        if (!puRes.data || !puRes.data.id) {
+          Portal.toast('Could not resolve your portal profile.', 'error');
+          return;
+        }
+        var portalUserId = puRes.data.id;
+
+        var isCash = !!(document.getElementById('pfsFlip_financing_cash') && document.getElementById('pfsFlip_financing_cash').checked);
+        var pp     = pfsFlipNum('pfsFlip_purchasePrice');
+        var arv    = pfsFlipNum('pfsFlip_arv');
+        var rehab  = pfsFlipNum('pfsFlip_rehabCost');
+        var months = parseInt((document.getElementById('pfsFlip_holdMonths') || {}).value, 10) || 0;
+        var dp     = isCash ? pp : pfsFlipNum('pfsFlip_downPayment');
+        var rate   = isCash ? 0 : (parseFloat((document.getElementById('pfsFlip_loanRate') || {}).value) || 0);
+        var closing = pfsFlipNum('pfsFlip_closingCosts');
+        var monthlyCarry = isCash ? 0 : pfsFlipNum('pfsFlip_monthlyCarry');
+        var sellPct = (parseFloat((document.getElementById('pfsFlip_sellingCostPct') || {}).value) || 0);
+
+        // Recompute outputs for the saved row
+        var loanAmt = isCash ? 0 : Math.max(0, pp - dp);
+        var monthlyRate = rate / 100 / 12;
+        var interestCost = (!isCash && monthlyRate > 0 && months > 0) ? loanAmt * monthlyRate * months : 0;
+        var totalHoldingCost = monthlyCarry * months;
+        var sellingCostDollars = arv * (sellPct / 100);
+        var totalProjectCost  = pp + rehab + closing + totalHoldingCost + interestCost + sellingCostDollars;
+        var netProfit = arv - totalProjectCost;
+        var cashInvested = (isCash ? pp : dp) + closing + rehab + totalHoldingCost + interestCost;
+        var roi = cashInvested > 0 ? (netProfit / cashInvested) * 100 : 0;
+        var annualized = months > 0 ? roi * (12 / months) : 0;
+
+        var shortAddr = (property && property.address) ? property.address : 'Flip Analysis';
+        var now = new Date();
+        var stamp = now.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        var name = shortAddr + ' - Flip - ' + stamp;
+
+        var insertRes = await Portal.supabase
+          .from('investor_saved_proformas')
+          .insert({
+            user_id:     portalUserId,
+            listing_id:  (listing && listing.listing_id) ? listing.listing_id : null,
+            property_id: (property && property.id) ? property.id : null,
+            name:        name,
+            inputs: {
+              mode:             'flip',
+              purchase_price:   pp,
+              arv:              arv,
+              rehab_cost:       rehab,
+              hold_months:      months,
+              financing:        isCash ? 'cash' : 'financed',
+              down_payment:     dp,
+              loan_rate:        rate,
+              closing_costs:    closing,
+              monthly_carry:    monthlyCarry,
+              selling_cost_pct: sellPct
+            },
+            outputs: {
+              net_profit:        netProfit,
+              annualized_return: annualized,
+              roi:               roi,
+              cash_on_cash:      roi,
+              total_project_cost: totalProjectCost,
+              cash_invested:     cashInvested,
+              breakdown: {
+                arv:      arv,
+                purchase: pp,
+                rehab:    rehab,
+                closing:  closing,
+                holding:  totalHoldingCost,
+                interest: interestCost,
+                selling:  sellingCostDollars,
+                net:      netProfit
+              }
+            },
+            archived: false
+          })
+          .select('id')
+          .single();
+
+        if (insertRes.error) {
+          console.error('pfSaveFlip insert error:', insertRes.error);
+          Portal.toast('Could not save flip analysis. Try again.', 'error');
+          return;
+        }
+        Portal.toast('Flip analysis saved to your dashboard.', 'success');
+      } catch (e) {
+        console.error('pfSaveFlip error:', e);
+        Portal.toast('Could not save flip analysis. Try again.', 'error');
+      }
+    }
+
+    // Generate flip-shaped PDF
+    async function pfGenerateFlipPDF() {
+      var { jsPDF } = window.jspdf;
+
+      // Read current computed values from DOM
+      function kdv(id) {
+        var el = document.getElementById(id);
+        return el ? (el.textContent || '').trim() : '-';
+      }
+
+      var isCash   = !!(document.getElementById('pfsFlip_financing_cash') && document.getElementById('pfsFlip_financing_cash').checked);
+      var pp       = pfsFlipNum('pfsFlip_purchasePrice');
+      var arv      = pfsFlipNum('pfsFlip_arv');
+      var rehab    = pfsFlipNum('pfsFlip_rehabCost');
+      var months   = parseInt((document.getElementById('pfsFlip_holdMonths') || {}).value, 10) || 0;
+      var rate     = parseFloat((document.getElementById('pfsFlip_loanRate') || {}).value) || 0;
+      var closing  = pfsFlipNum('pfsFlip_closingCosts');
+      var dp       = pfsFlipNum('pfsFlip_downPayment');
+      var monthlyCarry = pfsFlipNum('pfsFlip_monthlyCarry');
+      var sellPct  = parseFloat((document.getElementById('pfsFlip_sellingCostPct') || {}).value) || 0;
+
+      var addr = (property && property.address)
+        ? [property.address, property.city, property.state, property.zip].filter(Boolean).join(', ')
+        : 'Fix & Flip Analysis';
+
+      // Palette
+      var TEAL    = [14, 116, 144];
+      var NAVY    = [15, 23, 42];
+      var MUTED   = [100, 116, 139];
+      var GREEN   = [34, 197, 94];
+      var RED     = [239, 68, 68];
+      var BORDER  = [203, 213, 225];
+      var BAND_BG = [241, 245, 249];
+      var TILE_BG = [248, 250, 252];
+
+      var pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+      var W = pdf.internal.pageSize.getWidth();
+      var H = pdf.internal.pageSize.getHeight();
+      var M = 36;
+      var contentW = W - 2 * M;
+      var y;
+
+      function drawBrandStrip(pageNum, pageTotal) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor.apply(pdf, NAVY);
+        pdf.text('Direct Off Market', M, M);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor.apply(pdf, MUTED);
+        pdf.text(addr, M, M + 12);
+        pdf.text('Page ' + pageNum + ' of ' + pageTotal, W - M, M + 12, { align: 'right' });
+        pdf.setDrawColor.apply(pdf, BORDER);
+        pdf.setLineWidth(0.5);
+        pdf.line(M, M + 18, W - M, M + 18);
+      }
+
+      function drawFooter() {
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(8);
+        pdf.setTextColor.apply(pdf, MUTED);
+        var today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+        pdf.text('Generated ' + today + ' - For informational and illustrative purposes only. Not investment advice.', M, H - 18);
+      }
+
+      y = M + 36;
+
+      // Title
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(20);
+      pdf.setTextColor.apply(pdf, NAVY);
+      pdf.text('Fix & Flip Analysis', M, y);
+      y += 18;
+
+      // KPI tile row
+      function drawKpiRow(items, height, valueSize) {
+        var gap   = 10;
+        var tileW = (contentW - gap * (items.length - 1)) / items.length;
+        items.forEach(function(it, i) {
+          var x = M + i * (tileW + gap);
+          pdf.setDrawColor.apply(pdf, BORDER);
+          pdf.setFillColor.apply(pdf, TILE_BG);
+          pdf.setLineWidth(0.5);
+          pdf.roundedRect(x, y, tileW, height, 6, 6, 'FD');
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(valueSize);
+          var valColor = it.positive ? TEAL : (it.negative ? RED : MUTED);
+          pdf.setTextColor.apply(pdf, valColor);
+          pdf.text(it.value || '-', x + tileW / 2, y + height * 0.55, { align: 'center' });
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor.apply(pdf, MUTED);
+          pdf.text(it.label.toUpperCase(), x + tileW / 2, y + height - 8, { align: 'center' });
+        });
+        y += height + 12;
+      }
+
+      var netProfitVal = kdv('pfsFlip_kpi_netProfit');
+      var annVal       = kdv('pfsFlip_kpi_annualized');
+      var roiVal       = kdv('pfsFlip_kpi_roi');
+      var cocVal       = kdv('pfsFlip_kpi_coc');
+      var netNum       = pfsFlipNum('pfsFlip_arv') - (pfsFlipNum('pfsFlip_purchasePrice') + pfsFlipNum('pfsFlip_rehabCost') + pfsFlipNum('pfsFlip_closingCosts'));
+
+      drawKpiRow([
+        { label: 'Net Profit',         value: netProfitVal, positive: parseFloat(netProfitVal.replace(/[^0-9.-]/g,'')) >= 0 },
+        { label: 'Annualized Return',  value: annVal,       positive: parseFloat(annVal) >= 25, negative: parseFloat(annVal) < 10 && annVal !== '-' },
+        { label: 'ROI',               value: roiVal,       positive: parseFloat(roiVal) >= 20, negative: parseFloat(roiVal) < 10 },
+        { label: 'Cash-on-Cash Return',value: cocVal,       positive: parseFloat(cocVal) >= 20, negative: parseFloat(cocVal) < 10 }
+      ], 60, 18);
+
+      y += 6;
+
+      // Section banner helper
+      function drawSectionBanner(title, estimatedH) {
+        var bottomLimit = H - M - 30;
+        if (estimatedH && (y + estimatedH > bottomLimit)) {
+          pdf.addPage();
+          y = M + 36;
+        }
+        pdf.setFillColor.apply(pdf, BAND_BG);
+        pdf.rect(M, y, contentW, 22, 'F');
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor.apply(pdf, TEAL);
+        pdf.text(title.toUpperCase(), M + 10, y + 15);
+        y += 22;
+      }
+
+      // Data row helper
+      function drawRow(label, value, kind) {
+        var rowH = 18;
+        var isDeduction = kind === 'deduction';
+        var isSum       = kind === 'sum';
+        var isHighlight = kind === 'highlight';
+        if (isHighlight) {
+          pdf.setFillColor(232, 246, 252);
+          pdf.rect(M, y, contentW, rowH, 'F');
+        }
+        pdf.setFont('helvetica', (isSum || isHighlight) ? 'bold' : 'normal');
+        pdf.setFontSize(10);
+        var labelColor = isDeduction ? RED : NAVY;
+        var valueColor = isDeduction ? RED : (isSum || isHighlight ? TEAL : NAVY);
+        var prefix     = isDeduction ? '- ' : (isSum ? '= ' : '');
+        pdf.setTextColor.apply(pdf, labelColor);
+        pdf.text(prefix + label, M + 12, y + 13);
+        pdf.setTextColor.apply(pdf, valueColor);
+        pdf.text(value || '-', W - M - 12, y + 13, { align: 'right' });
+        pdf.setDrawColor.apply(pdf, BORDER);
+        pdf.setLineWidth(0.3);
+        pdf.line(M, y + rowH, W - M, y + rowH);
+        y += rowH;
+      }
+
+      // Project Inputs section
+      drawSectionBanner('Project Inputs', 200);
+      drawRow('Purchase Price',   pfsFlipFc(pp),   'normal');
+      drawRow('After Repair Value (ARV)', pfsFlipFc(arv), 'normal');
+      drawRow('Rehab Cost',       pfsFlipFc(rehab), 'normal');
+      drawRow('Holding Time',     months + ' month' + (months !== 1 ? 's' : ''), 'normal');
+      drawRow('Financing Mode',   isCash ? 'Cash' : 'Financed', 'normal');
+      if (!isCash) {
+        drawRow('Down Payment',         pfsFlipFc(dp),          'normal');
+        drawRow('Loan Interest Rate',   rate.toFixed(2) + '%', 'normal');
+        drawRow('Monthly Carry',        pfsFlipFc(monthlyCarry), 'normal');
+      }
+      drawRow('Closing Costs',     pfsFlipFc(closing), 'normal');
+      drawRow('Selling Costs %',   sellPct.toFixed(1) + '%', 'normal');
+      y += 8;
+
+      // Profit Breakdown section
+      var loanAmt2       = isCash ? 0 : Math.max(0, pp - dp);
+      var mRate2         = rate / 100 / 12;
+      var interestCost2  = (!isCash && mRate2 > 0 && months > 0) ? loanAmt2 * mRate2 * months : 0;
+      var holdingCost2   = monthlyCarry * months;
+      var sellingDollars = arv * (sellPct / 100);
+      var netProfitNum   = arv - (pp + rehab + closing + holdingCost2 + interestCost2 + sellingDollars);
+      var cashInv        = (isCash ? pp : dp) + closing + rehab + holdingCost2 + interestCost2;
+
+      drawSectionBanner('Profit Breakdown', 250);
+      drawRow('After Repair Value (ARV)', pfsFlipFc(arv),          'normal');
+      drawRow('Purchase Price',           pfsFlipFc(pp),           'deduction');
+      drawRow('Rehab Cost',               pfsFlipFc(rehab),        'deduction');
+      drawRow('Closing Costs',            pfsFlipFc(closing),      'deduction');
+      if (!isCash) {
+        drawRow('Total Holding Cost',     pfsFlipFc(holdingCost2),  'deduction');
+        drawRow('Loan Interest Cost',     pfsFlipFc(interestCost2), 'deduction');
+      }
+      drawRow('Selling Costs',            pfsFlipFc(sellingDollars), 'deduction');
+      drawRow('Net Profit',               pfsFlipFc(netProfitNum),   'sum');
+      y += 4;
+      drawRow('Total Cash Invested',      pfsFlipFc(cashInv),        'highlight');
+
+      // Brand strip + footer on every page
+      var pageCount = pdf.internal.getNumberOfPages();
+      for (var p = 1; p <= pageCount; p++) {
+        pdf.setPage(p);
+        drawBrandStrip(p, pageCount);
+        drawFooter();
+      }
+
+      // Save
+      var raw  = 'Fix and Flip Analysis - ' + addr + '.pdf';
+      var safe = raw.replace(/[/\\:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
+      pdf.save(safe);
+    }
+
+
+    // Initialize defaults for new tab subviews
+    function pfsHoldInitDefaults(ls) {
+      ls = ls || {};
+      var pp = listing.asking_price || 0;
+      var ppEl = document.getElementById('pfsHold_purchasePrice');
+      if (ppEl) { var ppDef = pp ? Math.round(pp * 1.2 / 100) * 100 : 0; ppEl.value = ppDef ? ppDef.toLocaleString('en-US') : ''; }
+      var hoa = (function() {
+        var amt = property.hoa_amount || 0;
+        var freq = (property.hoa_frequency || 'monthly').toLowerCase();
+        return (freq === 'annual' || freq === 'yearly') ? Math.round(amt / 12) : amt;
+      })();
+      var fm = [
+        ['pfsHold_downPct', ls.down_payment_pct != null ? ls.down_payment_pct : 25],
+        ['pfsHold_closingCostPct', ls.closing_cost_pct != null ? ls.closing_cost_pct : 0.50],
+        ['pfsHold_loanFeePct', ls.loan_cost_pct != null ? ls.loan_cost_pct : 0.50],
+        ['pfsHold_mortgageRate', ls.mortgage_rate_pct != null ? ls.mortgage_rate_pct : 6.5],
+        ['pfsHold_rentLow', ls.rent_range_low != null ? ls.rent_range_low : 0],
+        ['pfsHold_rentHigh', ls.rent_range_high != null ? ls.rent_range_high : 0],
+        ['pfsHold_otherIncome', ls.other_monthly_income != null ? ls.other_monthly_income : 0],
+        ['pfsHold_propTaxPct', ls.property_tax_pct != null ? ls.property_tax_pct : 1.20],
+        ['pfsHold_insurance', ls.est_insurance_annual != null ? ls.est_insurance_annual : 0],
+        ['pfsHold_pmPct', ls.pm_pct != null ? ls.pm_pct : 8],
+        ['pfsHold_vacancyPct', ls.vacancy_pct != null ? ls.vacancy_pct : 5],
+        ['pfsHold_repairPct', ls.repair_cost_pct != null ? ls.repair_cost_pct : 0.50],
+        ['pfsHold_rentGrowth', ls.rent_appreciation_pct != null ? ls.rent_appreciation_pct : 2],
+        ['pfsHold_expGrowth', ls.expense_increase_pct != null ? ls.expense_increase_pct : 2],
+        ['pfsHold_priceGrowth', ls.price_appreciation_pct != null ? ls.price_appreciation_pct : 3],
+        ['pfsHold_costOfSale', ls.cost_of_sale_pct != null ? ls.cost_of_sale_pct : 6],
+        ['pfsHold_hoaMonthly', hoa]
+      ];
+      fm.forEach(function(p) {
+        var el = document.getElementById(p[0]);
+        if (el && p[1] != null) { if (el.type === 'checkbox') el.checked = !!p[1]; else el.value = p[1]; }
+      });
+      var cashEl = document.getElementById('pfsHold_cashPurchase');
+      if (cashEl) { cashEl.checked = !!(ls.cash_purchase); pfsHoldToggleCash(); }
+      if (ls.loan_type) { var lt = document.getElementById('pfsHold_loanType'); if (lt) lt.value = ls.loan_type; }
+      pfsHoldCalc();
+    }
+
+    function pfsResetHold() {
+      pfsHoldInitDefaults((listing && listing._ls) || {});
+    }
+
+    function pfsFlipInitDefaults(ls) {
+      ls = ls || {};
+      var pp = property.current_market_value || null, arv = property.estimated_arv || null;
+      var rehab = property.estimated_repairs_flip || null, holdMonths = property.estimated_hold_months || null;
+      if (pp) {
+        var ppEl = document.getElementById('pfsFlip_purchasePrice'); if (ppEl) ppEl.value = Math.round(pp).toLocaleString('en-US');
+        var dp = document.getElementById('pfsFlip_downPayment'); if (dp) dp.value = Math.round(pp * 0.25).toLocaleString('en-US');
+        var cl = document.getElementById('pfsFlip_closingCosts'); if (cl) cl.value = Math.round(pp * 0.02).toLocaleString('en-US');
+        var ann = ls.property_tax_pct ? pp * (ls.property_tax_pct / 100) : pp * 0.012;
+        var ins = ls.est_insurance_annual ? Number(ls.est_insurance_annual) : 1200;
+        var flood = ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0;
+        var hoaMo = (property.hoa_amount && (property.hoa_frequency || '').toLowerCase() !== 'annual') ? (property.hoa_amount || 0) : (property.hoa_amount ? Math.round(property.hoa_amount / 12) : 0);
+        var carry = (ann + ins + flood) / 12 + hoaMo; if (!carry || carry < 100) carry = pp * 0.005;
+        var c = document.getElementById('pfsFlip_monthlyCarry'); if (c) c.value = Math.round(carry).toLocaleString('en-US');
+      }
+      if (arv) { var a = document.getElementById('pfsFlip_arv'); if (a) a.value = Math.round(arv).toLocaleString('en-US'); }
+      if (rehab) { var r = document.getElementById('pfsFlip_rehabCost'); if (r) r.value = Math.round(rehab).toLocaleString('en-US'); }
+      var h = document.getElementById('pfsFlip_holdMonths'); if (h) h.value = holdMonths || 6;
+      pfsFlipCalc();
+    }
+
+    function pfsResetFlip() {
+      pfsFlipInitDefaults((listing && listing._ls) || {});
+    }
+
+    function pfsBrrrrNum(id) {
+      var el = document.getElementById(id); if (!el) return 0;
+      return parseFloat(el.value.replace(/,/g, '')) || 0;
+    }
+    function pfsBrrrrFc(n) { return Portal.fc(Math.round(n)); }
+    function pfsBrrrrMonthlyPI(principal, annRate, term) {
+      if (!principal || !annRate) return 0;
+      var r = annRate / 100 / 12;
+      if (term === '10yr_io') return principal * r;
+      var n = term === '15yr_fixed' ? 180 : 360;
+      return principal * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n)-1);
+    }
+    function pfsBrrrrOnPPChange() {
+      var pp = pfsBrrrrNum('pfsBrrrr_purchasePrice'); if (!pp) return;
+      var d = document.getElementById('pfsBrrrr_downPayment'); if (d) d.value = Math.round(pp*0.25).toLocaleString('en-US');
+      var c = document.getElementById('pfsBrrrr_closingCosts'); if (c) c.value = Math.round(pp*0.02).toLocaleString('en-US');
+    }
+    function pfsBrrrrOnARVChange() {
+      var arv = pfsBrrrrNum('pfsBrrrr_arv');
+      var ltv = parseFloat((document.getElementById('pfsBrrrr_refiLTV')||{}).value) || 75;
+      var rc = document.getElementById('pfsBrrrr_refiClosingCosts');
+      if (rc) rc.value = Math.round(arv * ltv/100 * 0.02).toLocaleString('en-US');
+    }
+    function pfsBrrrrSetMode(mode) {
+      var isCash = mode === 'cash';
+      var pc = document.getElementById('pfsBrrrrPillCash'), pf = document.getElementById('pfsBrrrrPillFinanced');
+      if (pc) pc.classList.toggle('active', isCash); if (pf) pf.classList.toggle('active', !isCash);
+      var rc = document.getElementById('pfsBrrrr_financing_cash'), rf = document.getElementById('pfsBrrrr_financing_financed');
+      if (rc) rc.checked = isCash; if (rf) rf.checked = !isCash;
+      var w = document.getElementById('pfsBrrrrFinancingWrap'); if (w) w.classList.toggle('collapsed', isCash);
+      pfsBrrrrCalc();
+    }
+    function pfsBrrrrInitDefaults(ls) {
+      ls = ls || {};
+      var pp = property.current_market_value || null, arv = property.estimated_arv || null;
+      var rehab = property.estimated_repairs_flip || null, months = property.estimated_hold_months || 6;
+      if (pp) {
+        var ppEl = document.getElementById('pfsBrrrr_purchasePrice'); if (ppEl) ppEl.value = Math.round(pp).toLocaleString('en-US');
+        var dp = document.getElementById('pfsBrrrr_downPayment'); if (dp) dp.value = Math.round(pp*0.25).toLocaleString('en-US');
+        var cl = document.getElementById('pfsBrrrr_closingCosts'); if (cl) cl.value = Math.round(pp*0.02).toLocaleString('en-US');
+        var ann = ls.property_tax_pct ? pp*(ls.property_tax_pct/100) : pp*0.012;
+        var ins = ls.est_insurance_annual ? Number(ls.est_insurance_annual) : 1200;
+        var flood = ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0;
+        var hoa2 = (property.hoa_amount && (property.hoa_frequency||'').toLowerCase()!=='annual') ? (property.hoa_amount||0) : (property.hoa_amount ? Math.round(property.hoa_amount/12) : 0);
+        var carry = (ann+ins+flood)/12+hoa2; if (!carry||carry<100) carry=pp*0.005;
+        var ca = document.getElementById('pfsBrrrr_monthlyCarry'); if (ca) ca.value = Math.round(carry).toLocaleString('en-US');
+      }
+      if (arv) {
+        var arvEl = document.getElementById('pfsBrrrr_arv'); if (arvEl) arvEl.value = Math.round(arv).toLocaleString('en-US');
+        var rc = document.getElementById('pfsBrrrr_refiClosingCosts'); if (rc) rc.value = Math.round(arv*0.75*0.02).toLocaleString('en-US');
+      }
+      if (rehab) { var re = document.getElementById('pfsBrrrr_rehabCost'); if (re) re.value = Math.round(rehab).toLocaleString('en-US'); }
+      var m = document.getElementById('pfsBrrrr_monthsToRefi'); if (m) m.value = months;
+      var rentMid = null;
+      if (ls.rent_range_low!=null&&ls.rent_range_high!=null) rentMid=Math.round((Number(ls.rent_range_low)+Number(ls.rent_range_high))/2);
+      else if (ls.rent_range_low!=null) rentMid=Number(ls.rent_range_low);
+      else if (property&&property.estimated_rent) rentMid=Number(property.estimated_rent);
+      if (rentMid) { var rEl=document.getElementById('pfsBrrrr_monthlyRent'); if(rEl) rEl.value=Math.round(rentMid).toLocaleString('en-US'); }
+      var taxAnn=(property&&property.taxes_annual)?property.taxes_annual:(arv?arv*0.012:0);
+      var tEl=document.getElementById('pfsBrrrr_propTax'); if(tEl&&taxAnn) tEl.value=Math.round(taxAnn).toLocaleString('en-US');
+      var insAnn=(ls.est_insurance_annual?Number(ls.est_insurance_annual):0)+(ls.est_flood_insurance_annual?Number(ls.est_flood_insurance_annual):0);
+      var iEl=document.getElementById('pfsBrrrr_insurance'); if(iEl&&insAnn) iEl.value=Math.round(insAnn).toLocaleString('en-US');
+      pfsBrrrrCalc();
+    }
+    function pfsResetBrrrr() {
+      pfsBrrrrInitDefaults((listing && listing._ls) || {});
+    }
+    function pfsBrrrrCalc() {
+      var pp=pfsBrrrrNum('pfsBrrrr_purchasePrice'),arv=pfsBrrrrNum('pfsBrrrr_arv'),rehab=pfsBrrrrNum('pfsBrrrr_rehabCost');
+      var months=parseInt((document.getElementById('pfsBrrrr_monthsToRefi')||{}).value,10)||0;
+      var isCash=!!(document.getElementById('pfsBrrrr_financing_cash')&&document.getElementById('pfsBrrrr_financing_cash').checked);
+      var dp=isCash?pp:pfsBrrrrNum('pfsBrrrr_downPayment');
+      var acqRate=isCash?0:(parseFloat((document.getElementById('pfsBrrrr_acqRate')||{}).value)||0);
+      var closing=pfsBrrrrNum('pfsBrrrr_closingCosts'),carry=isCash?0:pfsBrrrrNum('pfsBrrrr_monthlyCarry');
+      var refiLTV=(parseFloat((document.getElementById('pfsBrrrr_refiLTV')||{}).value)||75)/100;
+      var refiRate=parseFloat((document.getElementById('pfsBrrrr_refiRate')||{}).value)||7.5;
+      var refiClose=pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
+      var refiTerm=(document.getElementById('pfsBrrrr_refiTerm')||{}).value||'30yr_fixed';
+      var rent=pfsBrrrrNum('pfsBrrrr_monthlyRent'),propTax=pfsBrrrrNum('pfsBrrrr_propTax'),insAnn=pfsBrrrrNum('pfsBrrrr_insurance');
+      var hoa=pfsBrrrrNum('pfsBrrrr_hoaMonthly');
+      var vacPct=(parseFloat((document.getElementById('pfsBrrrr_vacancyPct')||{}).value)||0)/100;
+      var pmPct=(parseFloat((document.getElementById('pfsBrrrr_pmPct')||{}).value)||0)/100;
+      var repPct=(parseFloat((document.getElementById('pfsBrrrr_repairsPct')||{}).value)||0)/100;
+      if(!arv){
+        ['pfsBrrrr_kpi_refiOut','pfsBrrrr_kpi_cashLeftIn','pfsBrrrr_kpi_monthlyCF','pfsBrrrr_kpi_coc',
+         'pfsBrrrrbd_totalCashIn','pfsBrrrrbd_refiOut','pfsBrrrrbd_cashLeftIn','pfsBrrrrbd_rent',
+         'pfsBrrrrbd_taxMo','pfsBrrrrbd_insMo','pfsBrrrrbd_hoa','pfsBrrrrbd_vacancy',
+         'pfsBrrrrbd_pm','pfsBrrrrbd_repairs','pfsBrrrrbd_debtService','pfsBrrrrbd_monthlyCF','pfsBrrrrbd_coc'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML='&mdash;';});
+        return;
+      }
+      var loanAmt=isCash?0:Math.max(0,pp-dp);
+      var acqMR=acqRate/100/12;
+      var acqInt=(!isCash&&acqMR>0&&months>0)?loanAmt*acqMR*months:0;
+      var holdCost=carry*months;
+      var totalCashIn=(isCash?pp:dp)+rehab+closing+holdCost+acqInt;
+      var refiLoanAmt=Math.round(arv*refiLTV);
+      if(!refiClose) refiClose=Math.round(refiLoanAmt*0.02);
+      var refiOutCash=refiLoanAmt-refiClose;
+      var cashLeftIn=totalCashIn-refiOutCash;
+      var isInfinite=cashLeftIn<=0;
+      var debtSvc=pfsBrrrrMonthlyPI(refiLoanAmt,refiRate,refiTerm);
+      var taxMo=propTax/12,insMo=insAnn/12;
+      var monthlyCF=rent-taxMo-insMo-hoa-(rent*vacPct)-(rent*pmPct)-(rent*repPct)-debtSvc;
+      var annCF=monthlyCF*12;
+      var coc=isInfinite?null:(cashLeftIn>0?(annCF/cashLeftIn)*100:0);
+      var ro=document.getElementById('pfsBrrrr_kpi_refiOut');
+      if(ro){ro.innerHTML=pfsBrrrrFc(refiOutCash);ro.style.color=refiOutCash>0?'#22c55e':'#94a3b8';}
+      var tile=document.getElementById('pfsBrrrr_tile_cashLeftIn');
+      var cliEl=document.getElementById('pfsBrrrr_kpi_cashLeftIn');
+      var lbl=document.getElementById('pfsBrrrr_kpi_cashLeftIn_label');
+      if(cliEl&&tile){
+        if(isInfinite){
+          tile.classList.add('brrrr-infinite-tile');
+          cliEl.innerHTML=pfsBrrrrFc(cashLeftIn)+'<span class="brrrr-infinite-glyph">&#9854;</span>';
+          cliEl.style.color='#fff';
+          if(lbl)lbl.innerHTML='<span class="brrrr-infinite-caption">All capital recovered.</span>';
+        }else{
+          tile.classList.remove('brrrr-infinite-tile');
+          cliEl.innerHTML=pfsBrrrrFc(cashLeftIn);
+          cliEl.style.color=cashLeftIn<=50000?'#22c55e':'#94a3b8';
+          if(lbl)lbl.innerHTML='Cash Left In <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Total cash in &minus; refi-out. &le;$0 = BRRRR holy grail.</span></span>';
+        }
+      }
+      var cfEl=document.getElementById('pfsBrrrr_kpi_monthlyCF');
+      if(cfEl){cfEl.innerHTML=pfsBrrrrFc(monthlyCF);cfEl.style.color=monthlyCF>=0?'#22c55e':'#ef4444';}
+      var cocEl=document.getElementById('pfsBrrrr_kpi_coc');
+      if(cocEl){
+        if(isInfinite){cocEl.innerHTML='&#9854; INFINITE';cocEl.style.color='#4fc3f7';cocEl.style.fontSize='18px';}
+        else{cocEl.innerHTML=coc!==null?coc.toFixed(1)+'%':'&mdash;';cocEl.style.fontSize='';cocEl.style.color=coc===null?'#94a3b8':(coc>=12?'#22c55e':(coc>=6?'#94a3b8':'#ef4444'));}
+      }
+      function setBD(id,val){var el=document.getElementById(id);if(el)el.textContent=pfsBrrrrFc(val);}
+      setBD('pfsBrrrrbd_totalCashIn',totalCashIn);setBD('pfsBrrrrbd_refiOut',refiOutCash);
+      var bdcli=document.getElementById('pfsBrrrrbd_cashLeftIn');
+      if(bdcli){bdcli.textContent=pfsBrrrrFc(cashLeftIn);bdcli.style.color=cashLeftIn<=0?'#22c55e':'#94a3b8';
+        var lr=bdcli.closest('.pfs-bd-row');if(lr){var ll=lr.querySelector('.pfs-bd-label');if(ll)ll.style.color=cashLeftIn<=0?'#22c55e':'';}
+      }
+      setBD('pfsBrrrrbd_rent',rent);setBD('pfsBrrrrbd_taxMo',taxMo);setBD('pfsBrrrrbd_insMo',insMo);
+      setBD('pfsBrrrrbd_hoa',hoa);setBD('pfsBrrrrbd_vacancy',rent*vacPct);setBD('pfsBrrrrbd_pm',rent*pmPct);
+      setBD('pfsBrrrrbd_repairs',rent*repPct);setBD('pfsBrrrrbd_debtService',debtSvc);
+      var bdmcf=document.getElementById('pfsBrrrrbd_monthlyCF');
+      if(bdmcf){bdmcf.textContent=pfsBrrrrFc(monthlyCF);bdmcf.style.color=monthlyCF>=0?'#22c55e':'#ef4444';
+        var mr=bdmcf.closest('.pfs-bd-row');if(mr){var ml=mr.querySelector('.pfs-bd-label');if(ml)ml.style.color=monthlyCF>=0?'#22c55e':'#ef4444';}
+      }
+      var bdcoc=document.getElementById('pfsBrrrrbd_coc');
+      if(bdcoc){
+        if(isInfinite){bdcoc.innerHTML='&#9854; INFINITE';bdcoc.style.color='#4fc3f7';}
+        else{bdcoc.textContent=coc!==null?coc.toFixed(1)+'%':'—';bdcoc.style.color=coc===null?'#94a3b8':(coc>=12?'#22c55e':(coc>=6?'#94a3b8':'#ef4444'));}
+      }
+    }
+
+    // ── Save functions (isolated per mode) ────────────────────────────────────
+    async function pfsSaveHold() {
+      try {
+        var session=await Portal.getSession();
+        if(!session||!session.user){Portal.toast('Sign in to save your pro forma.','info');return;}
+        var pu=await Portal.supabase.from('portal_users').select('id').eq('user_id',session.user.id).maybeSingle();
+        if(!pu.data||!pu.data.id){Portal.toast('Could not resolve your portal profile.','error');return;}
+        var pid=pu.data.id;
+        var ids=['pfsHold_purchasePrice','pfsHold_closingCostPct','pfsHold_cashPurchase','pfsHold_downPct',
+          'pfsHold_loanFeePct','pfsHold_loanAmount','pfsHold_loanType','pfsHold_mortgageRate',
+          'pfsHold_rentLow','pfsHold_rentHigh','pfsHold_otherIncome','pfsHold_vacancyPct',
+          'pfsHold_propTaxPct','pfsHold_insurance','pfsHold_hoaMonthly','pfsHold_repairPct','pfsHold_pmPct',
+          'pfsHold_rentGrowth','pfsHold_expGrowth','pfsHold_priceGrowth','pfsHold_costOfSale'];
+        var inputs={mode:'hold'};
+        ids.forEach(function(id){var el=document.getElementById(id);if(!el)return;inputs[id]=el.type==='checkbox'?el.checked:el.value;});
+        if(typeof pfsHoldYears!=='undefined') inputs.pfsHoldYears=pfsHoldYears;
+        var addr=(property&&property.address)?property.address:'Pro Forma';
+        var now=new Date();
+        var stamp=now.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+        var res=await Portal.supabase.from('investor_saved_proformas').insert({
+          user_id:pid,listing_id:(listing&&listing.listing_id)?listing.listing_id:null,
+          property_id:(property&&property.id)?property.id:null,
+          name:addr+' - '+stamp,inputs:inputs,outputs:{mode:'hold'},archived:false
+        }).select('id').single();
+        if(res.error){Portal.toast('Could not save pro forma. Try again.','error');return;}
+        Portal.toast('Hold pro forma saved to your dashboard.','success');
+      }catch(e){Portal.toast('Could not save. Try again.','error');}
+    }
+
+    async function pfsSaveFlip() {
+      try {
+        var session=await Portal.getSession();
+        if(!session||!session.user){Portal.toast('Sign in to save your flip analysis.','info');return;}
+        var pu=await Portal.supabase.from('portal_users').select('id').eq('user_id',session.user.id).maybeSingle();
+        if(!pu.data||!pu.data.id){Portal.toast('Could not resolve your portal profile.','error');return;}
+        var pid=pu.data.id;
+        var isCash=!!(document.getElementById('pfsFlip_financing_cash')&&document.getElementById('pfsFlip_financing_cash').checked);
+        var pp=pfsFlipNum('pfsFlip_purchasePrice'),arv=pfsFlipNum('pfsFlip_arv'),rehab=pfsFlipNum('pfsFlip_rehabCost');
+        var months=parseInt((document.getElementById('pfsFlip_holdMonths')||{}).value,10)||0;
+        var dp=isCash?pp:pfsFlipNum('pfsFlip_downPayment');
+        var rate=isCash?0:(parseFloat((document.getElementById('pfsFlip_loanRate')||{}).value)||0);
+        var closing=pfsFlipNum('pfsFlip_closingCosts'),carry=isCash?0:pfsFlipNum('pfsFlip_monthlyCarry');
+        var sellPct=parseFloat((document.getElementById('pfsFlip_sellingCostPct')||{}).value)||0;
+        var loanAmt=isCash?0:Math.max(0,pp-dp);
+        var mr=rate/100/12;
+        var intCost=(!isCash&&mr>0&&months>0)?loanAmt*mr*months:0;
+        var holdCost=carry*months,sellDollars=arv*(sellPct/100);
+        var netProfit=arv-(pp+rehab+closing+holdCost+intCost+sellDollars);
+        var cashInv=(isCash?pp:dp)+closing+rehab+holdCost+intCost;
+        var roi=cashInv>0?(netProfit/cashInv)*100:0;
+        var ann=months>0?roi*(12/months):0;
+        var addr=(property&&property.address)?property.address:'Flip';
+        var now=new Date();
+        var stamp=now.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+        var res=await Portal.supabase.from('investor_saved_proformas').insert({
+          user_id:pid,listing_id:(listing&&listing.listing_id)?listing.listing_id:null,
+          property_id:(property&&property.id)?property.id:null,
+          name:addr+' - Flip - '+stamp,
+          inputs:{mode:'flip',purchase_price:pp,arv:arv,rehab_cost:rehab,hold_months:months,financing:isCash?'cash':'financed',down_payment:dp,loan_rate:rate,closing_costs:closing,monthly_carry:carry,selling_cost_pct:sellPct},
+          outputs:{net_profit:netProfit,annualized_return:ann,roi:roi,cash_on_cash:roi,cash_invested:cashInv},archived:false
+        }).select('id').single();
+        if(res.error){Portal.toast('Could not save flip analysis. Try again.','error');return;}
+        Portal.toast('Flip analysis saved to your dashboard.','success');
+      }catch(e){Portal.toast('Could not save flip analysis. Try again.','error');}
+    }
+
+    async function pfsSaveBrrrr() {
+      try {
+        var session=await Portal.getSession();
+        if(!session||!session.user){Portal.toast('Sign in to save your BRRRR analysis.','info');return;}
+        var pu=await Portal.supabase.from('portal_users').select('id').eq('user_id',session.user.id).maybeSingle();
+        if(!pu.data||!pu.data.id){Portal.toast('Could not resolve your portal profile.','error');return;}
+        var pid=pu.data.id;
+        var isCash=!!(document.getElementById('pfsBrrrr_financing_cash')&&document.getElementById('pfsBrrrr_financing_cash').checked);
+        var pp=pfsBrrrrNum('pfsBrrrr_purchasePrice'),arv=pfsBrrrrNum('pfsBrrrr_arv'),rehab=pfsBrrrrNum('pfsBrrrr_rehabCost');
+        var months=parseInt((document.getElementById('pfsBrrrr_monthsToRefi')||{}).value,10)||0;
+        var dp=isCash?pp:pfsBrrrrNum('pfsBrrrr_downPayment');
+        var acqRate=isCash?0:(parseFloat((document.getElementById('pfsBrrrr_acqRate')||{}).value)||0);
+        var closing=pfsBrrrrNum('pfsBrrrr_closingCosts'),carry=isCash?0:pfsBrrrrNum('pfsBrrrr_monthlyCarry');
+        var refiLTV=(parseFloat((document.getElementById('pfsBrrrr_refiLTV')||{}).value)||75)/100;
+        var refiRate=parseFloat((document.getElementById('pfsBrrrr_refiRate')||{}).value)||7.5;
+        var refiClose=pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
+        var refiTerm=(document.getElementById('pfsBrrrr_refiTerm')||{}).value||'30yr_fixed';
+        var rent=pfsBrrrrNum('pfsBrrrr_monthlyRent'),propTax=pfsBrrrrNum('pfsBrrrr_propTax'),insAnn=pfsBrrrrNum('pfsBrrrr_insurance');
+        var hoa=pfsBrrrrNum('pfsBrrrr_hoaMonthly');
+        var vacPct=parseFloat((document.getElementById('pfsBrrrr_vacancyPct')||{}).value)||0;
+        var pmPct=parseFloat((document.getElementById('pfsBrrrr_pmPct')||{}).value)||0;
+        var repPct=parseFloat((document.getElementById('pfsBrrrr_repairsPct')||{}).value)||0;
+        var refiLoanAmt=Math.round(arv*refiLTV);
+        if(!refiClose)refiClose=Math.round(refiLoanAmt*0.02);
+        var refiOutCash=refiLoanAmt-refiClose;
+        var loanAmt=isCash?0:Math.max(0,pp-dp);
+        var acqR=acqRate/100/12;
+        var acqInt=(!isCash&&acqR>0&&months>0)?loanAmt*acqR*months:0;
+        var holdCost=carry*months,totalCashIn=(isCash?pp:dp)+rehab+closing+holdCost+acqInt;
+        var cashLeftIn=totalCashIn-refiOutCash,isInfinite=cashLeftIn<=0;
+        var debtSvc=pfsBrrrrMonthlyPI(refiLoanAmt,refiRate,refiTerm);
+        var monthlyCF=rent-propTax/12-insAnn/12-hoa-(rent*vacPct/100)-(rent*pmPct/100)-(rent*repPct/100)-debtSvc;
+        var coc=isInfinite?null:(cashLeftIn>0?(monthlyCF*12/cashLeftIn*100):0);
+        var addr=(property&&property.address)?property.address:'BRRRR';
+        var now=new Date();
+        var stamp=now.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+        var res=await Portal.supabase.from('investor_saved_proformas').insert({
+          user_id:pid,listing_id:(listing&&listing.listing_id)?listing.listing_id:null,
+          property_id:(property&&property.id)?property.id:null,
+          name:addr+' - BRRRR - '+stamp,
+          inputs:{mode:'brrrr',purchase_price:pp,arv:arv,rehab_cost:rehab,months_to_refi:months,financing:isCash?'cash':'financed',down_payment:dp,acq_rate:acqRate,closing_costs:closing,monthly_carry:carry,refi_ltv:refiLTV*100,refi_rate:refiRate,refi_closing_costs:refiClose,refi_term:refiTerm,monthly_rent:rent,prop_tax:propTax,insurance:insAnn,hoa_monthly:hoa,vacancy_pct:vacPct,pm_pct:pmPct,repairs_pct:repPct},
+          outputs:{refi_out_cash:refiOutCash,cash_left_in:cashLeftIn,post_refi_monthly_cf:monthlyCF,post_refi_coc:coc,is_infinite_return:isInfinite},
+          archived:false
+        }).select('id').single();
+        if(res.error){Portal.toast('Could not save BRRRR analysis. Try again.','error');return;}
+        Portal.toast('BRRRR analysis saved to your dashboard.','success');
+      }catch(e){Portal.toast('Could not save BRRRR analysis. Try again.','error');}
+    }
+
+    // ── PDF functions (isolated per mode) ────────────────────────────────────
+    async function pfsGenerateHoldPDF() {
+      var { jsPDF } = window.jspdf;
+      function dv(id) { var el=document.getElementById(id); return el?(el.textContent||'').trim():'-'; }
+      var addr=(property&&property.address)?[property.address,property.city,property.state,property.zip].filter(Boolean).join(', '):'Pro Forma';
+      var TEAL=[14,116,144],NAVY=[15,23,42],MUTED=[100,116,139],RED=[220,38,38],BORDER=[203,213,225],BAND_BG=[241,245,249],TILE_BG=[248,250,252];
+      var pdf=new jsPDF({unit:'pt',format:'letter',orientation:'portrait'});
+      var W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),M=36,cW=W-2*M,y;
+      function dBrand(pg,tot){pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,NAVY);pdf.text('Direct Off Market',M,M);pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,MUTED);pdf.text(addr,M,M+12);pdf.text('Page '+pg+' of '+tot,W-M,M+12,{align:'right'});pdf.setDrawColor.apply(pdf,BORDER);pdf.setLineWidth(0.5);pdf.line(M,M+18,W-M,M+18);}
+      function dFoot(){pdf.setFont('helvetica','italic');pdf.setFontSize(8);pdf.setTextColor.apply(pdf,MUTED);pdf.text('Generated '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+' - For informational purposes only.',M,H-18);}
+      y=M+36;
+      pdf.setFont('helvetica','bold');pdf.setFontSize(20);pdf.setTextColor.apply(pdf,NAVY);pdf.text('Investment Pro Forma (Hold)',M,y);y+=18;
+      function dKpiRow(items,h,vs){var gap=10,tw=(cW-gap*(items.length-1))/items.length;items.forEach(function(it,i){var x=M+i*(tw+gap);pdf.setDrawColor.apply(pdf,BORDER);pdf.setFillColor.apply(pdf,TILE_BG);pdf.setLineWidth(0.5);pdf.roundedRect(x,y,tw,h,6,6,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(vs);pdf.setTextColor.apply(pdf,TEAL);pdf.text(it.v||'-',x+tw/2,y+h*0.55,{align:'center'});pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,MUTED);pdf.text(it.l.toUpperCase(),x+tw/2,y+h-8,{align:'center'});});y+=h+12;}
+      dKpiRow([{l:'Cap Rate',v:dv('pfsHold_kpi_capRate')},{l:'Cash-on-Cash',v:dv('pfsHold_kpi_coc')},{l:'DSCR',v:dv('pfsHold_kpi_dscr')}],60,20);
+      dKpiRow([{l:'Day 1 Equity',v:dv('pfsHold_kpi_day1equity')},{l:'Monthly CF (Yr1)',v:dv('pfsHold_kpi_monthlyCF')},{l:'Annual CF',v:dv('pfsHold_kpi_annualCF')}],48,15);
+      y+=6;
+      function dBanner(title,est){var bot=H-M-30;if(est&&y+est>bot){pdf.addPage();y=M+36;}pdf.setFillColor.apply(pdf,BAND_BG);pdf.rect(M,y,cW,22,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,TEAL);pdf.text(title.toUpperCase(),M+10,y+15);y+=22;}
+      function dRow(lbl,val,kind){var rH=18,isDed=kind==='deduction',isSum=kind==='sum',isHl=kind==='highlight';if(isHl){pdf.setFillColor(232,246,252);pdf.rect(M,y,cW,rH,'F');}pdf.setFont('helvetica',(isSum||isHl)?'bold':'normal');pdf.setFontSize(10);var lc=isDed?RED:NAVY,vc=isDed?RED:(isSum||isHl?TEAL:NAVY),pf2=isDed?'- ':(isSum?'= ':'');pdf.setTextColor.apply(pdf,lc);pdf.text(pf2+lbl,M+12,y+13);pdf.setTextColor.apply(pdf,vc);pdf.text(val||'-',W-M-12,y+13,{align:'right'});pdf.setDrawColor.apply(pdf,BORDER);pdf.setLineWidth(0.3);pdf.line(M,y+rH,W-M,y+rH);y+=rH;}
+      dBanner('Acquisition Summary',160);
+      dRow('Purchase Price',dv('pfsHold_r2_purchasePrice'),'normal');dRow('Closing Costs',dv('pfsHold_r2_closingCosts'),'normal');dRow('Loan Fees',dv('pfsHold_r2_loanFees'),'normal');dRow('Total Acquisition Cost',dv('pfsHold_r2_totalAcqCost'),'sum');dRow('Down Payment',dv('pfsHold_r2_downPayment'),'normal');dRow('Initial Investment',dv('pfsHold_r2_initialInvestment'),'sum');dRow('Day 1 Equity',dv('pfsHold_r2_day1Equity'),'highlight');y+=8;
+      dBanner('Annual Income & Expenses',250);
+      dRow('Gross Rental Income',dv('pfsHold_r2_grossIncome'),'normal');dRow('Vacancy Loss',dv('pfsHold_r2_vacancyLoss'),'deduction');dRow('Effective Gross Income',dv('pfsHold_r2_egi'),'sum');dRow('Property Tax',dv('pfsHold_r2_propTax'),'deduction');dRow('Insurance',dv('pfsHold_r2_insurance'),'deduction');dRow('HOA',dv('pfsHold_r2_hoa'),'deduction');dRow('Repair & Maint.',dv('pfsHold_r2_repairs'),'deduction');dRow('Property Mgmt',dv('pfsHold_r2_pm'),'deduction');dRow('Net Operating Income',dv('pfsHold_r2_noi'),'sum');dRow('Annual Debt Service',dv('pfsHold_r2_debtService'),'deduction');dRow('Annual Cash Flow',dv('pfsHold_r2_annualCF'),'sum');dRow('Monthly Cash Flow',dv('pfsHold_r2_monthlyCF'),'highlight');y+=8;
+      var pc=pdf.internal.getNumberOfPages();for(var p=1;p<=pc;p++){pdf.setPage(p);dBrand(p,pc);dFoot();}
+      var safe=('Pro Forma - '+addr+'.pdf').replace(/[/\\:*?"<>|]/g,'-').replace(/\s+/g,' ').trim();
+      pdf.save(safe);
+    }
+
+    async function pfsGenerateFlipPDF() {
+      var { jsPDF } = window.jspdf;
+      var isCash=!!(document.getElementById('pfsFlip_financing_cash')&&document.getElementById('pfsFlip_financing_cash').checked);
+      var pp=pfsFlipNum('pfsFlip_purchasePrice'),arv=pfsFlipNum('pfsFlip_arv'),rehab=pfsFlipNum('pfsFlip_rehabCost');
+      var months=parseInt((document.getElementById('pfsFlip_holdMonths')||{}).value,10)||0;
+      var dp=pfsFlipNum('pfsFlip_downPayment'),rate=isCash?0:(parseFloat((document.getElementById('pfsFlip_loanRate')||{}).value)||0);
+      var closing=pfsFlipNum('pfsFlip_closingCosts'),carry=isCash?0:pfsFlipNum('pfsFlip_monthlyCarry');
+      var sellPct=parseFloat((document.getElementById('pfsFlip_sellingCostPct')||{}).value)||0;
+      var addr=(property&&property.address)?[property.address,property.city,property.state,property.zip].filter(Boolean).join(', '):'Flip Analysis';
+      var TEAL=[14,116,144],NAVY=[15,23,42],MUTED=[100,116,139],RED=[239,68,68],BORDER=[203,213,225],BAND_BG=[241,245,249],TILE_BG=[248,250,252];
+      var pdf=new jsPDF({unit:'pt',format:'letter',orientation:'portrait'});
+      var W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),M=36,cW=W-2*M,y;
+      function dBrand(pg,tot){pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,NAVY);pdf.text('Direct Off Market',M,M);pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,MUTED);pdf.text(addr,M,M+12);pdf.text('Page '+pg+' of '+tot,W-M,M+12,{align:'right'});pdf.setDrawColor.apply(pdf,BORDER);pdf.setLineWidth(0.5);pdf.line(M,M+18,W-M,M+18);}
+      function dFoot(){pdf.setFont('helvetica','italic');pdf.setFontSize(8);pdf.setTextColor.apply(pdf,MUTED);pdf.text('Generated '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+' - For informational purposes only.',M,H-18);}
+      y=M+36;pdf.setFont('helvetica','bold');pdf.setFontSize(20);pdf.setTextColor.apply(pdf,NAVY);pdf.text('Fix & Flip Analysis',M,y);y+=18;
+      var loanAmt=isCash?0:Math.max(0,pp-dp);var mr=rate/100/12;var intCost=(!isCash&&mr>0&&months>0)?loanAmt*mr*months:0;
+      var holdCost=carry*months;var sellDollars=arv*(sellPct/100);var netProfit=arv-(pp+rehab+closing+holdCost+intCost+sellDollars);
+      var cashInv=(isCash?pp:dp)+closing+rehab+holdCost+intCost;var roi=cashInv>0?(netProfit/cashInv)*100:0;var ann=months>0?roi*(12/months):0;
+      function fc2(n){return Portal.fc(Math.round(n));}
+      function dKpiRow(items,h,vs){var gap=10,tw=(cW-gap*(items.length-1))/items.length;items.forEach(function(it,i){var x=M+i*(tw+gap);pdf.setDrawColor.apply(pdf,BORDER);pdf.setFillColor.apply(pdf,TILE_BG);pdf.setLineWidth(0.5);pdf.roundedRect(x,y,tw,h,6,6,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(vs);pdf.setTextColor.apply(pdf,TEAL);pdf.text(it.v||'-',x+tw/2,y+h*0.55,{align:'center'});pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,MUTED);pdf.text(it.l.toUpperCase(),x+tw/2,y+h-8,{align:'center'});});y+=h+12;}
+      dKpiRow([{l:'Net Profit',v:fc2(netProfit)},{l:'Annualized Return',v:ann.toFixed(1)+'%'},{l:'ROI',v:roi.toFixed(1)+'%'},{l:'Cash-on-Cash',v:roi.toFixed(1)+'%'}],60,16);y+=6;
+      function dBanner(t,est){var bot=H-M-30;if(est&&y+est>bot){pdf.addPage();y=M+36;}pdf.setFillColor.apply(pdf,BAND_BG);pdf.rect(M,y,cW,22,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,TEAL);pdf.text(t.toUpperCase(),M+10,y+15);y+=22;}
+      function dRow(lbl,val,kind){var rH=18,isDed=kind==='deduction',isSum=kind==='sum',isHl=kind==='highlight';if(isHl){pdf.setFillColor(232,246,252);pdf.rect(M,y,cW,rH,'F');}pdf.setFont('helvetica',(isSum||isHl)?'bold':'normal');pdf.setFontSize(10);var lc=isDed?RED:NAVY,vc=isDed?RED:(isSum||isHl?TEAL:NAVY),pr=isDed?'- ':(isSum?'= ':'');pdf.setTextColor.apply(pdf,lc);pdf.text(pr+lbl,M+12,y+13);pdf.setTextColor.apply(pdf,vc);pdf.text(val||'-',W-M-12,y+13,{align:'right'});pdf.setDrawColor.apply(pdf,BORDER);pdf.setLineWidth(0.3);pdf.line(M,y+rH,W-M,y+rH);y+=rH;}
+      dBanner('Project Inputs',180);dRow('Purchase Price',fc2(pp),'normal');dRow('After Repair Value (ARV)',fc2(arv),'normal');dRow('Rehab Cost',fc2(rehab),'normal');dRow('Holding Time',months+' months','normal');dRow('Financing',isCash?'Cash':'Financed','normal');if(!isCash){dRow('Down Payment',fc2(dp),'normal');dRow('Loan Rate',rate.toFixed(2)+'%','normal');}dRow('Closing Costs',fc2(closing),'normal');dRow('Selling Costs %',sellPct.toFixed(1)+'%','normal');y+=8;
+      dBanner('Profit Breakdown',180);dRow('After Repair Value',fc2(arv),'normal');dRow('Purchase Price',fc2(pp),'deduction');dRow('Rehab Cost',fc2(rehab),'deduction');dRow('Closing Costs',fc2(closing),'deduction');if(!isCash){dRow('Holding Cost',fc2(holdCost),'deduction');dRow('Interest Cost',fc2(intCost),'deduction');}dRow('Selling Costs',fc2(sellDollars),'deduction');dRow('Net Profit',fc2(netProfit),'sum');y+=4;dRow('Total Cash Invested',fc2(cashInv),'highlight');
+      var pc=pdf.internal.getNumberOfPages();for(var p=1;p<=pc;p++){pdf.setPage(p);dBrand(p,pc);dFoot();}
+      var safe=('Fix and Flip Analysis - '+addr+'.pdf').replace(/[/\\:*?"<>|]/g,'-').replace(/\s+/g,' ').trim();
+      pdf.save(safe);
+    }
+
+    async function pfsGenerateBrrrrPDF() {
+      var { jsPDF } = window.jspdf;
+      var isCash=!!(document.getElementById('pfsBrrrr_financing_cash')&&document.getElementById('pfsBrrrr_financing_cash').checked);
+      var pp=pfsBrrrrNum('pfsBrrrr_purchasePrice'),arv=pfsBrrrrNum('pfsBrrrr_arv'),rehab=pfsBrrrrNum('pfsBrrrr_rehabCost');
+      var months=parseInt((document.getElementById('pfsBrrrr_monthsToRefi')||{}).value,10)||0;
+      var dp=isCash?pp:pfsBrrrrNum('pfsBrrrr_downPayment');
+      var acqRate=isCash?0:(parseFloat((document.getElementById('pfsBrrrr_acqRate')||{}).value)||0);
+      var closing=pfsBrrrrNum('pfsBrrrr_closingCosts'),carry=isCash?0:pfsBrrrrNum('pfsBrrrr_monthlyCarry');
+      var refiLTV=(parseFloat((document.getElementById('pfsBrrrr_refiLTV')||{}).value)||75)/100;
+      var refiRate=parseFloat((document.getElementById('pfsBrrrr_refiRate')||{}).value)||7.5;
+      var refiClose=pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
+      var refiTerm=(document.getElementById('pfsBrrrr_refiTerm')||{}).value||'30yr_fixed';
+      var rent=pfsBrrrrNum('pfsBrrrr_monthlyRent'),propTax=pfsBrrrrNum('pfsBrrrr_propTax'),insAnn=pfsBrrrrNum('pfsBrrrr_insurance');
+      var hoa=pfsBrrrrNum('pfsBrrrr_hoaMonthly');
+      var vacPct=parseFloat((document.getElementById('pfsBrrrr_vacancyPct')||{}).value)||0;
+      var pmPct=parseFloat((document.getElementById('pfsBrrrr_pmPct')||{}).value)||0;
+      var repPct=parseFloat((document.getElementById('pfsBrrrr_repairsPct')||{}).value)||0;
+      var refiLoanAmt=Math.round(arv*refiLTV);if(!refiClose)refiClose=Math.round(refiLoanAmt*0.02);
+      var refiOutCash=refiLoanAmt-refiClose;
+      var loanAmt=isCash?0:Math.max(0,pp-dp);var acqR=acqRate/100/12;
+      var acqInt=(!isCash&&acqR>0&&months>0)?loanAmt*acqR*months:0;
+      var holdCost=carry*months,totalCashIn=(isCash?pp:dp)+rehab+closing+holdCost+acqInt;
+      var cashLeftIn=totalCashIn-refiOutCash,isInfinite=cashLeftIn<=0;
+      var debtSvc=pfsBrrrrMonthlyPI(refiLoanAmt,refiRate,refiTerm);
+      var monthlyCF=rent-propTax/12-insAnn/12-hoa-(rent*vacPct/100)-(rent*pmPct/100)-(rent*repPct/100)-debtSvc;
+      var coc=isInfinite?null:(cashLeftIn>0?(monthlyCF*12/cashLeftIn*100):0);
+      var addr=(property&&property.address)?[property.address,property.city,property.state,property.zip].filter(Boolean).join(', '):'BRRRR Analysis';
+      var TEAL=[14,116,144],NAVY=[15,23,42],MUTED=[100,116,139],RED=[239,68,68],BORDER=[203,213,225],BAND_BG=[241,245,249],TILE_BG=[248,250,252];
+      var pdf=new jsPDF({unit:'pt',format:'letter',orientation:'portrait'});
+      var W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight(),M=36,cW=W-2*M,y;
+      function dBrand(pg,tot){pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,NAVY);pdf.text('Direct Off Market',M,M);pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,MUTED);pdf.text(addr,M,M+12);pdf.text('Page '+pg+' of '+tot,W-M,M+12,{align:'right'});pdf.setDrawColor.apply(pdf,BORDER);pdf.setLineWidth(0.5);pdf.line(M,M+18,W-M,M+18);}
+      function dFoot(){pdf.setFont('helvetica','italic');pdf.setFontSize(8);pdf.setTextColor.apply(pdf,MUTED);pdf.text('Generated '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+' - For informational purposes only.',M,H-18);}
+      y=M+36;pdf.setFont('helvetica','bold');pdf.setFontSize(20);pdf.setTextColor.apply(pdf,NAVY);pdf.text('BRRRR Analysis',M,y);y+=18;
+      if(isInfinite){y+=6;pdf.setFillColor.apply(pdf,TEAL);pdf.roundedRect(M,y,cW,32,6,6,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor(255,255,255);pdf.text('INFINITE RETURN - All capital recovered. Every dollar of rent is pure return.',M+12,y+13);pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.text('Cash Left In: '+pfsBrrrrFc(cashLeftIn),M+12,y+25);y+=44;}
+      function dKpiRow(items,h,vs){var gap=10,tw=(cW-gap*(items.length-1))/items.length;items.forEach(function(it,i){var x=M+i*(tw+gap);pdf.setDrawColor.apply(pdf,BORDER);pdf.setFillColor.apply(pdf,TILE_BG);pdf.setLineWidth(0.5);pdf.roundedRect(x,y,tw,h,6,6,'FD');pdf.setFont('helvetica','bold');pdf.setFontSize(vs);pdf.setTextColor.apply(pdf,it.neg?RED:TEAL);pdf.text(it.v||'-',x+tw/2,y+h*0.55,{align:'center'});pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor.apply(pdf,MUTED);pdf.text(it.l.toUpperCase(),x+tw/2,y+h-8,{align:'center'});});y+=h+12;}
+      var cocDisp=isInfinite?'INFINITE':(coc!==null?coc.toFixed(1)+'%':'-');
+      dKpiRow([{l:'Refi-Out Cash',v:pfsBrrrrFc(refiOutCash)},{l:'Cash Left In',v:pfsBrrrrFc(cashLeftIn),neg:cashLeftIn>0},{l:'Post-Refi Monthly CF',v:pfsBrrrrFc(monthlyCF),neg:monthlyCF<0},{l:'Post-Refi CoC',v:cocDisp,neg:!isInfinite&&coc!==null&&coc<6}],60,16);y+=6;
+      function dBanner(t,est){var bot=H-M-30;if(est&&y+est>bot){pdf.addPage();y=M+36;}pdf.setFillColor.apply(pdf,BAND_BG);pdf.rect(M,y,cW,22,'F');pdf.setFont('helvetica','bold');pdf.setFontSize(11);pdf.setTextColor.apply(pdf,TEAL);pdf.text(t.toUpperCase(),M+10,y+15);y+=22;}
+      function dRow(lbl,val,kind){var rH=18,isDed=kind==='deduction',isSum=kind==='sum',isHl=kind==='highlight';if(isHl){pdf.setFillColor(232,246,252);pdf.rect(M,y,cW,rH,'F');}pdf.setFont('helvetica',(isSum||isHl)?'bold':'normal');pdf.setFontSize(10);var lc=isDed?RED:NAVY,vc=isDed?RED:(isSum||isHl?TEAL:NAVY),pr=isDed?'- ':(isSum?'= ':'');pdf.setTextColor.apply(pdf,lc);pdf.text(pr+lbl,M+12,y+13);pdf.setTextColor.apply(pdf,vc);pdf.text(val||'-',W-M-12,y+13,{align:'right'});pdf.setDrawColor.apply(pdf,BORDER);pdf.setLineWidth(0.3);pdf.line(M,y+rH,W-M,y+rH);y+=rH;}
+      dBanner('Project Inputs',200);dRow('Purchase Price',pfsBrrrrFc(pp),'normal');dRow('ARV',pfsBrrrrFc(arv),'normal');dRow('Rehab',pfsBrrrrFc(rehab),'normal');dRow('Months to Refi',months+'','normal');dRow('Financing',isCash?'Cash':'Financed','normal');if(!isCash){dRow('Down Payment',pfsBrrrrFc(dp),'normal');dRow('Acq. Rate',acqRate.toFixed(2)+'%','normal');}dRow('Closing Costs',pfsBrrrrFc(closing),'normal');dRow('Refi LTV',(refiLTV*100).toFixed(0)+'%','normal');dRow('Refi Rate',refiRate.toFixed(2)+'%','normal');dRow('Refi Loan',pfsBrrrrFc(refiLoanAmt),'normal');y+=8;
+      dBanner('Cash Recovery',100);dRow('Total Cash In',pfsBrrrrFc(totalCashIn),'normal');dRow('Refi-Out Cash',pfsBrrrrFc(refiOutCash),'deduction');dRow('Cash Left In',pfsBrrrrFc(cashLeftIn),cashLeftIn<=0?'sum':'highlight');y+=8;
+      dBanner('Post-Refi Monthly Operating',200);dRow('Rent',pfsBrrrrFc(rent),'normal');dRow('Tax/12',pfsBrrrrFc(propTax/12),'deduction');dRow('Insurance/12',pfsBrrrrFc(insAnn/12),'deduction');dRow('HOA',pfsBrrrrFc(hoa),'deduction');dRow('Vacancy',pfsBrrrrFc(rent*vacPct/100),'deduction');dRow('PM',pfsBrrrrFc(rent*pmPct/100),'deduction');dRow('Repairs',pfsBrrrrFc(rent*repPct/100),'deduction');dRow('Debt Service',pfsBrrrrFc(debtSvc),'deduction');dRow('Monthly CF',pfsBrrrrFc(monthlyCF),monthlyCF>=0?'sum':'highlight');y+=6;dRow('Post-Refi CoC',cocDisp,'highlight');
+      var pc=pdf.internal.getNumberOfPages();for(var p=1;p<=pc;p++){pdf.setPage(p);dBrand(p,pc);dFoot();}
+      var safe=('BRRRR Analysis - '+addr+'.pdf').replace(/[/\\:*?"<>|]/g,'-').replace(/\s+/g,' ').trim();
+      pdf.save(safe);
+    }
+
+    // ── Init call from renderProForma ─────────────────────────────────────────
+    // pfsHoldInitDefaults(ls), pfsFlipInitDefaults(ls), pfsBrrrrInitDefaults(ls)
+    // called after renderProForma fetches ls
+
+    // ===== END PRO FORMAS NEW TAB JS =====
 
     function renderPropertyDetails() {
       function fv(v) { return (v != null && v !== '' && v !== false && v !== 'false') ? String(v) : null; }
