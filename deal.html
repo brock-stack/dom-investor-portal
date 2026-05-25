@@ -817,7 +817,7 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.35);
     }
     .proformas-mode-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
-    .proformas-mode-pill { padding:8px 22px; border:none; background:var(--surface); color:var(--text-muted); font-size:14px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; white-space:nowrap; }
+    .proformas-mode-pill { padding:14px 32px; border:none; background:var(--surface); color:var(--text-muted); font-size:16px; font-weight:700; letter-spacing:0.02em; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; white-space:nowrap; }
     .proformas-mode-pill:hover { background:var(--surface-2); color:var(--text); }
     .proformas-mode-pill.active { background:#4fc3f7; color:#0f172a; }
     .proformas-subview { display:none; }
@@ -1213,8 +1213,8 @@
       </div>
 
 
-      <!-- Header -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;" class="pf-print-hide">
+      <!-- Header hidden in Pro Formas tab; buttons are in the single bottom row -->
+      <div style="display:none;" class="pf-print-hide">
         <div>
           <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">Investment Pro Forma</h2>
           <p style="color:var(--text-muted);font-size:14px;">Edit the highlighted fields to run your own numbers.</p>
@@ -1744,8 +1744,10 @@
 
       <!-- Section 4: Actions + Disclaimer -->
       <div style="display:flex;gap:8px;margin-bottom:16px;" class="pf-print-hide">
-        <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;" title="Download a PDF of this pro forma"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
-        <button class="btn-outline-heavy" onclick="pfSave()" title="Save this pro forma to your dashboard">Save Pro Forma</button>
+        <button class="btn-outline-heavy" onclick="pfPrint()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
+        <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+        <button class="btn-outline-heavy" onclick="pfReset()">&#8635; Reset Defaults</button>
+        <button class="btn-outline-heavy" onclick="pfSave()">Save Pro Forma</button>
       </div>
       <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:16px;line-height:1.7;">
         This pro forma is for informational and illustrative purposes only and should not be relied upon as a guarantee, representation, or warranty of future performance or results. The projections, assumptions, and estimates included in this pro forma are based on current market conditions and other factors that may change in the future, which could affect the accuracy of the projections. Actual results may vary significantly from the projections, and there is no assurance that the investment will achieve the returns projected in this pro forma. The investment involves various risks and uncertainties that may affect the outcome of the investment. Before making any investment decisions, it is important to consult with a professional financial advisor and conduct thorough due diligence. This pro forma does not constitute an offer to sell or a solicitation of an offer to buy any securities or interests in real estate investments.<br><br>
@@ -1763,18 +1765,7 @@
       </div>
 
 
-      <!-- Title + action buttons (top bar) -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-        <div>
-          <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">Fix &amp; Flip Calculator</h2>
-          <p style="color:var(--text-muted);font-size:14px;">Model your flip scenario. Inputs prefill from property data — edit to run your own numbers.</p>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
-          <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
-          <button class="btn-outline-heavy" onclick="pfSave()" title="Save this flip analysis to your dashboard">Save Pro Forma</button>
-        </div>
-      </div>
+ 
 
       <!-- KPI Tile Row -->
       <div class="flip-kpi-row">
@@ -1927,11 +1918,12 @@
         </div>
       </div>
 
-      <!-- Bottom action row -->
+      <!-- Flip button row: Print | PDF | Reset | Save -->
       <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <button class="btn-outline-heavy" onclick="window.print()" title="Print"><span style="font-size:18px;">&#128424;</span> Print</button>
-        <button class="btn-primary" onclick="pfDownloadPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
-        <button class="btn-outline-heavy" onclick="pfSave()">Save Pro Forma</button>
+        <button class="btn-primary" onclick="pfGenerateFlipPDF()" style="font-size:14px;font-weight:700;padding:10px 18px;display:inline-flex;align-items:center;gap:8px;"><span style="font-size:16px;">&#128229;</span> Download PDF</button>
+        <button class="btn-outline-heavy" onclick="pfsResetFlip()">&#8635; Reset Defaults</button>
+        <button class="btn-outline-heavy" onclick="pfSaveFlip()">Save Pro Forma</button>
       </div>
       <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:16px;margin-top:8px;line-height:1.7;">This calculator is for informational and illustrative purposes only. Projections are estimates based on inputs provided and do not constitute investment advice. Consult a qualified financial advisor before making investment decisions.</div>
 
@@ -5135,6 +5127,9 @@
       var insAnn = (ls.est_insurance_annual ? Number(ls.est_insurance_annual) : 0) + (ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0);
       var iEl = document.getElementById('pfsBrrrr_insurance'); if (iEl && insAnn) iEl.value = Math.round(insAnn).toLocaleString('en-US');
       pfsBrrrrCalc();
+    }
+    function pfsResetFlip() {
+      flipInitDefaults((listing && listing._ls) || {});
     }
     function pfsResetBrrrr() {
       pfsBrrrrInitDefaults((listing && listing._ls) || {});
