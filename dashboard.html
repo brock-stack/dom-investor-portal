@@ -1507,10 +1507,22 @@
     async function loadProformas() {
       var container = document.getElementById('proformasContainer');
       try {
+        // portalUser.id is portal_users.id (what save handlers write);
+        // session.user.id is the auth UUID (different — this was the bug).
+        var pfUserId = portalUser && portalUser.id ? portalUser.id : null;
+        if (!pfUserId) {
+          // portalUser not yet resolved — fall back to resolving it now
+          var puRes = await Portal.supabase.from('portal_users').select('id').eq('user_id', session.user.id).maybeSingle();
+          pfUserId = puRes.data && puRes.data.id ? puRes.data.id : null;
+        }
+        if (!pfUserId) {
+          container.innerHTML = '<div class="empty-state-inline">No saved pro formas yet. Open any deal and run the pro forma calculator to save it here.</div>';
+          return;
+        }
         var result = await Portal.supabase
           .from('investor_saved_proformas')
           .select('id, name, created_at, listing_id, inputs, outputs')
-          .eq('user_id', session.user.id)
+          .eq('user_id', pfUserId)
           .order('created_at', { ascending: false });
         if (result.error) throw result.error;
         var rows = result.data || [];
