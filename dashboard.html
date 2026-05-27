@@ -1549,7 +1549,9 @@
           var isInf = out2.is_infinite_return === true;
           var pfMode = (mode === 'flip' || mode === 'brrrr') ? mode : 'hold';
           var portalListingId = plMap[row.listing_id] || null;
-          var viewLink = portalListingId ? '/deal.html?id=' + portalListingId + '&tab=proforma&mode=' + pfMode + '&sp_id=' + row.id : '#';
+          var viewLink = portalListingId
+            ? '/deal.html?id=' + portalListingId + '&tab=proforma&mode=' + pfMode + '&sp_id=' + row.id + '&view_pdf=1'
+            : '#';
           var dispName = (row.name || '-') + (isInf ? ' <span title="Infinite Return">&#9854;</span>' : '');
           html += '<tr>' +
             '<td>' + badge + '</td>' +
