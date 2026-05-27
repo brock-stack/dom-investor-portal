@@ -1525,6 +1525,13 @@
           .order('created_at', { ascending: false });
         if (result.error) throw result.error;
         var rows = result.data || [];
+        // Look up portal_listings.id for each row's listing_id (the CRM listings.id stored in the saved row)
+        var plMap = {}; // crmListingId -> portal_listings.id
+        var crmListingIds = Array.from(new Set(rows.map(function(r){ return r.listing_id; }).filter(Boolean)));
+        if (crmListingIds.length) {
+          var plRes = await Portal.supabase.from('portal_listings').select('id, listing_id').in('listing_id', crmListingIds);
+          (plRes.data || []).forEach(function(pl){ plMap[pl.listing_id] = pl.id; });
+        }
         if (rows.length === 0) {
           container.innerHTML = '<div class="empty-state-inline">No saved pro formas yet. Open any deal and run the pro forma calculator to save it here.</div>';
           return;
@@ -1541,7 +1548,8 @@
             : '<span style="background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;">&#127968; Hold</span>';
           var isInf = out2.is_infinite_return === true;
           var pfMode = (mode === 'flip' || mode === 'brrrr') ? mode : 'hold';
-          var viewLink = row.listing_id ? '/deal.html?id=' + row.listing_id + '&tab=proforma&mode=' + pfMode : '#';
+          var portalListingId = plMap[row.listing_id] || null;
+          var viewLink = portalListingId ? '/deal.html?id=' + portalListingId + '&tab=proforma&mode=' + pfMode + '&sp_id=' + row.id : '#';
           var dispName = (row.name || '-') + (isInf ? ' <span title="Infinite Return">&#9854;</span>' : '');
           html += '<tr>' +
             '<td>' + badge + '</td>' +
