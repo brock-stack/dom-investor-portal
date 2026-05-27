@@ -3144,7 +3144,14 @@
         var data = await resp.json();
         if (data && data.rate30) {
           var r = parseFloat(data.rate30);
-          if (isFinite(r) && r > 0 && r < 20) _liveMortgageRate = r;
+          if (isFinite(r) && r > 0 && r < 20) {
+            _liveMortgageRate = r;
+            // Update fields that still hold the static default (not manually changed)
+            var mrEl = document.getElementById('pf2_mortgageRate');
+            if (mrEl && mrEl.dataset.manual !== '1') { mrEl.value = r; if (typeof pfCalc === 'function') pfCalc(); }
+            var rrEl = document.getElementById('pfsBrrrr_refiRate');
+            if (rrEl && rrEl.dataset.manual !== '1') { rrEl.value = r; if (typeof pfsBrrrrCalc === 'function') pfsBrrrrCalc(); }
+          }
         }
       } catch(e) { /* silent fallback to 6.5 */ }
     })();
