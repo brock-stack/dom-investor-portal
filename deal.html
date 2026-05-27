@@ -1976,8 +1976,11 @@
           </div>
         </div>
 
-        <!-- Property Details -->
-        <div class="pro-forma-section-title">Property Details</div>
+        <!-- Step 1 — BUY -->
+        <div class="pro-forma-section-title" style="margin-top:8px;">
+          <span style="color:var(--accent-teal);font-weight:800;">Step 1 — BUY</span>
+          <span style="font-weight:500;font-size:13px;color:var(--text-muted);margin-left:8px;">Acquire the property. Cash or financed.</span>
+        </div>
         <div class="pfs-section-grid">
           <div class="form-group">
             <div class="pf-label-row"><span class="pf-label-text">Purchase Price</span></div>
@@ -1989,18 +1992,6 @@
             <div class="pf-label-row"><span class="pf-label-text">After Repair Value (ARV)</span></div>
             <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
               <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_arv" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrOnARVChange();pfsBrrrrCalc();">
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Rehab Cost</span></div>
-            <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
-              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_rehabCost" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Months to Refi</span></div>
-            <div class="pf-input-wrap">
-              <input type="number" class="pro-forma-input" id="pfsBrrrr_monthsToRefi" value="6" placeholder="6" min="0" step="1" oninput="pfsBrrrrCalc();">
             </div>
           </div>
         </div>
@@ -2018,7 +2009,6 @@
 
         <!-- Acquisition Financing (collapsible) -->
         <div id="pfsBrrrrFinancingWrap" class="pfs-fin-wrap">
-          <div class="pro-forma-section-title">Acquisition Financing</div>
           <div class="pfs-section-grid">
             <div class="form-group">
               <div class="pf-label-row"><span class="pf-label-text">Down Payment</span></div>
@@ -2039,50 +2029,40 @@
                 <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_closingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
               </div>
             </div>
-            <div class="form-group">
-              <div class="pf-label-row"><span class="pf-label-text">Monthly Carrying Costs</span></div>
-              <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
-                <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_monthlyCarry" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
-              </div>
-            </div>
           </div>
         </div>
 
-        <!-- Refinance -->
-        <div class="pro-forma-section-title" style="margin-top:8px;">Refinance</div>
+        <!-- Step 2 — REHAB -->
+        <div class="pro-forma-section-title" style="margin-top:14px;">
+          <span style="color:var(--accent-teal);font-weight:800;">Step 2 — REHAB</span>
+          <span style="font-weight:500;font-size:13px;color:var(--text-muted);margin-left:8px;">Add value. Hold the property while you fix it.</span>
+        </div>
         <div class="pfs-section-grid">
           <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Refi LTV <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Cash-out refi loans typically max at 75% of appraised value (ARV).</span></span></span></div>
-            <div class="pf-input-wrap">
-              <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_refiLTV" value="75" min="0" max="100" step="1" oninput="pfsBrrrrOnARVChange();pfsBrrrrCalc();">
-              <span class="pf-input-suffix">%</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Refi Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Current 30-year conventional cash-out refi rate.</span></span></span></div>
-            <div class="pf-input-wrap">
-              <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_refiRate" value="7.5" min="0" step="0.125" oninput="pfsBrrrrCalc();">
-              <span class="pf-input-suffix">%</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Refi Closing Costs</span></div>
+            <div class="pf-label-row"><span class="pf-label-text">Rehab Cost</span></div>
             <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
-              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_refiClosingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_rehabCost" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
             </div>
           </div>
           <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Refi Loan Term</span></div>
-            <select class="pro-forma-input" id="pfsBrrrr_refiTerm" onchange="pfsBrrrrCalc();">
-              <option value="30yr_fixed" selected>30 Year Fixed</option>
-              <option value="15yr_fixed">15 Year Fixed</option>
-              <option value="10yr_io">10 Year I/O</option>
-            </select>
+            <div class="pf-label-row"><span class="pf-label-text">Months Holding</span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input" id="pfsBrrrr_monthsToRefi" value="6" placeholder="6" min="0" step="1" oninput="pfsBrrrrCalc();">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Monthly Carrying Costs</span></div>
+            <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_monthlyCarry" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+            </div>
           </div>
         </div>
 
-        <!-- Rental Operations -->
-        <div class="pro-forma-section-title" style="margin-top:8px;">Rental Operations</div>
+        <!-- Step 3 — RENT -->
+        <div class="pro-forma-section-title" style="margin-top:14px;">
+          <span style="color:var(--accent-teal);font-weight:800;">Step 3 — RENT</span>
+          <span style="font-weight:500;font-size:13px;color:var(--text-muted);margin-left:8px;">Tenant the property. Season it for the lender (6 mo typical).</span>
+        </div>
         <div class="pfs-section-grid">
           <div class="form-group">
             <div class="pf-label-row"><span class="pf-label-text">Est. Monthly Rent</span></div>
@@ -2131,8 +2111,47 @@
           </div>
         </div>
 
-        <!-- Profit Breakdown -->
-        <div class="pro-forma-section-title" style="margin-top:8px;">Profit Breakdown</div>
+        <!-- Step 4 — REFINANCE -->
+        <div class="pro-forma-section-title" style="margin-top:14px;">
+          <span style="color:var(--accent-teal);font-weight:800;">Step 4 — REFINANCE</span>
+          <span style="font-weight:500;font-size:13px;color:var(--text-muted);margin-left:8px;">Cash-out refi on the new appraised value. Recycle your capital.</span>
+        </div>
+        <div class="pfs-section-grid">
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Refi LTV <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Cash-out refi loans typically max at 75% of appraised value (ARV).</span></span></span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_refiLTV" value="75" min="0" max="100" step="1" oninput="pfsBrrrrOnARVChange();pfsBrrrrCalc();">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Refi Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Current 30-year conventional cash-out refi rate.</span></span></span></div>
+            <div class="pf-input-wrap">
+              <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_refiRate" value="7.5" min="0" step="0.125" oninput="pfsBrrrrCalc();">
+              <span class="pf-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Refi Closing Costs</span></div>
+            <div class="pf-input-wrap"><span class="pf-input-prefix">$</span>
+              <input type="text" inputmode="numeric" class="pro-forma-input has-prefix" id="pfsBrrrr_refiClosingCosts" placeholder="0" oninput="pfFormatCurrencyInput(this);pfsBrrrrCalc();">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="pf-label-row"><span class="pf-label-text">Refi Loan Term</span></div>
+            <select class="pro-forma-input" id="pfsBrrrr_refiTerm" onchange="pfsBrrrrCalc();">
+              <option value="30yr_fixed" selected>30 Year Fixed</option>
+              <option value="15yr_fixed">15 Year Fixed</option>
+              <option value="10yr_io">10 Year I/O</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Step 5 — REPEAT -->
+        <div class="pro-forma-section-title" style="margin-top:14px;">
+          <span style="color:var(--accent-teal);font-weight:800;">Step 5 — REPEAT</span>
+          <span style="font-weight:500;font-size:13px;color:var(--text-muted);margin-left:8px;">What you got back. Roll it into the next deal.</span>
+        </div>
         <div class="pfs-breakdown-card">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Cash Recovery</div>
           <div class="pfs-bd-row"><span class="pfs-bd-label">Total Cash Into Deal</span><span class="pfs-bd-value" id="pfsBrrrrbd_totalCashIn">&mdash;</span></div>
@@ -3789,10 +3808,10 @@
       // Initialize BRRRR Calculator defaults
       pfsBrrrrInitDefaults(ls);
 
-      // Populate editable purchase price (defaults to asking price × 1.2, rounded to nearest $100)
+      // Populate editable purchase price (defaults to asking price × 1.3, rounded to nearest $100)
       var ppEl = document.getElementById('pf2_purchasePrice');
       if (ppEl) {
-        var ppDefault = pp ? Math.round(pp * 1.2 / 100) * 100 : 0;
+        var ppDefault = pp ? Math.round(pp * 1.3 / 100) * 100 : 0;
         ppEl.value = ppDefault ? ppDefault.toLocaleString('en-US') : '';
       }
       // List Price = asking price (the portal-facing price)
@@ -4247,10 +4266,10 @@
         ['pf2_costOfSale',     ls.cost_of_sale_pct       || 6.5]
       ];
       fieldMap.forEach(function(p) { var el = document.getElementById(p[0]); if (el) el.value = p[1]; });
-      // Reset purchase price to 1.2× asking, rounded to nearest $100
+      // Reset purchase price to 1.3× asking, rounded to nearest $100
       var ppResetEl = document.getElementById('pf2_purchasePrice');
       if (ppResetEl) {
-        var ppReset = listing.asking_price ? Math.round(listing.asking_price * 1.2 / 100) * 100 : 0;
+        var ppReset = listing.asking_price ? Math.round(listing.asking_price * 1.3 / 100) * 100 : 0;
         ppResetEl.value = ppReset ? ppReset.toLocaleString('en-US') : '';
       }
       var ltEl = document.getElementById('pf2_loanType');
@@ -4625,7 +4644,8 @@
     // Initialize inputs from property + listings data
     function flipInitDefaults(ls) {
       ls = ls || {};
-      var pp  = property.current_market_value || null;
+      var askingPrice = (listing && listing.asking_price) ? listing.asking_price : null;
+      var pp  = askingPrice ? Math.round(askingPrice * 1.3 / 100) * 100 : (property.current_market_value || null);
       var arv = property.estimated_arv || null;
       var rehab = property.estimated_repairs_flip || null;
       var holdMonths = property.estimated_hold_months || null;
@@ -5126,7 +5146,8 @@
     }
     function pfsBrrrrInitDefaults(ls) {
       ls = ls || {};
-      var pp    = property.current_market_value || null;
+      var askingPrice = (listing && listing.asking_price) ? listing.asking_price : null;
+      var pp    = askingPrice ? Math.round(askingPrice * 1.3 / 100) * 100 : (property.current_market_value || null);
       var arv   = property.estimated_arv || null;
       var rehab = property.estimated_repairs_flip || null;
       var months = property.estimated_hold_months || 6;
@@ -5217,6 +5238,7 @@
       var monthlyCF = rent - taxMo - insMo - hoa - (rent * vacPct) - (rent * pmPct) - (rent * repPct) - debtSvc;
       var annCF  = monthlyCF * 12;
       var coc    = isInfinite ? null : (cashLeftIn > 0 ? (annCF / cashLeftIn) * 100 : 0);
+      var equityMultipleAtRefi = (totalCashIn > 0) ? (refiOutCash / totalCashIn) : null;
 
       // KPI tiles
       var roEl = document.getElementById('pfsBrrrr_kpi_refiOut');
@@ -5225,25 +5247,40 @@
       var tile  = document.getElementById('pfsBrrrr_tile_cashLeftIn');
       var cliEl = document.getElementById('pfsBrrrr_kpi_cashLeftIn');
       var lbl   = document.getElementById('pfsBrrrr_kpi_cashLeftIn_label');
-      if (cliEl && tile) {
+      if (cliEl) {
         if (isInfinite) {
-          tile.classList.add('brrrr-infinite-tile');
-          cliEl.innerHTML = pfsBrrrrFc(cashLeftIn) + '<span class="brrrr-infinite-glyph">&#9854;</span>';
-          cliEl.style.color = '#fff';
-          if (lbl) lbl.innerHTML = '<span class="brrrr-infinite-caption">All capital recovered.</span>';
+          var recovered = Math.abs(cashLeftIn);
+          cliEl.innerHTML = '+' + pfsBrrrrFc(recovered);
+          cliEl.style.color = '#22c55e';
+          cliEl.style.fontSize = '22px';
+          if (lbl) lbl.innerHTML = 'Cash Recovered <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Refi-Out exceeds total cash in. You walked away from the closing table with this amount.</span></span>';
         } else {
-          tile.classList.remove('brrrr-infinite-tile');
           cliEl.innerHTML = pfsBrrrrFc(cashLeftIn);
           cliEl.style.color = cashLeftIn <= 50000 ? '#22c55e' : '#94a3b8';
-          if (lbl) lbl.innerHTML = 'Cash Left In <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Total cash in &minus; refi-out. &le;$0 = BRRRR holy grail.</span></span>';
+          cliEl.style.fontSize = '22px';
+          if (lbl) lbl.innerHTML = 'Cash Left In <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Total cash in &minus; Refi-Out. Lower is better; $0 = capital fully recovered.</span></span>';
         }
       }
+      if (tile) { tile.classList.remove('pf-kpi-card-selected', 'brrrr-infinite-tile'); tile.style.background = ''; }
+
       var cfEl = document.getElementById('pfsBrrrr_kpi_monthlyCF');
       if (cfEl) { cfEl.innerHTML = pfsBrrrrFc(monthlyCF); cfEl.style.color = monthlyCF >= 0 ? '#22c55e' : '#ef4444'; }
+
       var cocEl = document.getElementById('pfsBrrrr_kpi_coc');
+      var cocLbl = cocEl ? cocEl.parentNode.querySelector('.pf-kpi-label') : null;
       if (cocEl) {
-        if (isInfinite) { cocEl.innerHTML = '&#9854; INFINITE'; cocEl.style.color = '#4fc3f7'; cocEl.style.fontSize = '18px'; }
-        else { cocEl.innerHTML = coc !== null ? coc.toFixed(1) + '%' : '&mdash;'; cocEl.style.fontSize = ''; cocEl.style.color = coc === null ? '#94a3b8' : (coc >= 12 ? '#22c55e' : (coc >= 6 ? '#94a3b8' : '#ef4444')); }
+        if (isInfinite) {
+          var emTxt = (equityMultipleAtRefi !== null) ? equityMultipleAtRefi.toFixed(2) + 'x' : '—';
+          cocEl.innerHTML = emTxt;
+          cocEl.style.color = '#22c55e';
+          cocEl.style.fontSize = '22px';
+          if (cocLbl) cocLbl.innerHTML = 'Equity Multiple (at Refi) <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Refi-Out Cash &divide; Total Cash In. 1.0x means you recovered all your capital; 2.0x means you got back double.</span></span>';
+        } else {
+          cocEl.innerHTML = (coc !== null && isFinite(coc)) ? coc.toFixed(2) + '%' : '&mdash;';
+          cocEl.style.color = (coc !== null && coc >= 8) ? '#22c55e' : (coc !== null && coc >= 0 ? '#94a3b8' : '#ef4444');
+          cocEl.style.fontSize = '22px';
+          if (cocLbl) cocLbl.innerHTML = 'Post-Refi Cash-on-Cash <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Annual CF &divide; cash left in deal after refi.</span></span>';
+        }
       }
       // Breakdown
       function setBD(id, val) { var el = document.getElementById(id); if (el) el.textContent = pfsBrrrrFc(val); }
@@ -5251,10 +5288,15 @@
       setBD('pfsBrrrrbd_refiOut',     refiOutCash);
       var bdcli = document.getElementById('pfsBrrrrbd_cashLeftIn');
       if (bdcli) {
-        bdcli.textContent = pfsBrrrrFc(cashLeftIn);
-        bdcli.style.color = cashLeftIn <= 0 ? '#22c55e' : '#94a3b8';
+        if (isInfinite) {
+          bdcli.textContent = '+' + pfsBrrrrFc(Math.abs(cashLeftIn));
+          bdcli.style.color = '#22c55e';
+        } else {
+          bdcli.textContent = pfsBrrrrFc(cashLeftIn);
+          bdcli.style.color = cashLeftIn <= 50000 ? '#22c55e' : '#94a3b8';
+        }
         var lr = bdcli.closest('.pfs-bd-row');
-        if (lr) { var ll = lr.querySelector('.pfs-bd-label'); if (ll) ll.style.color = cashLeftIn <= 0 ? '#22c55e' : ''; }
+        if (lr) { var ll = lr.querySelector('.pfs-bd-label'); if (ll) ll.style.color = isInfinite ? '#22c55e' : (cashLeftIn <= 50000 ? '#22c55e' : ''); }
       }
       setBD('pfsBrrrrbd_rent',        rent);
       setBD('pfsBrrrrbd_taxMo',       taxMo);
@@ -5273,8 +5315,13 @@
       }
       var bdcoc = document.getElementById('pfsBrrrrbd_coc');
       if (bdcoc) {
-        if (isInfinite) { bdcoc.innerHTML = '&#9854; INFINITE'; bdcoc.style.color = '#4fc3f7'; }
-        else { bdcoc.textContent = coc !== null ? coc.toFixed(1) + '%' : '—'; bdcoc.style.color = coc === null ? '#94a3b8' : (coc >= 12 ? '#22c55e' : (coc >= 6 ? '#94a3b8' : '#ef4444')); }
+        if (isInfinite) {
+          bdcoc.textContent = (equityMultipleAtRefi !== null) ? equityMultipleAtRefi.toFixed(2) + 'x' : '—';
+          bdcoc.style.color = '#22c55e';
+        } else {
+          bdcoc.textContent = (coc !== null && isFinite(coc)) ? coc.toFixed(2) + '%' : '—';
+          bdcoc.style.color = coc === null ? '#94a3b8' : (coc >= 8 ? '#22c55e' : (coc >= 0 ? '#94a3b8' : '#ef4444'));
+        }
       }
     }
 
