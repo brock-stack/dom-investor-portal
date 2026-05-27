@@ -724,6 +724,24 @@
     .pf-input-row .pro-forma-input { flex:1; min-width:0; }
     .pf-reset-field-btn { background:none; border:1px solid var(--border); border-radius:6px; padding:5px 8px; color:var(--text-muted); cursor:pointer; font-size:13px; flex-shrink:0; line-height:1; font-family:inherit; }
     .pf-reset-field-btn:hover { color:var(--text); background:var(--surface-2); }
+    .pf-input-wrap.has-reset-btn { padding-left: 0; }
+    .pf-input-wrap.has-reset-btn .pf-reset-field-btn {
+      position: absolute;
+      left: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 2px 5px;
+      font-size: 12px;
+      line-height: 1;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      z-index: 2;
+    }
+    .pf-input-wrap.has-reset-btn .pf-reset-field-btn:hover { color: var(--text); background: var(--surface-2); }
+    .pf-input-wrap.has-reset-btn .pro-forma-input { padding-left: 28px; }
     /* === ACCORDION === */
     .pf-section-header { cursor:pointer; user-select:none; display:flex; justify-content:space-between; align-items:center; }
     .pf-section-chevron { font-size:12px; color:var(--text-muted); transition:transform 0.3s; }
@@ -3833,11 +3851,12 @@
       ];
       resetableIds.forEach(function(id) {
         var el = document.getElementById(id);
-        if (!el || el.parentNode.classList.contains('pf-input-row')) return; // already wrapped
-        var wrap = document.createElement('div');
-        wrap.className = 'pf-input-row';
-        el.parentNode.insertBefore(wrap, el);
-        wrap.appendChild(el);
+        if (!el) return;
+        var parent = el.parentNode;
+        // Idempotency: skip if a reset button already exists as a sibling inside the same wrap.
+        if (parent && parent.querySelector('.pf-reset-field-btn')) return;
+
+        // Build the reset button
         var btn = document.createElement('button');
         btn.className = 'pf-reset-field-btn';
         btn.type = 'button';
@@ -3845,7 +3864,22 @@
         btn.textContent = '\u21ba'; // ↺
         btn.setAttribute('data-reset-id', id);
         btn.onclick = function() { pfResetField(id); };
-        wrap.appendChild(btn);
+
+        if (parent && parent.classList.contains('pf-input-wrap')) {
+          // Field already lives in a position:relative wrap with an absolute-positioned
+          // .pf-input-suffix. Insert the reset button BEFORE the input so it sits to the
+          // LEFT of the value (never between value and suffix), and add a class so we can
+          // shift the input's left padding to make room.
+          parent.classList.add('has-reset-btn');
+          parent.insertBefore(btn, el);
+        } else {
+          // Field has no wrap (no suffix to protect) — keep the historical .pf-input-row layout.
+          var row = document.createElement('div');
+          row.className = 'pf-input-row';
+          parent.insertBefore(row, el);
+          row.appendChild(el);
+          row.appendChild(btn);
+        }
       });
 
       // Insurance hint
