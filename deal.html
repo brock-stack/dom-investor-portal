@@ -829,7 +829,7 @@
       z-index: 60;
       background: var(--bg);
       background-color: var(--bg);
-      padding: 14px 0 12px;
+      padding: 12px 0 12px;
       margin: 0;
       border-bottom: 1px solid var(--border);
       box-shadow: 0 4px 8px rgba(0,0,0,0.35);
@@ -837,7 +837,7 @@
       justify-content: center;
     }
     .proformas-mode-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
-    .proformas-mode-pill { padding:14px 32px; border:none; background:var(--surface); color:var(--text-muted); font-size:16px; font-weight:700; letter-spacing:0.02em; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; white-space:nowrap; }
+    .proformas-mode-pill { padding:10px 36px; border:none; background:var(--surface); color:var(--text-muted); font-size:16px; font-weight:700; letter-spacing:0.02em; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; white-space:nowrap; }
     .proformas-mode-pill:hover { background:var(--surface-2); color:var(--text); }
     .proformas-mode-pill.active { background:#4fc3f7; color:#0f172a; }
     .proformas-subview { display:none; }
@@ -1356,7 +1356,7 @@
               id="gauge_capRate_ring" style="transition:stroke-dasharray 0.5s,stroke 0.5s;transform:rotate(-90deg);transform-origin:50px 50px;"/>
             <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="var(--text)" font-size="14" font-weight="800" font-family="Inter,sans-serif" id="gauge_capRate_val">&mdash;</text>
           </svg>
-          <div class="pf-gauge-label">Cap Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">The ratio of net operating income (NOI) to total acquisition cost. As a pre-financing yield metric, cap rate removes the impact of debt.</span></span></div>
+          <div class="pf-gauge-label">Cap Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">NOI &divide; Purchase Price. Moves when Purchase Price, rent, or operating expenses change. Financing terms (down payment, mortgage rate, loan fees) don't affect it.</span></span></div>
         </div>
         <!-- CoC Donut -->
         <div class="pf-gauge-card" id="gauge_coc_card">
@@ -1367,7 +1367,7 @@
               id="gauge_coc_ring" style="transition:stroke-dasharray 0.5s,stroke 0.5s;transform:rotate(-90deg);transform-origin:50px 50px;"/>
             <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="var(--text)" font-size="14" font-weight="800" font-family="Inter,sans-serif" id="gauge_coc_val">&mdash;</text>
           </svg>
-          <div class="pf-gauge-label">Cash-on-Cash Return</div>
+          <div class="pf-gauge-label">Cash-on-Cash Return <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Annual Cash Flow &divide; Initial Investment. Moves with rent, expenses, AND financing terms. Includes debt-service impact.</span></span></div>
         </div>
         <!-- DSCR Bar -->
         <div class="pf-gauge-card" id="gauge_dscr_card">
@@ -1468,7 +1468,7 @@
               </select>
             </div>
             <div class="form-group">
-              <div class="pf-label-row"><span class="pf-label-text">Mortgage Rate %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Adjust as needed. This is for illustrative purposes only; availability and borrower eligibility are not guaranteed.</span></span></div>
+              <div class="pf-label-row"><span class="pf-label-text">Mortgage Rate %</span> <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Defaults to the current 30-year fixed rate from Freddie Mac PMMS (owner-occupied benchmark). Your investor rate may be 0.5&ndash;1.5% higher. Adjust as needed.</span></span></div>
               <div class="pf-input-wrap">
                 <input type="number" class="pro-forma-input has-suffix" id="pf2_mortgageRate" value="6.5" min="0" step="0.125" oninput="pfCalc()">
                 <span class="pf-input-suffix">%</span>
@@ -2123,7 +2123,7 @@
             </div>
           </div>
           <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">Refi Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Current 30-year conventional cash-out refi rate.</span></span></span></div>
+            <div class="pf-label-row"><span class="pf-label-text">Refi Rate <span class="pf-tip" tabindex="0">?<span class="pf-tip-text">Defaults to the current 30-year fixed rate from Freddie Mac PMMS (owner-occupied benchmark). Cash-out refi rates typically run 0.5&ndash;1.5% higher. Adjust as needed.</span></span></span></div>
             <div class="pf-input-wrap">
               <input type="number" class="pro-forma-input has-suffix" id="pfsBrrrr_refiRate" value="6.5" min="0" step="0.125" oninput="pfsBrrrrCalc();">
               <span class="pf-input-suffix">%</span>
@@ -3135,6 +3135,28 @@
       }
     }
 
+    // Fetch live 30-year mortgage rate (Freddie Mac PMMS) to use as Pro Forma default.
+    // Falls back to static 6.5 if the function is unavailable.
+    var _liveMortgageRate = null;
+    (async function loadLiveRate() {
+      try {
+        var resp = await fetch('/.netlify/functions/mortgage-rates');
+        if (!resp.ok) return;
+        var data = await resp.json();
+        if (data && data.rate30) {
+          var r = parseFloat(data.rate30);
+          if (isFinite(r) && r > 0 && r < 20) {
+            _liveMortgageRate = r;
+            // Update rate fields after fetch completes (handles the timing race with renderProForma)
+            var mrEl = document.getElementById('pf2_mortgageRate');
+            if (mrEl && mrEl.dataset.manual !== '1') { mrEl.value = r; if (typeof pfCalc === 'function') pfCalc(); }
+            var rrEl = document.getElementById('pfsBrrrr_refiRate');
+            if (rrEl && rrEl.dataset.manual !== '1') { rrEl.value = r; if (typeof pfsBrrrrCalc === 'function') pfsBrrrrCalc(); }
+          }
+        }
+      } catch(e) { /* silent fallback to static 6.5 */ }
+    })();
+
     async function init() {
       var session = await Portal.getSession();
       // Deal pages viewable without login — show signup banner if not authed
@@ -3822,9 +3844,9 @@
       })();
       var fieldMap = [
         ['pf2_downPct',        ls.down_payment_pct      != null ? ls.down_payment_pct      : 25],
-        ['pf2_closingCostPct', ls.closing_cost_pct      != null ? ls.closing_cost_pct      : 1.5],
+        ['pf2_closingCostPct', 1.5],
         ['pf2_loanFeePct',     ls.loan_cost_pct         != null ? ls.loan_cost_pct         : 0.50],
-        ['pf2_mortgageRate',   ls.mortgage_rate_pct     != null ? ls.mortgage_rate_pct     : 6.5],
+        ['pf2_mortgageRate',   _liveMortgageRate != null ? _liveMortgageRate : (ls.mortgage_rate_pct != null ? ls.mortgage_rate_pct : 6.5)],
         ['pf2_rentLow',        ls.rent_range_low        != null ? ls.rent_range_low        : 0],
         ['pf2_rentHigh',       ls.rent_range_high       != null ? ls.rent_range_high       : 0],
         ['pf2_otherIncome',    ls.other_monthly_income  != null ? ls.other_monthly_income  : 0],
@@ -4289,9 +4311,9 @@
       var ls = (listing && listing._ls) || {};
       var fieldMap = [
         ['pf2_downPct',        ls.down_payment_pct      || 25],
-        ['pf2_closingCostPct', ls.closing_cost_pct      || 1.5],
+        ['pf2_closingCostPct', 1.5],
         ['pf2_loanFeePct',     ls.loan_cost_pct         || 0.50],
-        ['pf2_mortgageRate',   ls.mortgage_rate_pct     || 6.5],
+        ['pf2_mortgageRate',   _liveMortgageRate != null ? _liveMortgageRate : (ls.mortgage_rate_pct || 6.5)],
         ['pf2_rentLow',        ls.rent_range_low        || 0],
         ['pf2_rentHigh',       ls.rent_range_high       || 0],
         ['pf2_otherIncome',    ls.other_monthly_income  || 0],
@@ -5252,6 +5274,9 @@
       var tEl = document.getElementById('pfsBrrrr_propTax'); if (tEl && taxAnn) tEl.value = Math.round(taxAnn).toLocaleString('en-US');
       var insAnn = (ls.est_insurance_annual ? Number(ls.est_insurance_annual) : 0) + (ls.est_flood_insurance_annual ? Number(ls.est_flood_insurance_annual) : 0);
       var iEl = document.getElementById('pfsBrrrr_insurance'); if (iEl && insAnn) iEl.value = Math.round(insAnn).toLocaleString('en-US');
+      // Apply live PMMS rate to BRRRR Refi Rate field when available
+      var refiRateEl = document.getElementById('pfsBrrrr_refiRate');
+      if (refiRateEl) refiRateEl.value = _liveMortgageRate != null ? _liveMortgageRate : 6.5;
       pfsBrrrrCalc();
     }
     function pfsResetFlip() {
@@ -5271,7 +5296,7 @@
       var closing = pfsBrrrrNum('pfsBrrrr_closingCosts');
       var carry   = isCash ? 0 : pfsBrrrrNum('pfsBrrrr_monthlyCarry');
       var refiLTV = (parseFloat((document.getElementById('pfsBrrrr_refiLTV') || {}).value) || 75) / 100;
-      var refiRate = parseFloat((document.getElementById('pfsBrrrr_refiRate') || {}).value) || 6.5;
+      var refiRate = parseFloat((document.getElementById('pfsBrrrr_refiRate') || {}).value) || _liveMortgageRate || 6.5;
       var refiClose = pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
       var refiTerm  = (document.getElementById('pfsBrrrr_refiTerm') || {}).value || '30yr_fixed';
       var rent     = pfsBrrrrNum('pfsBrrrr_monthlyRent');
@@ -5363,13 +5388,13 @@
       if (showBreakEvenHint && cfTileCard) {
         var hint = document.createElement('div');
         hint.className = 'cf-break-even-hint';
-        hint.style.cssText = 'margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);font-size:11px;line-height:1.45;color:#cbd5e1;';
+        hint.style.cssText = 'margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:11px;line-height:1.45;color:var(--text-muted);';
         var cashLeaveAbsFc = pfsBrrrrFc(Math.abs(cashToLeaveIn));
         var cashLeaveLabel = cashToLeaveIn >= 0
-          ? 'Cash to leave in: <strong style="color:#fff;">' + cashLeaveAbsFc + '</strong>'
+          ? 'Cash to leave in: <strong style="color:var(--text);">' + cashLeaveAbsFc + '</strong>'
           : 'Excess recovered at break-even: <strong style="color:#22c55e;">+' + cashLeaveAbsFc + '</strong>';
-        hint.innerHTML = 'Break-Even LTV: <strong style="color:#fff;">' + (breakEvenLTV * 100).toFixed(0) + '%</strong>' +
-          ' <span style="color:#94a3b8;">(vs ' + (refiLTV * 100).toFixed(0) + '%)</span><br>' +
+        hint.innerHTML = 'Break-Even LTV: <strong style="color:var(--text);">' + (breakEvenLTV * 100).toFixed(0) + '%</strong>' +
+          ' <span style="color:var(--text-muted);">(vs ' + (refiLTV * 100).toFixed(0) + '%)</span><br>' +
           cashLeaveLabel;
         cfTileCard.appendChild(hint);
       }
@@ -5450,7 +5475,7 @@
         var acqRate  = isCash ? 0 : (parseFloat((document.getElementById('pfsBrrrr_acqRate') || {}).value) || 0);
         var closing  = pfsBrrrrNum('pfsBrrrr_closingCosts'), carry = isCash ? 0 : pfsBrrrrNum('pfsBrrrr_monthlyCarry');
         var refiLTV  = (parseFloat((document.getElementById('pfsBrrrr_refiLTV') || {}).value) || 75) / 100;
-        var refiRate = parseFloat((document.getElementById('pfsBrrrr_refiRate') || {}).value) || 6.5;
+        var refiRate = parseFloat((document.getElementById('pfsBrrrr_refiRate') || {}).value) || _liveMortgageRate || 6.5;
         var refiClose= pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
         var refiTerm = (document.getElementById('pfsBrrrr_refiTerm') || {}).value || '30yr_fixed';
         var rent=pfsBrrrrNum('pfsBrrrr_monthlyRent'), propTax=pfsBrrrrNum('pfsBrrrr_propTax'), insAnn=pfsBrrrrNum('pfsBrrrr_insurance');
@@ -5493,7 +5518,7 @@
       var dp=isCash?pp:pfsBrrrrNum('pfsBrrrr_downPayment'),acqRate=isCash?0:(parseFloat((document.getElementById('pfsBrrrr_acqRate')||{}).value)||0);
       var closing=pfsBrrrrNum('pfsBrrrr_closingCosts'),carry=isCash?0:pfsBrrrrNum('pfsBrrrr_monthlyCarry');
       var refiLTV=(parseFloat((document.getElementById('pfsBrrrr_refiLTV')||{}).value)||75)/100;
-      var refiRate=parseFloat((document.getElementById('pfsBrrrr_refiRate')||{}).value)||6.5;
+      var refiRate=parseFloat((document.getElementById('pfsBrrrr_refiRate')||{}).value) || _liveMortgageRate || 6.5;
       var refiClose=pfsBrrrrNum('pfsBrrrr_refiClosingCosts');
       var refiTerm=(document.getElementById('pfsBrrrr_refiTerm')||{}).value||'30yr_fixed';
       var rent=pfsBrrrrNum('pfsBrrrr_monthlyRent'),propTax=pfsBrrrrNum('pfsBrrrr_propTax'),insAnn=pfsBrrrrNum('pfsBrrrr_insurance');
