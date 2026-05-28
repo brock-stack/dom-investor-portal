@@ -1323,7 +1323,7 @@
           if (ibb.min_price) document.getElementById('minPurchasePrice').value = '$' + Number(ibb.min_price).toLocaleString();
           if (ibb.min_arv) document.getElementById('minArv').value = '$' + Number(ibb.min_arv).toLocaleString();
           if (ibb.min_cap_rate) document.getElementById('minCapRate').value = ibb.min_cap_rate;
-          if (ibb.min_coc) document.getElementById('minCoc').value = ibb.min_coc;
+          if (ibb.min_cash_on_cash) document.getElementById('minCoc').value = ibb.min_cash_on_cash;
           if (ibb.min_bedrooms) document.getElementById('minBedrooms').value = ibb.min_bedrooms;
           if (ibb.min_bathrooms) document.getElementById('minBathrooms').value = ibb.min_bathrooms;
           if (ibb.property_types) document.querySelectorAll('input[name="prop_types"]').forEach(cb => { cb.checked = ibb.property_types.includes(cb.value); });
@@ -1367,7 +1367,7 @@
         strategy: strategies,
         financing_type: financingTypes,
         min_cap_rate: parseFloat((document.getElementById('minCapRate')||{}).value) || null,
-        min_coc: parseFloat((document.getElementById('minCoc')||{}).value) || null,
+        min_cash_on_cash: parseFloat((document.getElementById('minCoc')||{}).value) || null,
         notes: (document.getElementById('buyboxNotes')||{}).value||'',
         updated_at: new Date().toISOString()
       };
