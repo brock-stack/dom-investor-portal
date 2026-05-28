@@ -1339,8 +1339,10 @@
     // ── Buy Box: Save ──────────────────────────────────────────
 
     document.getElementById('saveBuyboxBtn').addEventListener('click', async function() {
-      if (!profile) {
-        Portal.toast('Could not find your profile. Please try again.', 'error');
+      // v2.2.11: hard-fail guard — portalUser MUST be non-null before any UI mutation or DB write.
+      // Previously the inner `if (portalUser)` silently skipped the INSERT while still showing success toast.
+      if (!portalUser || !portalUser.id) {
+        Portal.toast('Could not load your profile. Please refresh and try again.', 'error');
         return;
       }
 
@@ -1356,7 +1358,7 @@
       const financingTypes = Array.from(document.querySelectorAll('input[name="financing_type"]:checked')).map(cb => cb.value);
 
       const ibbData = {
-        user_id: portalUser ? portalUser.id : null,
+        user_id: portalUser.id,
         markets: _selectedMarkets,
         property_types: propTypes,
         min_price: stripPrice('minPurchasePrice'),
@@ -1371,24 +1373,41 @@
       };
 
       try {
-        // Save to investor_buy_box
-        if (portalUser) {
-          const existBB = await Portal.supabase.from('investor_buy_box').select('id').eq('user_id', portalUser.id).maybeSingle();
-          if (existBB.data && existBB.data.id) {
-            await Portal.supabase.from('investor_buy_box').update(ibbData).eq('id', existBB.data.id);
-          } else {
-            await Portal.supabase.from('investor_buy_box').insert(ibbData);
-          }
+        // Save to investor_buy_box — inner portalUser guard removed (upfront guard above guarantees non-null)
+        const existBB = await Portal.supabase.from('investor_buy_box').select('id').eq('user_id', portalUser.id).maybeSingle();
+        var bbRes;
+        if (existBB.data && existBB.data.id) {
+          bbRes = await Portal.supabase.from('investor_buy_box').update(ibbData).eq('id', existBB.data.id);
+        } else {
+          bbRes = await Portal.supabase.from('investor_buy_box').insert(ibbData);
+        }
+        console.log('[Buy Box Save] investor_buy_box save:', bbRes.error ? 'ERROR: ' + bbRes.error.message : 'OK');
+        if (bbRes.error) {
+          Portal.toast('Failed to save buy box: ' + bbRes.error.message, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Save Buy Box';
+          return;
         }
 
-        const statusEl = document.getElementById('saveStatus');
+        // v2.2.11: post-save verification read (matches onboarding.js pattern)
+        const verifyRes = await Portal.supabase.from('investor_buy_box').select('id, markets, updated_at').eq('user_id', portalUser.id).maybeSingle();
+        console.log('[Buy Box Save] verify after save:', verifyRes.data, verifyRes.error ? 'ERR:'+verifyRes.error.message : '');
+        if (!verifyRes.data) {
+          Portal.toast('Save may not have persisted. Please refresh and verify.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Save Buy Box';
+          return;
+        }
+
         _buyboxDirty = false;
         document.getElementById('floatingSaveBar').style.display = 'none';
         Portal.toast('\u2713 Buy box saved!', 'success');
-        Portal.toast('Buy box saved!', 'success');
       } catch (err) {
         console.error('Buy box save error:', err);
         Portal.toast('Failed to save buy box. Please try again.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Save Buy Box';
+        return;
       }
 
       btn.disabled = false;
