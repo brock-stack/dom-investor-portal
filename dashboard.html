@@ -127,6 +127,14 @@
       border-color: var(--accent) !important;
       font-weight: 700 !important;
     }
+    /* v2.2.14: Water Source + Sewer pill visual toggle on :checked radio */
+    label:has(input[name="water_source"]:checked),
+    label:has(input[name="sewer_type"]:checked) {
+      background: #4fc3f7 !important;
+      color: #0f172a !important;
+      border-color: #4fc3f7 !important;
+      font-weight: 700 !important;
+    }
     /* ── Buy Box Form ── */
     .buybox-grid {
       display: grid;
@@ -886,10 +894,7 @@
             <label style="font-size:11px;color:var(--text-muted);margin-top:6px;display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" id="bbNoMax" onchange="var i=document.getElementById('maxPurchasePrice');i.disabled=this.checked;i.style.opacity=this.checked?'0.4':'1';if(this.checked)i.value=''"> No max</label>
           </div>
         </div>
-        <div style="margin-bottom:14px;"><div style="background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:14px;">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:8px;">Min ARV</div>
-          <input type="text" inputmode="numeric" class="form-input" id="minArv" placeholder="--" style="width:100%;box-sizing:border-box;" oninput="var v=this.value.replace(/[^\d]/g,'');this.value=v?'$'+parseInt(v).toLocaleString():''">
-        </div></div>
+        <!-- Min ARV removed v2.2.14 per Andrew: "get rid of the min ARV from the portal that is useless" — DB column preserved -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
           <div style="background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:14px;">
             <div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:8px;">Min Cash-on-Cash Return</div>
@@ -1249,7 +1254,27 @@
     // ── Buy Box: Load ──────────────────────────────────────────
 
     // All market options
-    const ALL_MARKETS = ['Tampa','Orlando','Jacksonville','Miami','Fort Lauderdale','Naples','Sarasota','Cape Coral','Fort Myers','North Port','Gainesville','Space Coast','Tallahassee','Pensacola','The Keys'];
+    // v2.2.14: expanded 23-region Florida list (matches v2.2.13 data migration strings verbatim)
+    const ALL_MARKETS = [
+      // Northwest Florida (Panhandle)
+      'Pensacola Bay Area', 'Emerald Coast', 'Forgotten Coast', 'Tallahassee / Big Bend',
+      // North Central Florida
+      'Nature Coast', 'Gainesville Area',
+      // Northeast Florida (First Coast)
+      'Jacksonville Metro', 'First Coast (St. Augustine / Amelia Island)',
+      // Central Florida
+      'Greater Orlando', 'Lakeland-Winter Haven', 'Space Coast (Brevard)',
+      // Central West Florida (Tampa Bay Area)
+      'Tampa Bay (Tampa-St. Pete-Clearwater)', 'Sun Coast',
+      // Southwest Florida
+      'Fort Myers-Cape Coral', 'Naples (Paradise Coast)', 'Sarasota-Bradenton',
+      // South Central Florida (Heartland)
+      'Lake Okeechobee Region', 'Glades / Agricultural Heartland',
+      // Southeast Florida (Gold Coast / Treasure Coast)
+      'Treasure Coast (Martin/St. Lucie/Indian River)', 'Palm Beaches', 'Gold Coast (Miami-Fort Lauderdale-WPB)',
+      // Far South
+      'The Everglades', 'Florida Keys (Monroe)'
+    ];
     let _selectedMarkets = [];
 
     function initMarketPills(selected) {
@@ -1321,11 +1346,19 @@
           initMarketPills(ibb.markets || []);
           if (ibb.max_price) document.getElementById('maxPurchasePrice').value = '$' + Number(ibb.max_price).toLocaleString();
           if (ibb.min_price) document.getElementById('minPurchasePrice').value = '$' + Number(ibb.min_price).toLocaleString();
-          if (ibb.min_arv) document.getElementById('minArv').value = '$' + Number(ibb.min_arv).toLocaleString();
+          // min_arv hydration removed v2.2.14 (field removed from form; column preserved in DB)
           if (ibb.min_cap_rate) document.getElementById('minCapRate').value = ibb.min_cap_rate;
           if (ibb.min_cash_on_cash) document.getElementById('minCoc').value = ibb.min_cash_on_cash;
-          if (ibb.min_bedrooms) document.getElementById('minBedrooms').value = ibb.min_bedrooms;
-          if (ibb.min_bathrooms) document.getElementById('minBathrooms').value = ibb.min_bathrooms;
+          // v2.2.14: fixed column-name mismatch (was min_bedrooms/min_bathrooms, DB cols are min_beds/min_baths)
+          if (ibb.min_beds != null) document.getElementById('minBedrooms').value = ibb.min_beds;
+          if (ibb.min_baths != null) document.getElementById('minBathrooms').value = ibb.min_baths;
+          // v2.2.14: new field hydration
+          if (ibb.min_year_built != null) document.getElementById('minYearBuilt').value = ibb.min_year_built;
+          if (ibb.water_source) { var wsIn = document.querySelector('input[name="water_source"][value="' + ibb.water_source + '"]'); if (wsIn) wsIn.checked = true; }
+          if (ibb.sewer_type) { var stIn = document.querySelector('input[name="sewer_type"][value="' + ibb.sewer_type + '"]'); if (stIn) stIn.checked = true; }
+          if (ibb.no_flood_zone) document.getElementById('excludeFloodZone').checked = true;
+          if (ibb.no_hoa) document.getElementById('excludeHoa').checked = true;
+          console.log('[Buy Box Hydrate] loaded fields:', { min_beds: ibb.min_beds, min_baths: ibb.min_baths, min_year_built: ibb.min_year_built, water_source: ibb.water_source, sewer_type: ibb.sewer_type, no_flood_zone: ibb.no_flood_zone, no_hoa: ibb.no_hoa });
           if (ibb.property_types) document.querySelectorAll('input[name="prop_types"]').forEach(cb => { cb.checked = ibb.property_types.includes(cb.value); });
           if (ibb.strategy) document.querySelectorAll('input[name="strategies"]').forEach(cb => { cb.checked = ibb.strategy.includes(cb.value); });
           if (ibb.financing_type) document.querySelectorAll('input[name="financing_type"]').forEach(cb => { cb.checked = ibb.financing_type.includes(cb.value); });
@@ -1355,7 +1388,12 @@
       const cashBuyerEl = document.querySelector('input[name="cashBuyer"]:checked');
 
       function stripPrice(id) { var v = (document.getElementById(id)||{}).value||''; v=v.replace(/[^\d]/g,''); return v ? parseInt(v) : null; }
+      // v2.2.14: helper for integer-only fields (beds, baths, year)
+      function intOrNull(v) { var n = parseInt(v, 10); return Number.isFinite(n) ? n : null; }
       const financingTypes = Array.from(document.querySelectorAll('input[name="financing_type"]:checked')).map(cb => cb.value);
+      // v2.2.14: radio reads — "Either" has value="" so || null converts it to null (no preference = no filter)
+      var wsChecked = document.querySelector('input[name="water_source"]:checked');
+      var stChecked = document.querySelector('input[name="sewer_type"]:checked');
 
       const ibbData = {
         user_id: portalUser.id,
@@ -1363,13 +1401,24 @@
         property_types: propTypes,
         min_price: stripPrice('minPurchasePrice'),
         max_price: stripPrice('maxPurchasePrice'),
-        min_arv: stripPrice('minArv'),
+        // min_arv removed v2.2.14 — column kept, just no longer written
         strategy: strategies,
         financing_type: financingTypes,
         min_cap_rate: parseFloat((document.getElementById('minCapRate')||{}).value) || null,
         min_cash_on_cash: parseFloat((document.getElementById('minCoc')||{}).value) || null,
         notes: (document.getElementById('buyboxNotes')||{}).value||'',
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        // v2.2.14: fields that existed in schema but were silently dropped
+        // Note: form uses minBedrooms/minBathrooms as IDs; DB columns are min_beds/min_baths
+        min_beds: intOrNull((document.getElementById('minBedrooms')||{}).value),
+        min_baths: intOrNull((document.getElementById('minBathrooms')||{}).value),
+        min_year_built: intOrNull((document.getElementById('minYearBuilt')||{}).value),
+        // pool_required, max_rehab_budget: no form inputs exist yet (follow-up spec adds those)
+        // v2.2.14: v2.2.13 columns (water_source/sewer_type/no_flood_zone/no_hoa)
+        water_source: (wsChecked && wsChecked.value) || null,
+        sewer_type: (stChecked && stChecked.value) || null,
+        no_flood_zone: !!(document.getElementById('excludeFloodZone')||{}).checked,
+        no_hoa: !!(document.getElementById('excludeHoa')||{}).checked
       };
 
       try {
