@@ -1,9 +1,9 @@
--- v2.2.15 — Canonical metro mapping for investor_buy_box.markets
+-- v2.2.16 — Canonical metro mapping for investor_buy_box.markets
+-- Re-cut of v2.2.15 with the column-reference fix (outer SELECT column reference).
 -- Replaces 23-entry coast-nickname list with 19 U.S. Census MSA-aligned labels.
--- Idempotent: re-running on already-migrated data is a no-op (canonical strings pass through,
--- non-canonical strings that aren't in the mapping table are dropped).
+-- Idempotent: re-running on already-migrated data is a no-op.
 
-DO $$ BEGIN RAISE NOTICE 'v2.2.15 canonical metro migration starting'; END $$;
+DO $$ BEGIN RAISE NOTICE 'v2.2.16 canonical metro migration starting'; END $$;
 
 -- Step 1: explicit mapping for every legacy string currently in prod.
 -- canonical = NULL means DROP the string (no clean MSA fit).
@@ -62,7 +62,7 @@ UPDATE investor_buy_box bb
 SET markets = (
   SELECT COALESCE(
     ARRAY(
-      SELECT DISTINCT new_label
+      SELECT DISTINCT expanded.unnested -- v2.2.16 fix: correct column reference
       FROM UNNEST(bb.markets) AS m(legacy)
       LEFT JOIN mapping ON mapping.legacy = m.legacy
       LEFT JOIN canonical_set cs ON cs.label = m.legacy
@@ -88,7 +88,6 @@ SET markets = (
 WHERE bb.markets IS NOT NULL
   AND array_length(bb.markets, 1) > 0;
 
--- Step 3: reload PostgREST schema cache.
 NOTIFY pgrst, 'reload schema';
 
-DO $$ BEGIN RAISE NOTICE 'v2.2.15 canonical metro migration complete'; END $$;
+DO $$ BEGIN RAISE NOTICE 'v2.2.16 canonical metro migration complete'; END $$;
