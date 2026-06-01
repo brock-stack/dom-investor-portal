@@ -1254,27 +1254,30 @@
     // ── Buy Box: Load ──────────────────────────────────────────
 
     // All market options
-    // v2.2.14: expanded 23-region Florida list (matches v2.2.13 data migration strings verbatim)
+    // v2.2.15: replaced 23-entry coast-nickname list with 19 U.S. Census MSA-aligned labels (per Andrew 2026-06-01)
     const ALL_MARKETS = [
-      // Northwest Florida (Panhandle)
-      'Pensacola Bay Area', 'Emerald Coast', 'Forgotten Coast', 'Tallahassee / Big Bend',
-      // North Central Florida
-      'Nature Coast', 'Gainesville Area',
-      // Northeast Florida (First Coast)
-      'Jacksonville Metro', 'First Coast (St. Augustine / Amelia Island)',
+      // Southeast Florida
+      'Miami', 'Fort Lauderdale', 'West Palm Beach',
+      // Central West Florida
+      'Tampa', 'St. Petersburg',
       // Central Florida
-      'Greater Orlando', 'Lakeland-Winter Haven', 'Space Coast (Brevard)',
-      // Central West Florida (Tampa Bay Area)
-      'Tampa Bay (Tampa-St. Pete-Clearwater)', 'Sun Coast',
+      'Orlando-Kissimmee-Sanford',
+      // Northeast Florida
+      'Jacksonville',
       // Southwest Florida
-      'Fort Myers-Cape Coral', 'Naples (Paradise Coast)', 'Sarasota-Bradenton',
-      // South Central Florida (Heartland)
-      'Lake Okeechobee Region', 'Glades / Agricultural Heartland',
-      // Southeast Florida (Gold Coast / Treasure Coast)
-      'Treasure Coast (Martin/St. Lucie/Indian River)', 'Palm Beaches', 'Gold Coast (Miami-Fort Lauderdale-WPB)',
-      // Far South
-      'The Everglades', 'Florida Keys (Monroe)'
+      'North Port-Sarasota-Bradenton', 'Cape Coral-Fort Myers', 'Naples-Marco Island',
+      // Central Florida (inland)
+      'Lakeland-Winter Haven',
+      // East Central Florida
+      'Deltona-Daytona Beach-Ormond', 'Palm Bay-Melbourne-Titusville',
+      // Northwest Florida (Panhandle)
+      'Pensacola-Ferry Pass-Brent', 'Crestview-Fort Walton Beach-Destin', 'Tallahassee',
+      // North Central Florida
+      'Ocala', 'Gainesville',
+      // South Atlantic
+      'Port St. Lucie'
     ];
+    // 19 entries total. No coast nicknames. All labels match U.S. Census MSA names (or split components thereof).
     let _selectedMarkets = [];
 
     function initMarketPills(selected) {
@@ -1343,7 +1346,14 @@
         const { data: ibb } = await Portal.supabase
           .from('investor_buy_box').select('*').eq('user_id', portalUser.id).maybeSingle();
         if (ibb) {
-          initMarketPills(ibb.markets || []);
+          // v2.2.15: prune off-list markets at hydrate time so ghost strings can't re-enter _selectedMarkets.
+          const rawMarkets = ibb.markets || [];
+          const cleanMarkets = rawMarkets.filter(m => ALL_MARKETS.includes(m));
+          if (rawMarkets.length !== cleanMarkets.length) {
+            const dropped = rawMarkets.filter(m => !ALL_MARKETS.includes(m));
+            console.log('[Buy Box Hydrate] pruned', dropped.length, 'off-list markets:', dropped);
+          }
+          initMarketPills(cleanMarkets);
           if (ibb.max_price) document.getElementById('maxPurchasePrice').value = '$' + Number(ibb.max_price).toLocaleString();
           if (ibb.min_price) document.getElementById('minPurchasePrice').value = '$' + Number(ibb.min_price).toLocaleString();
           // min_arv hydration removed v2.2.14 (field removed from form; column preserved in DB)
@@ -1397,7 +1407,8 @@
 
       const ibbData = {
         user_id: portalUser.id,
-        markets: _selectedMarkets,
+        // v2.2.15: drop any non-canonical string before write. Last line of defense.
+        markets: _selectedMarkets.filter(m => ALL_MARKETS.includes(m)),
         property_types: propTypes,
         min_price: stripPrice('minPurchasePrice'),
         max_price: stripPrice('maxPurchasePrice'),
