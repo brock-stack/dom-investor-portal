@@ -367,6 +367,7 @@
     .popup-status-published { background: #22c55e; color: #fff; }
     .popup-status-pending { background: #f97316; color: #fff; }
     .popup-status-coming_soon { background: #4fc3f7; color: #1a2744; }
+    .popup-status-sold { background: #64748b; color: #fff; }
 
     /* Empty state */
     .empty-state {
@@ -674,6 +675,7 @@
           <button class="filter-pill" data-status="published">Available</button>
           <button class="filter-pill" data-status="pending">Pending</button>
           <button class="filter-pill" data-status="coming_soon">Coming Soon</button>
+          <button class="filter-pill" data-status="sold">Closed</button>
         </div>
         <div class="panel-title-row">
           <span id="listingCount">Loading...</span>
@@ -817,14 +819,23 @@
 
     async function loadListings() {
       try {
-        var result = await Portal.supabase
+        var ninetyDaysAgo = new Date(Date.now() - 90*24*60*60*1000).toISOString();
+
+        var activeResult = await Portal.supabase
           .from('portal_listings')
-          .select('id, asking_price, status, notes, featured, open_house_date, listing_id, property_id, listings (id, stage, list_price, property_id, properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)), properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)')
+          .select('id, asking_price, status, closed_at, notes, featured, open_house_date, listing_id, property_id, listings (id, stage, list_price, property_id, properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)), properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)')
           // Portal supports both: listing_id-linked (preferred) and property_id-only (fallback)
           .in('status', ['published', 'pending', 'coming_soon']);
 
-        if (result.error) throw result.error;
-        allListings = result.data || [];
+        var closedResult = await Portal.supabase
+          .from('portal_listings')
+          .select('id, asking_price, status, closed_at, notes, featured, open_house_date, listing_id, property_id, listings (id, stage, list_price, property_id, properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)), properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)')
+          .eq('status', 'sold')
+          .gte('closed_at', ninetyDaysAgo);
+
+        if (activeResult.error) throw activeResult.error;
+        if (closedResult.error) console.warn('[marketplace] closed fetch error:', closedResult.error.message);
+        allListings = [].concat(activeResult.data || [], closedResult.data || []);
 
         if (allListings.length > 0) {
           var listingIds = allListings.map(function(l) { return l.listing_id; }).filter(Boolean);
@@ -865,13 +876,13 @@
 
       var el = document.createElement('div');
       el.className = 'dom-map-marker';
-      el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:#4fc3f7;border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
+      el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (listing.status === 'sold' ? '#64748b' : '#4fc3f7') + ';border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
       el.dataset.id = listing.id;
 
       var popup = new mapboxgl.Popup({ offset: 25, closeButton: true })
         .setHTML(
           '<div class="map-popup">' +
-            (listing._photo ? '<div style="position:relative;"><img src="' + listing._photo + '" alt="property" style="width:100%;height:140px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">' + '<span class="popup-status popup-status-' + (listing.status||'published') + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(listing.status) + '</span></div>' : '') +
+            (listing._photo ? '<div style="position:relative;"><img src="' + listing._photo + '" alt="property" style="width:100%;height:140px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">' + '<span class="popup-status popup-status-' + (listing.status||'published') + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(listing.status, listing.closed_at) + '</span></div>' : '') +
             '<div style="padding:12px 14px 0;">' +
               '<div class="popup-address">' + (p.address || '') + '</div>' +
               '<div class="popup-city">' + [p.city, p.state].filter(Boolean).join(', ') + '</div>' +
@@ -979,20 +990,29 @@
       return m[slug] || slug || 'SFR';
     }
 
-    function getStatusLabel(status) {
-      var m = { published: 'Available', pending: 'Pending', coming_soon: 'Coming Soon' };
-      return m[status] || status;
+    function getStatusLabel(status, closedAt) {
+      var m = { published: 'Available', pending: 'Pending', coming_soon: 'Coming Soon', sold: 'Closed' };
+      var label = m[status] || status;
+      if (status === 'sold' && closedAt) {
+        try {
+          var d = new Date(closedAt);
+          var mm = d.toLocaleString('en-US', { month: 'short' });
+          var dd = d.getUTCDate();
+          label = 'Closed ' + mm + ' ' + dd;
+        } catch (e) {}
+      }
+      return label;
     }
 
     function getBadgeClass(status) {
-      var m = { published: 'badge-available', pending: 'badge-pending', coming_soon: 'badge-coming-soon' };
+      var m = { published: 'badge-available', pending: 'badge-pending', coming_soon: 'badge-coming-soon', sold: 'badge-sold' };
       return m[status] || '';
     }
 
     function updatePillCounts() {
-      var counts = { all: allListings.length, published: 0, pending: 0, coming_soon: 0 };
+      var counts = { all: allListings.length, published: 0, pending: 0, coming_soon: 0, sold: 0 };
       allListings.forEach(function(l) { if (counts[l.status] !== undefined) counts[l.status]++; });
-      var labels = { all: 'All', published: 'Available', pending: 'Pending', coming_soon: 'Coming Soon' };
+      var labels = { all: 'All', published: 'Available', pending: 'Pending', coming_soon: 'Coming Soon', sold: 'Closed' };
       document.querySelectorAll('.filter-pill').forEach(function(pill) {
         var s = pill.dataset.status;
         var count = counts[s] !== undefined ? counts[s] : 0;
@@ -1009,7 +1029,7 @@
       document.getElementById('listingCount').textContent = 'Showing ' + filtered.length + ' of ' + allListings.length;
 
       if (filtered.length === 0) {
-        var filterLabel = currentFilter === 'all' ? 'active' : getStatusLabel(currentFilter).toLowerCase();
+        var filterLabel = currentFilter === 'all' ? 'active' : getStatusLabel(currentFilter, null).toLowerCase();
         panel.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p style="margin-top:12px;color:var(--text-muted);">No ' + filterLabel + ' deals right now.<br>Check back soon.</p></div>';
         panel.style.cssText = '';
         return;
@@ -1030,8 +1050,8 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           var arvHtml = p.estimated_arv
             ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:16px;font-weight:800;color:var(--text);">' + Portal.fc(p.estimated_arv) + '</div></div>'
             : '';
-          return '<div class="card-wrapper"><div class="deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;">' +
-            '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status) + '</span>' +
+          return '<div class="card-wrapper"><div class="deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;' + (l.status === 'sold' ? 'opacity:0.75;' : '') + '">' +
+            '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status, l.closed_at) + '</span>' +
             '<button onclick="event.stopPropagation();toggleMktFavorite(this,\'' + l.id + '\')" data-lid="' + l.id + '" class="mkt-heart-btn" title="Save to Favorites" style="position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:background .15s;z-index:5;"">&#9825;</button>' +
           '</div>' +
             '<div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">' +
@@ -1494,11 +1514,11 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         var photo = l._photo
           ? '<img src="' + l._photo + '" alt="property" loading="lazy">'
           : '<div style="position:absolute;inset:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg></div>';
-        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? '#f97316' : '#4fc3f7');
-        var statusLabel = getStatusLabel(l.status).toUpperCase();
+        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? '#f97316' : (l.status === 'sold' ? '#64748b' : '#4fc3f7'));
+        var statusLabel = getStatusLabel(l.status, l.closed_at).toUpperCase();
         var isFav = (JSON.parse(localStorage.getItem('dom_portal_favorites') || '[]')).some(function(f){return f.id === l.id;});
 
-        return '<div class="mobile-listing-card" data-listing-id="' + l.id + '" onclick="mobileCardClick(event,\'' + l.id + '\')">' +
+        return '<div class="mobile-listing-card" data-listing-id="' + l.id + '" onclick="mobileCardClick(event,\'' + l.id + '\')" style="' + (l.status === 'sold' ? 'opacity:0.75;' : '') + '">' +
           '<div class="mobile-card-photo-wrap">' +
             photo +
             '<span style="position:absolute;top:10px;left:10px;background:' + statusColor + ';color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;">' + statusLabel + '</span>' +
