@@ -1289,10 +1289,12 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
     function toggleFloodLayer(show) {
       if (!map) return;
       try {
-        if (show && !map.getLayer(FEMA_LAYER_ID)) {
+        if (show) {
+          // Always rebuild on ON — fixes v2.2.19 bug where setLayoutProperty visibility flip
+          // didn't trigger tile requests on raster sources with bounds constraints.
           addFemaIfMissing();
         } else if (map.getLayer(FEMA_LAYER_ID)) {
-          map.setLayoutProperty(FEMA_LAYER_ID, 'visibility', show ? 'visible' : 'none');
+          map.setLayoutProperty(FEMA_LAYER_ID, 'visibility', 'none');
         }
       } catch (e) {
         console.warn('[flood] toggleFloodLayer failed:', e.message || e);
