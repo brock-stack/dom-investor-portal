@@ -1281,6 +1281,8 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           paint: { 'raster-opacity': 0.65 },
           layout: { visibility: floodVisible ? 'visible' : 'none' }
         });
+        // v2.2.21 — force tile repaint to work around stuck-tiles on raster source re-add
+        if (typeof map.triggerRepaint === 'function') map.triggerRepaint();
       } catch (e) {
         console.warn('[flood] addFemaIfMissing failed:', e.message || e);
       }
