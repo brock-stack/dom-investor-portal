@@ -661,6 +661,14 @@
         <button id="floodToggleBtn" class="map-style-btn" style="white-space:nowrap;">Flood Zones</button>
         <button id="resetMapBtn" class="map-style-btn" style="white-space:nowrap;">Reset Map</button>
       </div>
+      <div id="floodLegend" style="display:none;position:absolute;top:12px;left:170px;background:rgba(255,255,255,.95);border-radius:10px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.35);font-size:13px;width:260px;z-index:9999;backdrop-filter:blur(4px);color:#1a2744;font-family:inherit;">
+        <h3 style="margin:0 0 8px;font-size:14px;font-weight:600;text-align:center;border-bottom:1px solid #ddd;padding-bottom:4px;">Flood Zone Legend</h3>
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><span style="display:inline-block;width:26px;height:16px;border-radius:3px;border:1px solid #777;background:transparent;"></span>Zone X (No Screen) &mdash; Minimal Risk</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><span style="display:inline-block;width:26px;height:16px;border-radius:3px;border:1px solid #ccc;background:#fdbf6f;"></span>Zone X (Shaded) &mdash; 0.2% Annual Chance</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><span style="display:inline-block;width:26px;height:16px;border-radius:3px;border:1px solid #ccc;background:#fdf7cc;"></span>Zone D &mdash; Undetermined Risk</div>
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><span style="display:inline-block;width:26px;height:16px;border-radius:3px;border:1px solid #ccc;background:#a6cee3;"></span>Zones AE/A/AO/AH/VE/V &mdash; 1% Annual Chance</div>
+        <button id="floodLegendClose" style="display:block;margin:10px auto 0;border:none;background:#f2f2f2;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:12px;color:#1a2744;">Close</button>
+      </div>
       <!-- Mobile map style select (injected by initMobileZillow, desktop hidden via CSS) -->
       <select id="mapStyleSelect" onchange="changeMapStyle(this.value)" style="display:none;"></select>
       
@@ -778,8 +786,16 @@
           if (floodVisible) toggleFloodLayer(true);
         });
       };
-      // Apply on load based on current theme
-      map.on('load', function() { window._applyThemeMapStyle(); });
+      // Apply on load based on current theme; register style.load reattach hook
+      map.on('load', function() {
+        window._applyThemeMapStyle();
+        // Re-add FEMA flood layer if it was visible before a base-style swap
+        map.on('style.load', function() {
+          if (floodVisible) {
+            addFemaIfMissing();
+          }
+        });
+      });
 
       window.changeMapStyle = function(styleKey) {
         var style = STYLE_MAP[styleKey] || CUSTOM_STYLE;
@@ -813,7 +829,16 @@
       var floodBtn = document.getElementById('floodToggleBtn'); if (floodBtn) floodBtn.addEventListener('click', function() {
         floodVisible = !floodVisible;
         toggleFloodLayer(floodVisible);
-        document.getElementById('floodToggleBtn').textContent = '\u{1F4A7} Flood Zones: ' + (floodVisible ? 'ON' : 'OFF');
+        floodBtn.textContent = '\u{1F4A7} Flood Zones: ' + (floodVisible ? 'ON' : 'OFF');
+        floodBtn.classList.toggle('active', floodVisible);
+        var legend = document.getElementById('floodLegend');
+        if (legend) legend.style.display = floodVisible ? 'block' : 'none';
+      });
+
+      var floodLegendClose = document.getElementById('floodLegendClose');
+      if (floodLegendClose) floodLegendClose.addEventListener('click', function() {
+        var legend = document.getElementById('floodLegend');
+        if (legend) legend.style.display = 'none';
       });
     }
 
@@ -1229,12 +1254,49 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
       map.fitBounds(bounds, { padding: fitPad, maxZoom: 13, duration: 1000 });
     }
 
-    function toggleFloodLayer(show) {
+    const FEMA_SOURCE_ID = 'fema-flood';
+    const FEMA_LAYER_ID = 'fema-flood-layer';
+    // Florida bounding box — keeps the FEMA service load low.
+    // Bounds chosen to cover all of FL mainland + keys + panhandle with ~10mi margin.
+    const FEMA_BOUNDS = [[-87.7, 24.4], [-79.9, 31.1]];
+
+    function addFemaIfMissing() {
+      if (!map) return;
+      if (map.getLayer(FEMA_LAYER_ID)) map.removeLayer(FEMA_LAYER_ID);
+      if (map.getSource(FEMA_SOURCE_ID)) map.removeSource(FEMA_SOURCE_ID);
       try {
-        if (map.getLayer('fema-flood-layer')) {
-          map.setLayoutProperty('fema-flood-layer', 'visibility', show ? 'visible' : 'none');
+        map.addSource(FEMA_SOURCE_ID, {
+          type: 'raster',
+          tiles: [
+            'https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=512,512&format=png32&transparent=true&f=image'
+          ],
+          tileSize: 512,
+          bounds: [FEMA_BOUNDS[0][0], FEMA_BOUNDS[0][1], FEMA_BOUNDS[1][0], FEMA_BOUNDS[1][1]],
+          minzoom: 5
+        });
+        map.addLayer({
+          id: FEMA_LAYER_ID,
+          type: 'raster',
+          source: FEMA_SOURCE_ID,
+          paint: { 'raster-opacity': 0.65 },
+          layout: { visibility: floodVisible ? 'visible' : 'none' }
+        });
+      } catch (e) {
+        console.warn('[flood] addFemaIfMissing failed:', e.message || e);
+      }
+    }
+
+    function toggleFloodLayer(show) {
+      if (!map) return;
+      try {
+        if (show && !map.getLayer(FEMA_LAYER_ID)) {
+          addFemaIfMissing();
+        } else if (map.getLayer(FEMA_LAYER_ID)) {
+          map.setLayoutProperty(FEMA_LAYER_ID, 'visibility', show ? 'visible' : 'none');
         }
-      } catch(e) {}
+      } catch (e) {
+        console.warn('[flood] toggleFloodLayer failed:', e.message || e);
+      }
     }
 
     function showEmpty(msg) {
