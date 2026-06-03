@@ -529,7 +529,7 @@
 
   // Load recent closings
   async function loadRecentClosings() {
-    var grid = document.getElementById('closingsGrid');
+    var grid = document.getElementById('recentClosings');
     var isAnonRC = true;
     try { var _rcSession = await Portal.getSession(); isAnonRC = !_rcSession; } catch(e) { isAnonRC = true; }
 
