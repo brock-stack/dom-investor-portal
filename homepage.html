@@ -534,15 +534,16 @@
     try { var _rcSession = await Portal.getSession(); isAnonRC = !_rcSession; } catch(e) { isAnonRC = true; }
 
     var placeholderClosings = [
-      { city: 'Sarasota', state: 'FL', type: 'SFR', beds: 4, baths: 3, price: 385000, arv: 645000, closed: 'Feb 2026', _isPad: true },
-      { city: 'Tampa', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 312000, arv: 525000, closed: 'Jan 2026', _isPad: true }
+      { city: 'Sarasota', state: 'FL', type: 'SFR', beds: 4, baths: 3, price: 385000, arv: 645000, closed: 'May 2026', _isPad: true, _photoUrl: '/img/track-record/sarasota.jpg' },
+      { city: 'Tampa', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 312000, arv: 525000, closed: 'Apr 2026', _isPad: true, _photoUrl: '/img/track-record/tampa.jpg' }
     ];
     var hardcodedRealCapeCoral = { city: 'Cape Coral', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 260000, arv: 345000, closed: 'Mar 2026', _isPad: false, _photoUrl: 'https://spvuknwwppqsbyrfduvw.supabase.co/storage/v1/object/public/attachments/listings/7580b624-195b-45e4-b21a-ae06110b4b88/photos/1779467873643_IMG_5028_Medium.jpeg' };
 
     function closingCard(c, photoUrl) {
       var isPad = !!c._isPad;
+      // isPad placeholders get permanent blur (Option Z: stays blurred in both auth states)
       var photoZone = isPad
-        ? '<div class="hp-closing-photo hp-closing-pad" style="height:160px;background:linear-gradient(135deg,#3b4a6b 0%,#1a2744 50%,#4fc3f7 100%);filter:blur(8px);opacity:0.75;"></div>'
+        ? '<div class="hp-closing-photo" style="height:160px;overflow:hidden;filter:blur(12px);"><img src="' + photoUrl + '" alt="' + c.city + '" style="width:100%;height:100%;object-fit:cover;"></div>'
         : (photoUrl
             ? '<div class="hp-closing-photo" style="height:160px;overflow:hidden;"><img src="' + photoUrl + '" alt="' + c.city + '" style="width:100%;height:100%;object-fit:cover;"></div>'
             : '<div class="hp-closing-photo" style="height:160px;background:linear-gradient(135deg,var(--surface-2) 0%,var(--bg-primary) 100%);display:flex;align-items:center;justify-content:center;font-size:52px;">🏡</div>');
@@ -621,7 +622,7 @@
 
     if (isAnonRC) {
       try {
-        grid.querySelectorAll('.hp-closing-photo:not(.hp-closing-pad)').forEach(function(el) { el.style.filter = 'blur(12px)'; });
+        grid.querySelectorAll('.hp-closing-photo').forEach(function(el) { el.style.filter = 'blur(12px)'; });
         grid.querySelectorAll('.hp-closing-location').forEach(function(el) { el.style.filter = 'blur(10px)'; });
         grid.querySelectorAll('.hp-closing-specs').forEach(function(el) { el.style.filter = 'blur(10px)'; });
       } catch(e) {}
