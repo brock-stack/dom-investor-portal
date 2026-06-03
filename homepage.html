@@ -490,7 +490,7 @@
           ? '<img src="' + l._photo + '" alt="' + loc + '" style="width:100%;height:100%;object-fit:cover;">'
           : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:28px;opacity:0.18;"></div>';
         return '<div class="mini-card">' +
-          '<div class="mini-photo" style="position:relative;">' + photoHtml +
+          '<div class="mini-photo hp-photo-zone" style="position:relative;">' + photoHtml +
             '<span style="position:absolute;top:10px;left:10px;background:#f97316;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;">⭐ Featured</span>' +
           '</div>' +
           '<div class="mini-content">' +
@@ -510,6 +510,15 @@
           '</div>' +
         '</div>';
       }).join('');
+      // v2.2.23 — blur ONLY the photo when logged out; all text/numbers stay readable
+      try {
+        const _sess = await Portal.getSession();
+        if (!_sess) {
+          section.querySelectorAll('.hp-photo-zone').forEach(function(el) {
+            el.style.filter = 'blur(12px)';
+          });
+        }
+      } catch (e2) {}
     } catch (e) {
       section.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><p>Check back soon for featured deals.</p></div>';
     }
@@ -517,15 +526,20 @@
 
   // Load recent closings
   async function loadRecentClosings() {
-    var grid = document.getElementById('closingsGrid');
+    var grid = document.getElementById('closingsGrid') || document.getElementById('recentClosings');
+    if (!grid) return;
+
     var staticData = [
-      { city: 'Kissimmee', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 185000, closed: 'Mar 2026' },
-      { city: 'Port Charlotte', state: 'FL', type: 'SFR', beds: 4, baths: 2, price: 210000, closed: 'Mar 2026' },
-      { city: 'Haines City', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 162000, closed: 'Feb 2026' }
+      { city: 'Cape Coral', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 260000, closed: 'Mar 2026' },
+      { city: 'North Port', state: 'FL', type: 'SFR', beds: 4, baths: 2, price: 219000, closed: 'Feb 2026' },
+      { city: 'Kissimmee', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 185000, closed: 'Jan 2026' }
     ];
-    function closingCard(city, state, type, beds, baths, price, closedLabel) {
+    function closingCard(city, state, type, beds, baths, price, closedLabel, photoUrl) {
+      var photo = photoUrl
+        ? '<img src="' + photoUrl + '" alt="' + city + ' ' + state + '" style="width:100%;height:100%;object-fit:cover;">'
+        : '<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--surface-2) 0%,var(--bg-primary) 100%);display:flex;align-items:center;justify-content:center;font-size:52px;">🏡</div>';
       return '<div style="background:var(--surface);border:1px solid var(--border-color);border-radius:12px;overflow:hidden;">' +
-        '<div style="height:160px;background:linear-gradient(135deg,var(--surface-2) 0%,var(--bg-primary) 100%);display:flex;align-items:center;justify-content:center;font-size:52px;">🏡</div>' +
+        '<div class="hp-closing-photo" style="height:160px;overflow:hidden;">' + photo + '</div>' +
         '<div style="padding:20px;">' +
           '<div style="display:inline-block;background:rgba(34,197,94,0.15);color:#22c55e;font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:100px;margin-bottom:10px;">CLOSED</div>' +
           '<div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">' + city + ', ' + state + '</div>' +
@@ -538,29 +552,58 @@
       '</div>';
     }
     try {
+      // v2.2.23 — Read from portal_listings (correct table with sold_price + closed_at)
       var { data, error } = await Portal.supabase
-        .from('listings')
-        .select('id, list_price, sold_date, properties(city, state, property_type, bedrooms, bathrooms)')
-        .eq('stage', 'sold')
-        .order('sold_date', { ascending: false })
+        .from('portal_listings')
+        .select('id, listing_id, status, sold_price, closed_at, properties(city, state, property_type, bedrooms, bathrooms)')
+        .eq('status', 'sold')
+        .order('closed_at', { ascending: false, nullsFirst: false })
         .limit(3);
-      if (error || !data || data.length === 0) {
-        grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
-        return;
+
+      // Fetch primary photos
+      if (data && data.length > 0) {
+        var listingIds = data.map(function(l) { return l.listing_id; }).filter(Boolean);
+        if (listingIds.length > 0) {
+          var photosRes = await Portal.supabase
+            .from('listing_photos')
+            .select('listing_id, url')
+            .in('listing_id', listingIds)
+            .eq('is_primary', true);
+          var photoMap = {};
+          (photosRes.data || []).forEach(function(p) { photoMap[p.listing_id] = p.url; });
+          data.forEach(function(l) { l._photo = photoMap[l.listing_id] || null; });
+        }
       }
-      grid.innerHTML = data.map(function(l) {
-        var p = l.properties || {};
-        var city = p.city || 'Florida';
-        var state = p.state || 'FL';
-        var type = p.property_type || 'SFR';
-        var beds = p.bedrooms || '—';
-        var baths = p.bathrooms || '—';
-        var price = l.asking_price || 0;
-        var closedLabel = l.published_at ? new Date(l.published_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
-        return closingCard(city, state, type, beds, baths, price, closedLabel);
-      }).join('');
+
+      if (error || !data || data.length === 0) {
+        grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed, null); }).join('');
+      } else {
+        grid.innerHTML = data.map(function(l) {
+          var p = l.properties || {};
+          var city = p.city || 'Florida';
+          var state = p.state || 'FL';
+          var type = p.property_type || 'SFR';
+          var beds = p.bedrooms || '—';
+          var baths = p.bathrooms || '—';
+          var price = l.sold_price || 0;
+          var closedLabel = l.closed_at
+            ? new Date(l.closed_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+            : '';
+          return closingCard(city, state, type, beds, baths, price, closedLabel, l._photo || null);
+        }).join('');
+      }
+
+      // v2.2.23 — blur ONLY the photo when logged out
+      try {
+        var _closedSess = await Portal.getSession();
+        if (!_closedSess) {
+          grid.querySelectorAll('.hp-closing-photo').forEach(function(el) {
+            el.style.filter = 'blur(12px)';
+          });
+        }
+      } catch (e2) {}
     } catch(e) {
-      grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed); }).join('');
+      grid.innerHTML = staticData.map(function(c) { return closingCard(c.city, c.state, c.type, c.beds, c.baths, c.price, c.closed, null); }).join('');
     }
   }
 
