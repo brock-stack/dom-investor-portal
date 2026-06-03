@@ -537,7 +537,7 @@
       { city: 'Sarasota', state: 'FL', type: 'SFR', beds: 4, baths: 3, price: 385000, arv: 445000, closed: 'Feb 2026', _isPad: true },
       { city: 'Tampa', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 312000, arv: 365000, closed: 'Jan 2026', _isPad: true }
     ];
-    var hardcodedRealCapeCoral = { city: 'Cape Coral', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 260000, arv: 345000, closed: 'Mar 2026', _isPad: false };
+    var hardcodedRealCapeCoral = { city: 'Cape Coral', state: 'FL', type: 'SFR', beds: 3, baths: 2, price: 260000, arv: 345000, closed: 'Mar 2026', _isPad: false, _photoUrl: 'https://spvuknwwppqsbyrfduvw.supabase.co/storage/v1/object/public/attachments/listings/7580b624-195b-45e4-b21a-ae06110b4b88/photos/1779467873643_IMG_5028_Medium.jpeg' };
 
     function closingCard(c, photoUrl) {
       var isPad = !!c._isPad;
@@ -610,7 +610,7 @@
     finalThree = finalThree.slice(0, 3);
 
     grid.innerHTML = finalThree.map(function(c) {
-      var pUrl = c._listingId ? (rcPhotoMap[c._listingId] || null) : null;
+      var pUrl = c._listingId ? (rcPhotoMap[c._listingId] || null) : (c._photoUrl || null);
       return closingCard(c, pUrl);
     }).join('');
 
