@@ -41,8 +41,34 @@
         mask-image: linear-gradient(to right, black 85%, transparent 100%);
       }
       .tab-btn { scroll-snap-align: start; }
-      .dashboard-header-top { gap: 8px; }
-      .dashboard-user-info { text-align: left; width: 100%; }
+      .dashboard-header-top {
+        gap: 8px;
+        flex-wrap: nowrap; /* force one row */
+        align-items: baseline; /* title baseline aligns with name baseline */
+      }
+      .dashboard-title {
+        font-size: 18px; /* shrink from 26px so it fits next to user-info */
+        flex-shrink: 1;
+        min-width: 0; /* allow ellipsis if needed */
+      }
+      .dashboard-user-info {
+        flex-shrink: 0; /* never compress; the title shrinks if needed */
+        max-width: 55%; /* cap so a long name doesn't push title off */
+        min-width: 0;
+        text-align: right; /* explicit — no cascade dependency */
+      }
+      .dashboard-user-name {
+        font-size: 13px; /* shrink from 15px */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dashboard-user-email {
+        font-size: 11px; /* shrink from 13px */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .home-row2, .home-row3 { grid-template-columns: 1fr; gap: 16px; }
       .home-tools-grid, .home-coming-grid { grid-template-columns: repeat(2, 1fr); }
     }
