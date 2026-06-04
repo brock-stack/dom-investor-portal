@@ -3170,7 +3170,6 @@
 
       listingId = new URLSearchParams(window.location.search).get('id');
       if (!listingId) { window.location.href = '/marketplace.html'; return; }
-      initFavorites();
 
       // Log deal view (fire-and-forget)
       (function() {
@@ -3266,6 +3265,7 @@
 
       listing = result.data;
       property = result.data.properties || {};
+      initFavorites(); // moved here so listing.listing_id is available for CRM id lookup
 
       renderHeader();
       renderStatsBar();
