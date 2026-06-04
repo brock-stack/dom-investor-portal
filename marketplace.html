@@ -1111,8 +1111,11 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
     }
 
     function _applyMktHearts() {
+      var portalToCrm = {};
+      allListings.forEach(function(l){ if(l.id && l.listing_id) portalToCrm[l.id] = l.listing_id; });
       document.querySelectorAll('.mkt-heart-btn').forEach(function(btn){
-        if (_mktFavIds.has(btn.dataset.lid)) {
+        var crmId = portalToCrm[btn.dataset.lid];
+        if (crmId && _mktFavIds.has(crmId)) {
           btn.innerHTML = '&#9829;';
           btn.style.color = '#e8476a';
           btn.style.background = 'rgba(232,71,106,0.18)';
@@ -1172,20 +1175,23 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           if (!pu.data) return;
           _mktPortalUid = pu.data.id;
         }
-        if (_mktFavIds.has(listingId)) {
-          await Portal.supabase.from('investor_saved_deals').delete().eq('user_id', _mktPortalUid).eq('listing_id', listingId);
-          _mktFavIds.delete(listingId);
+        // Translate portal_listings.id → CRM listings.id before writing
+        var pl = await Portal.supabase.from('portal_listings').select('listing_id, property_id').eq('id', listingId).maybeSingle();
+        if (!pl.data || !pl.data.listing_id) { Portal.toast('Cannot save this listing right now.', 'error'); return; }
+        var crmListingId = pl.data.listing_id;
+        if (_mktFavIds.has(crmListingId)) {
+          await Portal.supabase.from('investor_saved_deals').delete().eq('user_id', _mktPortalUid).eq('listing_id', crmListingId);
+          _mktFavIds.delete(crmListingId);
           _applyMktHearts();
           _showFavModal(false);
         } else {
-          var pl = await Portal.supabase.from('portal_listings').select('property_id').eq('id', listingId).maybeSingle();
           await Portal.supabase.from('investor_saved_deals').insert({
             user_id: _mktPortalUid,
-            listing_id: listingId,
-            property_id: pl.data ? pl.data.property_id : null,
+            listing_id: crmListingId,
+            property_id: pl.data.property_id || null,
             saved_at: new Date().toISOString()
           });
-          _mktFavIds.add(listingId);
+          _mktFavIds.add(crmListingId);
           _applyMktHearts();
           _showFavModal(true);
         }
