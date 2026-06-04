@@ -616,6 +616,10 @@
       font-weight: 600;
     }
     .data-table a:hover { text-decoration: underline; }
+    @media (max-width: 640px) {
+      .data-table-wrap { overflow-x: auto; }
+      .data-table td:last-child, .data-table th:last-child { padding-right: 24px; }
+    }
     .badge-closed {
       background: rgba(34,197,94,0.15);
       color: #22c55e;

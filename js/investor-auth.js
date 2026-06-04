@@ -103,7 +103,7 @@ window.Portal = {
         navRight.innerHTML = '<div id="navAvatarBtn" onclick="Portal.openProfileMenu()" style="width:36px;height:36px;border-radius:50%;background:#4fc3f7;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(79,195,247,0.4);">' + inner + '</div>';
       }
     } else {
-      if (navRight) navRight.innerHTML = '<a href="/login.html" style="color:#4fc3f7;font-size:13px;font-weight:600;text-decoration:none;margin-right:8px;">Sign In</a><a href="/signup.html" style="background:#4fc3f7;color:#1a2744;font-size:13px;font-weight:700;padding:7px 16px;border-radius:8px;text-decoration:none;">Get Access</a>';
+      if (navRight) navRight.innerHTML = '<a href="/signup.html" style="background:#4fc3f7;color:#1a2744;font-size:13px;font-weight:700;padding:7px 16px;border-radius:8px;text-decoration:none;">Get Access</a>';
     }
     this.updateThemeBtn();
   },
@@ -344,7 +344,7 @@ window.Portal = {
   Portal.getSession().then(function(session) {
     var btn = document.querySelector('.pin-menu-btn');
     if (!session && btn) {
-      btn.outerHTML = '<a href="/login.html" class="btn-secondary btn-sm" style="font-size:13px;padding:7px 16px;white-space:nowrap;">Sign In</a>';
+      btn.outerHTML = '<a href="/login.html" class="btn-secondary btn-sm" style="font-size:13px;padding:8px 18px;white-space:nowrap;box-shadow:0 0 0 1px rgba(79,195,247,0.15), 0 2px 12px rgba(79,195,247,0.18);">Sign In</a>';
     } else if (session) {
       window._portalMenuUser = { name: session.user.email.split('@')[0], email: session.user.email };
     }
