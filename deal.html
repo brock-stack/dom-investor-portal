@@ -3052,11 +3052,13 @@
       }
       var puid = await _getPortalUserId();
       if (!puid) { Portal.toast('Account not found. Please log in again.', 'error'); return; }
+      var crmListingId = listing && listing.listing_id;
+      if (!crmListingId) { Portal.toast('Cannot save this listing right now.', 'error'); return; }
       try {
         if (_isSaved) {
           // Delete
           var del = await Portal.supabase.from('investor_saved_deals')
-            .delete().eq('user_id', puid).eq('listing_id', listingId);
+            .delete().eq('user_id', puid).eq('listing_id', crmListingId);
           if (del.error) throw del.error;
           _isSaved = false;
           _setFavCard(false);
@@ -3065,8 +3067,8 @@
           // Insert
           var ins = await Portal.supabase.from('investor_saved_deals').insert({
             user_id: puid,
-            listing_id: listingId,
-            property_id: listing ? listing.property_id : null,
+            listing_id: crmListingId,
+            property_id: listing.property_id || null,
             saved_at: new Date().toISOString()
           });
           if (ins.error) throw ins.error;
@@ -3101,8 +3103,10 @@
       try {
         var puid = await _getPortalUserId();
         if (!puid) return;
+        var crmListingId = listing && listing.listing_id;
+        if (!crmListingId) return;
         var res = await Portal.supabase.from('investor_saved_deals')
-          .select('id').eq('user_id', puid).eq('listing_id', listingId).maybeSingle();
+          .select('id').eq('user_id', puid).eq('listing_id', crmListingId).maybeSingle();
         _isSaved = !!res.data;
         _setFavCard(_isSaved);
       } catch(e) { /* silently fall back to localStorage state */ }

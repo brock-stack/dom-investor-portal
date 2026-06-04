@@ -1491,43 +1491,42 @@
         }
         var listingIds = rows.map(function(r){ return r.listing_id; }).filter(Boolean);
         var metaMap = {};
+        // crmToPortal: CRM listings.id -> portal_listings.id (for building deal.html URLs)
+        var crmToPortal = {};
         if (listingIds.length) {
           var lRes = await Portal.supabase.from('portal_listings')
             .select('id, listing_id, asking_price, properties(address, city, state, bedrooms, bathrooms, sqft, property_type)')
-            .in('id', listingIds);
-          // Build map from portal listing id -> crm listing id
-          var crmListingIdMap = {};
+            .in('listing_id', listingIds);
           (lRes.data || []).forEach(function(l) {
             var p = l.properties || {};
-            metaMap[l.id] = { price: l.asking_price, address: p.address, city: p.city, state: p.state, beds: p.bedrooms, baths: p.bathrooms, sqft: p.sqft, type: p.property_type };
-            if (l.listing_id) crmListingIdMap[l.id] = l.listing_id; // portal id -> crm listing id
+            if (l.listing_id) {
+              // Key metaMap by CRM listing id (what investor_saved_deals.listing_id stores)
+              metaMap[l.listing_id] = { price: l.asking_price, address: p.address, city: p.city, state: p.state, beds: p.bedrooms, baths: p.bathrooms, sqft: p.sqft, type: p.property_type };
+              crmToPortal[l.listing_id] = l.id; // CRM id -> portal id (for deal URL)
+            }
           });
           // Fetch cover photos using CRM listing IDs
-          var crmIds = Object.values(crmListingIdMap);
-          // Reverse map: crm listing id -> portal listing id
-          var crmToPortal = {};
-          Object.keys(crmListingIdMap).forEach(function(pid){ crmToPortal[crmListingIdMap[pid]] = pid; });
+          var crmIds = listingIds.filter(function(id){ return !!crmToPortal[id]; });
           if (crmIds.length) {
             var photoRes = await Portal.supabase.from('listing_photos')
               .select('listing_id, url').in('listing_id', crmIds).eq('is_primary', true);
             (photoRes.data || []).forEach(function(ph) {
-              var pid = crmToPortal[ph.listing_id];
-              if (pid && metaMap[pid]) metaMap[pid].photo = ph.url;
+              if (metaMap[ph.listing_id]) metaMap[ph.listing_id].photo = ph.url;
             });
             // Fallback: any photo for missing
-            var neededCrm = crmIds.filter(function(cid){ var pid=crmToPortal[cid]; return pid && metaMap[pid] && !metaMap[pid].photo; });
+            var neededCrm = crmIds.filter(function(cid){ return metaMap[cid] && !metaMap[cid].photo; });
             if (neededCrm.length) {
               var fbRes = await Portal.supabase.from('listing_photos').select('listing_id, url').in('listing_id', neededCrm).order('sort_order').limit(neededCrm.length * 2);
               (fbRes.data || []).forEach(function(ph) {
-                var pid = crmToPortal[ph.listing_id];
-                if (pid && metaMap[pid] && !metaMap[pid].photo) metaMap[pid].photo = ph.url;
+                if (metaMap[ph.listing_id] && !metaMap[ph.listing_id].photo) metaMap[ph.listing_id].photo = ph.url;
               });
             }
           }
         }
         var cards = rows.map(function(row) {
           var m = metaMap[row.listing_id] || {};
-          var dealLink = '/deal.html?id=' + (row.listing_id || '');
+          var portalId = crmToPortal[row.listing_id] || '';
+          var dealLink = '/deal.html?id=' + portalId;
           var fullAddr = [m.address, m.city, m.state].filter(Boolean).join(', ') || 'Unknown Address';
           var streetAddr = m.address || fullAddr;
           var cityState = [m.city, m.state].filter(Boolean).join(', ');
@@ -1875,22 +1874,23 @@
         if (!savedList.length) {
           if (savesEl) savesEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);">No favorites yet. <a href="/marketplace.html" style="color:#4fc3f7;font-weight:600;">Browse deals</a></div>';
         } else {
-          var slids = savedList.map(function(s){ return s.listing_id; });
-          var plRes2 = await Portal.supabase.from('portal_listings').select('id,listing_id,asking_price,properties(address,city,state)').in('id', slids);
+          var slids = savedList.map(function(s){ return s.listing_id; }); // CRM listing ids after fix
+          var plRes2 = await Portal.supabase.from('portal_listings').select('id,listing_id,asking_price,properties(address,city,state)').in('listing_id', slids);
           var plMap2 = {}; var crmPlMap2 = {};
-          (plRes2.data||[]).forEach(function(l){ plMap2[l.id]=l; if(l.listing_id) crmPlMap2[l.listing_id]=l.id; });
-          var crmIds2 = Object.keys(crmPlMap2);
+          (plRes2.data||[]).forEach(function(l){ if(l.listing_id){ plMap2[l.listing_id]=l; crmPlMap2[l.listing_id]=l.id; } });
+          var crmIds2 = Object.keys(crmPlMap2); // these ARE the CRM ids
           var photoMap2 = {};
           if (crmIds2.length) {
             var phRes2 = await Portal.supabase.from('listing_photos').select('listing_id,url').in('listing_id',crmIds2).eq('is_primary',true);
-            (phRes2.data||[]).forEach(function(ph){ var pid=crmPlMap2[ph.listing_id]; if(pid) photoMap2[pid]=ph.url; });
+            (phRes2.data||[]).forEach(function(ph){ photoMap2[ph.listing_id]=ph.url; }); // keyed by CRM id
           }
           if (savesEl) savesEl.innerHTML = savedList.map(function(s){
             var l=plMap2[s.listing_id]||{}; var p=l.properties||{};
             var addr=p.address||'Unknown'; var city=[p.city,p.state].filter(Boolean).join(', ');
             var price=l.asking_price?'$'+Number(l.asking_price).toLocaleString():'';
-            var photo=photoMap2[s.listing_id];
-            return '<a href="/deal.html?id='+s.listing_id+'" style="flex-shrink:0;width:130px;text-decoration:none;background:var(--surface-2);border-radius:10px;overflow:hidden;border:1px solid var(--border);display:block;">'
+            var photo=photoMap2[s.listing_id]; // CRM id lookup
+            var portalId2=crmPlMap2[s.listing_id]||s.listing_id; // portal id for URL
+            return '<a href="/deal.html?id='+portalId2+'" style="flex-shrink:0;width:130px;text-decoration:none;background:var(--surface-2);border-radius:10px;overflow:hidden;border:1px solid var(--border);display:block;">'
               +(photo?'<img src="'+photo+'" style="width:130px;height:80px;object-fit:cover;display:block;">':'<div style="width:130px;height:80px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:24px;">&#127968;</div>')
               +'<div style="padding:8px;"><div style="font-size:11px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+addr+'</div>'
               +'<div style="font-size:10px;color:var(--text-muted);">'+city+'</div>'
@@ -1909,8 +1909,8 @@
         var saveListingIds = (r3saves.data||[]).map(function(s){return s.listing_id;}).filter(Boolean);
         var saveAddrMap = {};
         if (saveListingIds.length) {
-          var saRes = await Portal.supabase.from('portal_listings').select('id,properties(address)').in('id',saveListingIds);
-          (saRes.data||[]).forEach(function(l){ if(l.properties&&l.properties.address) saveAddrMap[l.id]=l.properties.address; });
+          var saRes = await Portal.supabase.from('portal_listings').select('id,listing_id,properties(address)').in('listing_id',saveListingIds);
+          (saRes.data||[]).forEach(function(l){ if(l.properties&&l.properties.address&&l.listing_id) saveAddrMap[l.listing_id]=l.properties.address; });
         }
         (r3saves.data||[]).forEach(function(s){ var addr=saveAddrMap[s.listing_id]?(' '+saveAddrMap[s.listing_id].split(',')[0]):''; events3.push({ts:s.saved_at,label:'Favorited'+addr,icon:'<span style="color:#e8476a;">&#10084;</span>'}); });
         (r3offers.data||[]).forEach(function(o){
