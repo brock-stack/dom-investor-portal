@@ -616,6 +616,46 @@
       font-weight: 600;
     }
     .data-table a:hover { text-decoration: underline; }
+    @media (max-width: 640px) {
+      .data-table-wrap { overflow-x: visible; border-radius: 12px; }
+      .data-table { display: block; }
+      .data-table thead { display: none; }
+      .data-table tbody { display: block; }
+      .data-table tr {
+        display: block;
+        border-bottom: 1px solid var(--border);
+        padding: 12px 16px;
+      }
+      .data-table tr:last-child { border-bottom: none; }
+      .data-table tr:hover td { background: transparent; }
+      .data-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 0;
+        border-bottom: none;
+        font-size: 13px;
+        text-align: right;
+      }
+      .data-table td::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+      .data-table td:first-child {
+        font-weight: 700;
+        font-size: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 6px;
+      }
+      .data-table td:first-child::before { display: none; }
+    }
     .badge-closed {
       background: rgba(34,197,94,0.15);
       color: #22c55e;
@@ -1746,11 +1786,11 @@
           var status = row.status || 'Other';
           var badgeCls = status.toLowerCase().includes('closed') ? 'badge-closed' : (status.toLowerCase().includes('pending') ? 'badge-pending' : 'badge-other');
           html += '<tr>' +
-            '<td>' + addr + '</td>' +
-            '<td>' + closed + '</td>' +
-            '<td>' + price + '</td>' +
-            '<td>' + type + '</td>' +
-            '<td><span class="' + badgeCls + '">' + status + '</span></td>' +
+            '<td data-label="Property">' + addr + '</td>' +
+            '<td data-label="Closed Date">' + closed + '</td>' +
+            '<td data-label="Purchase Price">' + price + '</td>' +
+            '<td data-label="Deal Type">' + type + '</td>' +
+            '<td data-label="Status"><span class="' + badgeCls + '">' + status + '</span></td>' +
           '</tr>';
         });
         html += '</tbody></table></div>';
