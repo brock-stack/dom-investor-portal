@@ -729,6 +729,9 @@
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
+  <!-- jsPDF for Calculator Download PDF (v2.3.5) -->
+  <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
     <nav id="investorNav" class="investor-nav">
@@ -1283,6 +1286,7 @@
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
   <input id="pfName" type="text" placeholder="Analysis name..." style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:13px;width:180px;font-family:inherit;">
   <button class="pf-save-btn" onclick="savePf()">Save Analysis</button>
+          <button class="pf-pdf-btn" onclick="downloadPfPdf()" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">&#128196; Download PDF</button>
   </div>
   </div>
 
@@ -1827,7 +1831,7 @@
           var portalListingId = plMap[row.listing_id] || null;
           var viewLink = portalListingId
             ? '/deal.html?id=' + portalListingId + '&tab=proforma&mode=' + pfMode + '&sp_id=' + row.id + '&view_pdf=1'
-            : '#';
+            : '/dashboard?tab=calculator&sp_id=' + row.id; // v2.3.5: freeform saves route to Calculator
           var dispName = (row.name || '-') + (isInf ? ' <span title="Infinite Return">&#9854;</span>' : '');
           html += '<tr>' +
             '<td>' + badge + '</td>' +
@@ -2331,13 +2335,161 @@
 
     // ── END v2.3.1 Pro Forma Calculator ──────────────────────────────────────
 
-    // Honor ?tab=<name> and #<name> deep-links on load. (v2.3.2)
+    // ── v2.3.5: hydratePfFromSpId ────────────────────────────────────────────
+    async function hydratePfFromSpId(spId) {
+      if (!spId) return;
+      try {
+        var res = await Portal.supabase
+          .from('investor_saved_proformas')
+          .select('id, name, inputs, outputs')
+          .eq('id', spId)
+          .maybeSingle();
+        if (res.error || !res.data) {
+          Portal.toast('Could not load saved analysis', 'error');
+          return;
+        }
+        var row = res.data;
+        var inputs = {};
+        try { inputs = typeof row.inputs === 'string' ? JSON.parse(row.inputs) : (row.inputs || {}); } catch(e) {}
+        var nameEl = document.getElementById('pfName');
+        if (nameEl) nameEl.value = row.name || '';
+        ['pfPurchase','pfDown','pfRate','pfTerm','pfClosing','pfRehab','pfRent','pfVacancy','pfTax','pfInsurance','pfMaint','pfMgmt','pfArv','pfHold','pfSellCost'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el && inputs[id] != null) el.value = inputs[id];
+        });
+        if (typeof calcPf === 'function') calcPf();
+        window._pfLoadedSpId = spId;
+      } catch(e) {
+        console.error('hydratePfFromSpId error:', e);
+        Portal.toast('Error loading analysis', 'error');
+      }
+    }
+    window.hydratePfFromSpId = hydratePfFromSpId;
+
+    // ── v2.3.5: downloadPfPdf ─────────────────────────────────────────────────
+    async function loadLogoForPdf() {
+      return new Promise(function(resolve) {
+        var img = new Image();
+        img.onload = function() { resolve(img); };
+        img.onerror = function() { resolve(null); };
+        img.src = '/img/dom-logo-white.png';
+      });
+    }
+
+    async function downloadPfPdf() {
+      if (!window.jspdf) {
+        Portal.toast('PDF library not loaded — please wait and try again', 'error');
+        return;
+      }
+      var jsPDF = window.jspdf.jsPDF;
+      var pdf = new jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+      var pageW = pdf.internal.pageSize.getWidth();
+      var pageH = pdf.internal.pageSize.getHeight();
+      var margin = 40;
+
+      // ── Brand header ───────────────────────────────────────────────────────
+      pdf.setFillColor(15, 27, 51);
+      pdf.rect(0, 0, pageW, 64, 'F');
+      var logo = await loadLogoForPdf();
+      if (logo) {
+        try { pdf.addImage(logo, 'PNG', margin, 18, 120, 28); } catch(e) { /* logo gracefully absent */ }
+      }
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.text('PRO FORMA ANALYSIS', pageW - margin, 30, { align: 'right' });
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(9);
+      pdf.text('deals.directoffmarket.com', pageW - margin, 46, { align: 'right' });
+
+      // ── Title row ──────────────────────────────────────────────────────────
+      var y = 96;
+      var name = (document.getElementById('pfName').value || '').trim() || 'Untitled Analysis';
+      pdf.setTextColor(15, 27, 51);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(18);
+      pdf.text(name, margin, y);
+      y += 22;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 116, 139);
+      var dateStr = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      pdf.text('Generated ' + dateStr, margin, y);
+      y += 24;
+
+      // ── Inputs table ───────────────────────────────────────────────────────
+      var labelMap = [
+        ['pfPurchase','Purchase Price'],['pfDown','Down Payment %'],['pfRate','Interest Rate %'],
+        ['pfTerm','Loan Term (years)'],['pfClosing','Closing Costs'],['pfRehab','Rehab / Repairs'],
+        ['pfRent','Monthly Rent'],['pfVacancy','Vacancy Rate %'],['pfTax','Property Tax / yr'],
+        ['pfInsurance','Insurance / yr'],['pfMaint','Maintenance / yr'],['pfMgmt','Property Mgmt %'],
+        ['pfArv','After Repair Value (ARV)'],['pfHold','Holding Period (months)'],['pfSellCost','Selling Costs %']
+      ];
+      var inputsRows = labelMap.map(function(pair) {
+        var el = document.getElementById(pair[0]);
+        return [pair[1], el ? (el.value || '\u2014') : '\u2014'];
+      });
+      pdf.autoTable({
+        startY: y,
+        head: [['INPUT', 'VALUE']],
+        body: inputsRows,
+        theme: 'striped',
+        headStyles: { fillColor: [15, 27, 51], textColor: 255, fontStyle: 'bold', fontSize: 9, halign: 'left' },
+        bodyStyles: { fontSize: 10, textColor: [15, 27, 51] },
+        alternateRowStyles: { fillColor: [240, 244, 250] },
+        columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
+        margin: { left: margin, right: margin }
+      });
+      y = pdf.lastAutoTable.finalY + 22;
+
+      // ── KPI Results table ──────────────────────────────────────────────────
+      var outputMap = [
+        ['pfCapRate','Cap Rate'],['pfCoc','Cash-on-Cash'],['pfNoi','Annual NOI'],
+        ['pfCashFlow','Monthly Cash Flow'],['pfTotalCash','Total Cash In'],['pfMortgage','Monthly P&I'],
+        ['pfGrossYield','Gross Yield'],['pfFlipProfit','Flip Profit']
+      ];
+      var outputRows = outputMap.map(function(pair) {
+        var el = document.getElementById(pair[0]);
+        return [pair[1], el ? (el.textContent || '\u2014') : '\u2014'];
+      });
+      pdf.autoTable({
+        startY: y,
+        head: [['PROJECTED RETURN', 'VALUE']],
+        body: outputRows,
+        theme: 'striped',
+        headStyles: { fillColor: [79, 195, 247], textColor: [15, 27, 51], fontStyle: 'bold', fontSize: 9, halign: 'left' },
+        bodyStyles: { fontSize: 10, textColor: [15, 27, 51] },
+        alternateRowStyles: { fillColor: [240, 244, 250] },
+        columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } },
+        margin: { left: margin, right: margin }
+      });
+
+      // ── Footer ─────────────────────────────────────────────────────────────
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 116, 139);
+      var disclaimer = 'This pro forma analysis is informational only and is not a guarantee of returns. Investors should independently verify all assumptions before committing capital.';
+      var wrapped = pdf.splitTextToSize(disclaimer, pageW - 2 * margin);
+      pdf.text(wrapped, margin, pageH - 60);
+      pdf.text('\u00A9 ' + new Date().getFullYear() + ' Direct Off Market \u2014 deals.directoffmarket.com', margin, pageH - 32);
+
+      // ── Save file ──────────────────────────────────────────────────────────
+      var fileNameSafe = name.replace(/[^a-z0-9\-_ ]/gi, '').replace(/\s+/g, '-').toLowerCase() || 'pro-forma';
+      pdf.save(fileNameSafe + '.pdf');
+    }
+    window.downloadPfPdf = downloadPfPdf;
+
+    // Honor ?tab=<name> and #<name> deep-links on load. (v2.3.5)
     (function() {
       var validTabs = ['dashboard','favorites','offers','proformas','calculator','transactions','settings','home'];
       var params = new URLSearchParams(window.location.search);
       var tab = params.get('tab') || (window.location.hash || '').replace(/^#/, '');
       if (tab && validTabs.indexOf(tab) !== -1) {
         switchTab(tab);
+      }
+      // v2.3.5: hydrate calculator from saved row if ?sp_id is present
+      var spId = params.get('sp_id');
+      if (spId && tab === 'calculator') {
+        setTimeout(function() { hydratePfFromSpId(spId); }, 0);
       }
     })();
 
