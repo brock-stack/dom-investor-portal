@@ -1,3 +1,5 @@
+@import url('liquid-glass.css');
+
 /* ============================================================
    DIRECT OFF MARKET — Investor Portal
    investor.css — Production Stylesheet
@@ -21,7 +23,23 @@
   --amber: #f59e0b;
   /* legacy gold alias removed -- use --accent */
   --gold: #4fc3f7;
+  /* ── Liquid Glass tokens (v2.3.0) ── */
+  --glass-bg: rgba(30, 35, 64, 0.55);
+  --glass-bg-strong: rgba(30, 35, 64, 0.72);
+  --glass-blur: 18px;
+  --glass-saturate: 180%;
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-rim: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --glass-shadow-hover: 0 14px 48px rgba(79, 195, 247, 0.20);
+  --glass-glow: 0 0 0 1px rgba(79, 195, 247, 0.20);
+  --glass-accent-tint: rgba(79, 195, 247, 0.18);
+
+  --mesh-1: radial-gradient(at 8% 12%, rgba(79, 195, 247, 0.18) 0%, transparent 45%);
+  --mesh-2: radial-gradient(at 92% 18%, rgba(124, 58, 237, 0.14) 0%, transparent 50%);
+  --mesh-3: radial-gradient(at 50% 92%, rgba(34, 197, 94, 0.10) 0%, transparent 55%);
 }
+
 
 [data-theme="light"] {
   --bg: #f0f4fa;
@@ -34,6 +52,22 @@
   --accent-hover: #7dd4f8;
   --navy: #2d3560;
   --navy-dark: #1a1e38;
+
+  /* ── Liquid Glass tokens light (v2.3.0) ── */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --glass-blur: 20px;
+  --glass-saturate: 200%;
+  --glass-border: rgba(45, 53, 96, 0.12);
+  --glass-rim: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 8px 32px rgba(45, 53, 96, 0.10);
+  --glass-shadow-hover: 0 14px 48px rgba(79, 195, 247, 0.16);
+  --glass-glow: 0 0 0 1px rgba(79, 195, 247, 0.14);
+  --glass-accent-tint: rgba(79, 195, 247, 0.14);
+
+  --mesh-1: radial-gradient(at 8% 12%, rgba(79, 195, 247, 0.22) 0%, transparent 45%);
+  --mesh-2: radial-gradient(at 92% 18%, rgba(124, 58, 237, 0.14) 0%, transparent 50%);
+  --mesh-3: radial-gradient(at 50% 92%, rgba(34, 197, 94, 0.12) 0%, transparent 55%);
 }
 
 /* ── Base ── */
@@ -257,6 +291,7 @@ body {
 }
 
 /* ── Deal Cards ── */
+/* [v2.3.0 LIQUID GLASS — old .deal-card rules commented out — see css/liquid-glass.css]
 .deal-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -271,6 +306,7 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 8px 30px rgba(0,0,0,0.3);
 }
+*/
 
 .card-photo {
   height: 200px;

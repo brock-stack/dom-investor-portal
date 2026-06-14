@@ -23,6 +23,7 @@
   </style>
 </head>
 <body class="auth-page">
+  <div class="lg-mesh" aria-hidden="true"></div>
 
     <nav id="investorNav" class="investor-nav">
     <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
@@ -194,6 +195,45 @@
       }
     });
 
+  })();
+  </script>
+
+  <script>
+  // v2.3.0 Liquid Glass — slider indicator positioner
+  (function() {
+    function positionAll() {
+      document.querySelectorAll('.lg-pill-row').forEach(function(row) {
+        var active = row.querySelector(
+          '.active, .accent, [aria-selected="true"], [data-active="true"]'
+        );
+        if (!active) {
+          row.style.setProperty('--lg-indicator-opacity', '0');
+          return;
+        }
+        var rect = row.getBoundingClientRect();
+        var aRect = active.getBoundingClientRect();
+        var left = aRect.left - rect.left;
+        var width = aRect.width;
+        row.style.setProperty('--lg-indicator-left', left + 'px');
+        row.style.setProperty('--lg-indicator-width', width + 'px');
+        row.style.setProperty('--lg-indicator-opacity', '1');
+      });
+    }
+    var ro = new ResizeObserver(positionAll);
+    document.querySelectorAll('.lg-pill-row').forEach(function(row) {
+      ro.observe(row);
+      row.addEventListener('click', function() { requestAnimationFrame(positionAll); });
+    });
+    // MutationObserver catches class toggles done by other scripts
+    var mo = new MutationObserver(positionAll);
+    document.querySelectorAll('.lg-pill-row').forEach(function(row) {
+      mo.observe(row, { subtree: true, attributes: true, attributeFilter: ['class', 'aria-selected', 'data-active'] });
+    });
+    window.addEventListener('load', positionAll);
+    window.addEventListener('resize', positionAll);
+    document.addEventListener('DOMContentLoaded', positionAll);
+    // Defer one more frame so any inline scripts that toggle .active on load have run
+    setTimeout(positionAll, 0);
   })();
   </script>
 </body>
