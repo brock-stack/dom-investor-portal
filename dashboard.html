@@ -1900,7 +1900,7 @@
     // ── Offers: Load ──────────────────────────────────────────
 
     function switchTab(tabName) {
-      var tabMap = { home:'tabHome', dashboard:'tabDashboard', favorites:'tabFavorites', offers:'tabOffers', proformas:'tabProformas', transactions:'tabTransactions', settings:'tabSettings' };
+      var tabMap = { home:'tabHome', dashboard:'tabDashboard', favorites:'tabFavorites', offers:'tabOffers', proformas:'tabProformas', calculator:'tabCalculator', transactions:'tabTransactions', settings:'tabSettings' }; // v2.3.4
       var targetId = tabMap[tabName];
       if (!targetId) return;
       document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
@@ -1920,6 +1920,10 @@
       if (tabName === 'proformas' && window.loadProFormas) {
         loadProformas();
         proformasLoaded = true;
+      }
+      if (tabName === 'calculator' && !window._calcInited) { // v2.3.4
+        try { calcPf(); } catch(e) { console.warn('Calc init failed:', e); }
+        window._calcInited = true;
       }
     }
     window.switchTab = switchTab;
@@ -2224,6 +2228,7 @@
       var v = el.value.replace(/[^\d]/g,'');
       el.value = v ? '$' + parseInt(v).toLocaleString() : '';
     }
+    window.fmtCur = fmtCur; // expose for inline oninput handlers (v2.3.4)
     function parseCur(id) {
       return parseFloat((document.getElementById(id).value||'0').replace(/[^0-9.]/g,'')) || 0;
     }
