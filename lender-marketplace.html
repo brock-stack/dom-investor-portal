@@ -764,6 +764,9 @@
       var resp = await fetch('/.netlify/functions/mortgage-rates');
       if (!resp.ok) throw new Error('rates unavailable');
       var data = await resp.json();
+      // v2.3.2 hardening: skip rendering if rates aren't real numbers
+      var hasValidRates = typeof data.rate30 === 'number' && isFinite(data.rate30);
+      if (!hasValidRates) throw new Error('Bad rates payload');
       var setRate = function(elId, chgId, rate, change) {
         var el = document.getElementById(elId);
         var chgEl = document.getElementById(chgId);

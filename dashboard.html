@@ -700,33 +700,31 @@
   .toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.2s;}
   .toggle-switch.active::after{transform:translateX(20px);}
 
-  /* ── v2.3.1: Pro Forma Calculator — scoped to #tabProformas ── */
-  #tabProformas .pf-page { max-width: 900px; margin: 0 auto; padding: 0 0 60px; }
-  #tabProformas .pf-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-  #tabProformas .pf-title { font-size: 22px; font-weight: 800; color: var(--text); }
-  #tabProformas .pf-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-  #tabProformas .pf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  #tabProformas .pf-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
-  #tabProformas .pf-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 16px; }
-  #tabProformas .pf-field { margin-bottom: 14px; }
-  #tabProformas .pf-label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 5px; }
-  #tabProformas .pf-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 14px; box-sizing: border-box; font-family: inherit; }
-  #tabProformas .pf-input:focus { outline: none; border-color: var(--accent); }
-  #tabProformas .pf-results { background: linear-gradient(135deg, #0f1b33, #1a2744); border-radius: 14px; padding: 24px; margin-top: 16px; }
-  #tabProformas .pf-results-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
-  #tabProformas .pf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-  #tabProformas .pf-kpi { text-align: center; }
-  #tabProformas .pf-kpi-value { font-size: 24px; font-weight: 900; color: var(--accent); }
-  #tabProformas .pf-kpi-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
-  #tabProformas .pf-kpi.negative .pf-kpi-value { color: var(--red); }
-  #tabProformas .pf-save-btn { background: var(--accent); color: #1a2744; border: none; border-radius: 10px; padding: 11px 24px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity .15s; }
-  #tabProformas .pf-save-btn:hover { opacity: .88; }
-  #tabProformas .pf-subtab-content { display: none; }
-  #tabProformas .pf-subtab-content.active { display: block; }
+  /* ── v2.3.2: Pro Forma Calculator — scoped to #tabCalculator ── */
+  #tabCalculator .pf-page { max-width: 900px; margin: 0 auto; padding: 0 0 60px; }
+  #tabCalculator .pf-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  #tabCalculator .pf-title { font-size: 22px; font-weight: 800; color: var(--text); }
+  #tabCalculator .pf-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+  #tabCalculator .pf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  #tabCalculator .pf-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  #tabCalculator .pf-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 16px; }
+  #tabCalculator .pf-field { margin-bottom: 14px; }
+  #tabCalculator .pf-label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 5px; }
+  #tabCalculator .pf-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); font-size: 14px; box-sizing: border-box; font-family: inherit; }
+  #tabCalculator .pf-input:focus { outline: none; border-color: var(--accent); }
+  #tabCalculator .pf-results { background: linear-gradient(135deg, #0f1b33, #1a2744); border-radius: 14px; padding: 24px; margin-top: 16px; }
+  #tabCalculator .pf-results-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+  #tabCalculator .pf-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  #tabCalculator .pf-kpi { text-align: center; }
+  #tabCalculator .pf-kpi-value { font-size: 24px; font-weight: 900; color: var(--accent); }
+  #tabCalculator .pf-kpi-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+  #tabCalculator .pf-kpi.negative .pf-kpi-value { color: var(--red); }
+  #tabCalculator .pf-save-btn { background: var(--accent); color: #1a2744; border: none; border-radius: 10px; padding: 11px 24px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity .15s; }
+  #tabCalculator .pf-save-btn:hover { opacity: .88; }
   @media (max-width: 680px) {
-    #tabProformas .pf-grid { grid-template-columns: 1fr; }
-    #tabProformas .pf-kpi-grid { grid-template-columns: repeat(2,1fr); }
-    #tabProformas .pf-header { flex-direction: column; }
+    #tabCalculator .pf-grid { grid-template-columns: 1fr; }
+    #tabCalculator .pf-kpi-grid { grid-template-columns: repeat(2,1fr); }
+    #tabCalculator .pf-header { flex-direction: column; }
   }
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
@@ -762,6 +760,7 @@
         <button class="tab-btn" data-tab="favorites">Favorites</button>
         <button class="tab-btn" data-tab="offers">Offers</button>
         <button class="tab-btn" data-tab="proformas">Pro Formas</button>
+        <button class="tab-btn" data-tab="calculator">Calculator</button>
         <button class="tab-btn" data-tab="transactions">Transactions</button>
         <button class="tab-btn" data-tab="settings">Settings</button>
       </div>
@@ -1268,83 +1267,71 @@
 
   <!-- ── PRO FORMAS TAB ── -->
   <div class="tab-content" id="tabProformas">
-
-    <!-- Sub-tab bar (v2.3.1) -->
-    <div class="tab-bar lg-pill-row" id="pfSubTabBar" style="margin-bottom:16px;">
-      <button class="tab-btn active" data-subtab="new">New Analysis</button>
-      <button class="tab-btn" data-subtab="saved">Saved Analyses</button>
-    </div>
-
-    <!-- Sub-tab A: New Analysis -->
-    <div class="pf-subtab-content active" data-subtab="new">
-      <div class="pf-page">
-        <div class="pf-header">
-          <div>
-            <div class="pf-title">Pro Forma Calculator</div>
-            <div class="pf-subtitle">Build your own investment analysis. Adjust inputs to see projections.</div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <input id="pfName" type="text" placeholder="Analysis name..." style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:13px;width:180px;font-family:inherit;">
-            <button class="pf-save-btn" onclick="savePf()">Save Analysis</button>
-          </div>
-        </div>
-
-        <div class="pf-grid">
-          <!-- Purchase & Financing -->
-          <div class="pf-card">
-            <div class="pf-card-title">Purchase &amp; Financing</div>
-            <div class="pf-field"><label class="pf-label">Purchase Price</label><input class="pf-input" id="pfPurchase" type="text" placeholder="$250,000" oninput="fmtCur(this);calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Down Payment %</label><input class="pf-input" id="pfDown" type="number" placeholder="20" value="20" min="0" max="100" oninput="calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Interest Rate %</label><input class="pf-input" id="pfRate" type="number" placeholder="7.5" value="7.5" step="0.1" oninput="calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Loan Term (years)</label><input class="pf-input" id="pfTerm" type="number" placeholder="30" value="30" oninput="calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Closing Costs</label><input class="pf-input" id="pfClosing" type="text" placeholder="$5,000" oninput="fmtCur(this);calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Rehab / Repairs</label><input class="pf-input" id="pfRehab" type="text" placeholder="$0" oninput="fmtCur(this);calcPf()"></div>
-          </div>
-          <!-- Income & Expenses -->
-          <div class="pf-card">
-            <div class="pf-card-title">Income &amp; Expenses</div>
-            <div class="pf-field"><label class="pf-label">Monthly Rent</label><input class="pf-input" id="pfRent" type="text" placeholder="$1,800" oninput="fmtCur(this);calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Vacancy Rate %</label><input class="pf-input" id="pfVacancy" type="number" placeholder="5" value="5" min="0" max="100" oninput="calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Property Tax / yr</label><input class="pf-input" id="pfTax" type="text" placeholder="$2,400" oninput="fmtCur(this);calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Insurance / yr</label><input class="pf-input" id="pfInsurance" type="text" placeholder="$1,200" oninput="fmtCur(this);calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Maintenance / yr</label><input class="pf-input" id="pfMaint" type="text" placeholder="$1,500" oninput="fmtCur(this);calcPf()"></div>
-            <div class="pf-field"><label class="pf-label">Property Mgmt %</label><input class="pf-input" id="pfMgmt" type="number" placeholder="8" value="8" min="0" max="100" oninput="calcPf()"></div>
-          </div>
-        </div>
-
-        <!-- ARV row -->
-        <div class="pf-card" style="margin-top:16px;display:flex;gap:16px;align-items:flex-end;padding:16px 20px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:160px;"><label class="pf-label">After Repair Value (ARV)</label><input class="pf-input" id="pfArv" type="text" placeholder="$320,000" oninput="fmtCur(this);calcPf()"></div>
-          <div style="flex:1;min-width:140px;"><label class="pf-label">Holding Period (months)</label><input class="pf-input" id="pfHold" type="number" placeholder="12" value="12" oninput="calcPf()"></div>
-          <div style="flex:1;min-width:130px;"><label class="pf-label">Selling Costs %</label><input class="pf-input" id="pfSellCost" type="number" placeholder="6" value="6" oninput="calcPf()"></div>
-        </div>
-
-        <!-- Results -->
-        <div class="pf-results" id="pfResults">
-          <div class="pf-results-title">Projected Returns</div>
-          <div class="pf-kpi-grid">
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfCapRate">—</div><div class="pf-kpi-label">Cap Rate</div></div>
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfCoc">—</div><div class="pf-kpi-label">Cash-on-Cash</div></div>
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfNoi">—</div><div class="pf-kpi-label">Annual NOI</div></div>
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfCashFlow">—</div><div class="pf-kpi-label">Monthly Cash Flow</div></div>
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfTotalCash">—</div><div class="pf-kpi-label">Total Cash In</div></div>
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfMortgage">—</div><div class="pf-kpi-label">Monthly P&amp;I</div></div>
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfGrossYield">—</div><div class="pf-kpi-label">Gross Yield</div></div>
-            <div class="pf-kpi"><div class="pf-kpi-value" id="pfFlipProfit">—</div><div class="pf-kpi-label">Flip Profit</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sub-tab B: Saved Analyses -->
-    <div class="pf-subtab-content" data-subtab="saved">
-      <h2 class="section-heading">Saved Analyses</h2>
-      <p class="section-sub">Your saved pro forma analyses.</p>
-      <div id="proformasContainer"><div class="empty-state-inline">Loading...</div></div>
-    </div>
-
+    <h2 class="section-heading">Pro Formas</h2>
+    <p class="section-sub">Your saved pro forma analyses.</p>
+    <div id="proformasContainer"><div class="empty-state-inline">Loading...</div></div>
   </div>
 
+  <!-- ── CALCULATOR TAB (v2.3.2) ── -->
+  <div class="tab-content" id="tabCalculator">
+  <div class="pf-page">
+  <div class="pf-header">
+  <div>
+  <div class="pf-title">Pro Forma Calculator</div>
+  <div class="pf-subtitle">Build your own investment analysis. Adjust inputs to see projections.</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+  <input id="pfName" type="text" placeholder="Analysis name..." style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:13px;width:180px;font-family:inherit;">
+  <button class="pf-save-btn" onclick="savePf()">Save Analysis</button>
+  </div>
+  </div>
+
+  <div class="pf-grid">
+  <!-- Purchase & Financing -->
+  <div class="pf-card">
+  <div class="pf-card-title">Purchase &amp; Financing</div>
+  <div class="pf-field"><label class="pf-label">Purchase Price</label><input class="pf-input" id="pfPurchase" type="text" placeholder="$250,000" oninput="fmtCur(this);calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Down Payment %</label><input class="pf-input" id="pfDown" type="number" placeholder="20" value="20" min="0" max="100" oninput="calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Interest Rate %</label><input class="pf-input" id="pfRate" type="number" placeholder="7.5" value="7.5" step="0.1" oninput="calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Loan Term (years)</label><input class="pf-input" id="pfTerm" type="number" placeholder="30" value="30" oninput="calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Closing Costs</label><input class="pf-input" id="pfClosing" type="text" placeholder="$5,000" oninput="fmtCur(this);calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Rehab / Repairs</label><input class="pf-input" id="pfRehab" type="text" placeholder="$0" oninput="fmtCur(this);calcPf()"></div>
+  </div>
+  <!-- Income & Expenses -->
+  <div class="pf-card">
+  <div class="pf-card-title">Income &amp; Expenses</div>
+  <div class="pf-field"><label class="pf-label">Monthly Rent</label><input class="pf-input" id="pfRent" type="text" placeholder="$1,800" oninput="fmtCur(this);calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Vacancy Rate %</label><input class="pf-input" id="pfVacancy" type="number" placeholder="5" value="5" min="0" max="100" oninput="calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Property Tax / yr</label><input class="pf-input" id="pfTax" type="text" placeholder="$2,400" oninput="fmtCur(this);calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Insurance / yr</label><input class="pf-input" id="pfInsurance" type="text" placeholder="$1,200" oninput="fmtCur(this);calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Maintenance / yr</label><input class="pf-input" id="pfMaint" type="text" placeholder="$1,500" oninput="fmtCur(this);calcPf()"></div>
+  <div class="pf-field"><label class="pf-label">Property Mgmt %</label><input class="pf-input" id="pfMgmt" type="number" placeholder="8" value="8" min="0" max="100" oninput="calcPf()"></div>
+  </div>
+  </div>
+
+  <!-- ARV row -->
+  <div class="pf-card" style="margin-top:16px;display:flex;gap:16px;align-items:flex-end;padding:16px 20px;flex-wrap:wrap;">
+  <div style="flex:1;min-width:160px;"><label class="pf-label">After Repair Value (ARV)</label><input class="pf-input" id="pfArv" type="text" placeholder="$320,000" oninput="fmtCur(this);calcPf()"></div>
+  <div style="flex:1;min-width:140px;"><label class="pf-label">Holding Period (months)</label><input class="pf-input" id="pfHold" type="number" placeholder="12" value="12" oninput="calcPf()"></div>
+  <div style="flex:1;min-width:130px;"><label class="pf-label">Selling Costs %</label><input class="pf-input" id="pfSellCost" type="number" placeholder="6" value="6" oninput="calcPf()"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="pf-results" id="pfResults">
+  <div class="pf-results-title">Projected Returns</div>
+  <div class="pf-kpi-grid">
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfCapRate">—</div><div class="pf-kpi-label">Cap Rate</div></div>
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfCoc">—</div><div class="pf-kpi-label">Cash-on-Cash</div></div>
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfNoi">—</div><div class="pf-kpi-label">Annual NOI</div></div>
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfCashFlow">—</div><div class="pf-kpi-label">Monthly Cash Flow</div></div>
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfTotalCash">—</div><div class="pf-kpi-label">Total Cash In</div></div>
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfMortgage">—</div><div class="pf-kpi-label">Monthly P&amp;I</div></div>
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfGrossYield">—</div><div class="pf-kpi-label">Gross Yield</div></div>
+  <div class="pf-kpi"><div class="pf-kpi-value" id="pfFlipProfit">—</div><div class="pf-kpi-label">Flip Profit</div></div>
+  </div>
+  </div>
+  </div>
+  </div>
   <!-- ── TRANSACTIONS TAB ── -->
   <div class="tab-content" id="tabTransactions">
     <h2 class="section-heading">Transactions</h2>
@@ -1404,10 +1391,11 @@
 
     const tabMap = {
       home: 'tabHome',
-          dashboard: 'tabDashboard',
+      dashboard: 'tabDashboard',
       favorites: 'tabFavorites',
       offers: 'tabOffers',
       proformas: 'tabProformas',
+      calculator: 'tabCalculator', // v2.3.2
       transactions: 'tabTransactions',
       settings: 'tabSettings'
     };
@@ -1436,8 +1424,16 @@
         if (this.dataset.tab === 'favorites') {
           loadFavorites();
         }
-        // Pro Formas: lazy-load now handled by sub-tab click handler (v2.3.1)
-        // Main tab click defaults to "New Analysis" sub-tab; "Saved" sub-tab triggers loadProformas()
+        // Pro Formas: lazy load on first visit (v2.3.2 — reverted from v2.3.1 sub-tab)
+        if (this.dataset.tab === 'proformas' && !proformasLoaded) {
+          try { loadProformas(); } catch(e) { console.warn('Proformas load failed:', e); }
+          proformasLoaded = true;
+        }
+        // Calculator: init on first visit (v2.3.2)
+        if (this.dataset.tab === 'calculator' && !window._calcInited) {
+          try { calcPf(); } catch(e) { console.warn('Calc init failed:', e); }
+          window._calcInited = true;
+        }
         // Transactions: lazy load on first visit
         if (this.dataset.tab === 'transactions' && !transactionsLoaded) {
           try { loadTransactions(); } catch(e) { console.warn('Transactions load failed:', e); }
@@ -1921,11 +1917,9 @@
         loadOffers();
         offersLoaded = true;
       }
-      // v2.3.1: proformas lazy-load handled by sub-tab click handler
-      if (tabName === 'proformas') {
-        // Default to New Analysis sub-tab on programmatic switch
-        var newSubBtn = document.querySelector('#tabProformas .tab-bar .tab-btn[data-subtab="new"]');
-        if (newSubBtn && !newSubBtn.classList.contains('active')) newSubBtn.click();
+      if (tabName === 'proformas' && window.loadProFormas) {
+        loadProformas();
+        proformasLoaded = true;
       }
     }
     window.switchTab = switchTab;
@@ -2321,45 +2315,25 @@
       }]);
       if (res.error) { Portal.toast('Error saving: ' + res.error.message, 'error'); return; }
       Portal.toast('Saved: ' + name, 'success');
-      // Reset the saved-loaded flag so next visit reloads
-      window._pfSavedLoaded = false;
+      // Reset so Pro Formas tab reloads on next visit (v2.3.2)
+      proformasLoaded = false;
     }
     window.savePf = savePf;
 
-    // Sub-tab click handler for #tabProformas
-    document.querySelectorAll('#tabProformas .tab-bar .tab-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('#tabProformas .tab-bar .tab-btn').forEach(function(b) { b.classList.remove('active'); });
-        this.classList.add('active');
-        document.querySelectorAll('#tabProformas .pf-subtab-content').forEach(function(c) { c.classList.remove('active'); });
-        var target = document.querySelector('#tabProformas .pf-subtab-content[data-subtab="' + this.dataset.subtab + '"]');
-        if (target) target.classList.add('active');
-        // Lazy-load saved analyses on first visit to "Saved" sub-tab
-        if (this.dataset.subtab === 'saved' && !window._pfSavedLoaded) {
-          try { loadProformas(); } catch(e) { console.warn('Proformas load failed:', e); }
-          window._pfSavedLoaded = true;
-        }
-      });
+    // v2.3.2: sub-tab handler removed (Calculator is now a top-level tab)
     });
 
-    // Run initial calcPf so KPI tiles are in a clean state
-    calcPf();
+    // Initial calcPf run on Calculator tab click (via _calcInited flag above)
 
     // ── END v2.3.1 Pro Forma Calculator ──────────────────────────────────────
 
-    // Honor ?tab=<name>, ?subtab=<name>, and #<name> deep-links on load. (v2.3.1)
+    // Honor ?tab=<name> and #<name> deep-links on load. (v2.3.2)
     (function() {
-      var validTabs = ['dashboard','favorites','offers','proformas','transactions','settings','home'];
+      var validTabs = ['dashboard','favorites','offers','proformas','calculator','transactions','settings','home'];
       var params = new URLSearchParams(window.location.search);
       var tab = params.get('tab') || (window.location.hash || '').replace(/^#/, '');
       if (tab && validTabs.indexOf(tab) !== -1) {
         switchTab(tab);
-      }
-      // Handle subtab deep-link (e.g. ?tab=proformas&subtab=saved)
-      var subtab = params.get('subtab');
-      if (subtab && tab === 'proformas') {
-        var sbtn = document.querySelector('#tabProformas .tab-bar .tab-btn[data-subtab="' + subtab + '"]');
-        if (sbtn) sbtn.click();
       }
     })();
 
