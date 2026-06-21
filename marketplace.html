@@ -844,7 +844,7 @@
 
     async function loadListings() {
       try {
-        var ninetyDaysAgo = new Date(Date.now() - 90*24*60*60*1000).toISOString();
+        var oneEightyDaysAgo = new Date(Date.now() - 180*24*60*60*1000).toISOString();
 
         var activeResult = await Portal.supabase
           .from('portal_listings')
@@ -856,7 +856,7 @@
           .from('portal_listings')
           .select('id, asking_price, sold_price, status, closed_at, notes, featured, open_house_date, listing_id, property_id, listings (id, stage, list_price, property_id, properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)), properties (id, address, city, state, zip, property_type, bedrooms, bathrooms, sqft, year_built, lat, lng, estimated_arv, estimated_repairs, current_market_value, mao_wholesale, mao_flip)')
           .eq('status', 'sold')
-          .gte('closed_at', ninetyDaysAgo);
+          .gte('closed_at', oneEightyDaysAgo);
 
         if (activeResult.error) throw activeResult.error;
         if (closedResult.error) console.warn('[marketplace] closed fetch error:', closedResult.error.message);
