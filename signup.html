@@ -496,7 +496,10 @@
 
         var userId = authResult.data && authResult.data.user ? authResult.data.user.id : null;
 
-        // 2. Insert portal_users profile (non-blocking)
+        var portalUserId = null;
+        var contactId = null;
+
+        // Step 1: Insert portal_users (no contact_id yet — server function returns it)
         if (userId) {
           try {
             var puData = {
@@ -506,41 +509,52 @@
               last_name:     formData.lastName,
               phone:         formData.phone || null,
               company:       formData.company || null,
-              investor_type: Array.isArray(formData.investorType) ? (formData.investorType.length ? formData.investorType : null) : (formData.investorType || null)
+              investor_type: Array.isArray(formData.investorType) ? (formData.investorType.length ? formData.investorType : null) : (formData.investorType || null),
             };
-            // Link to existing contact from invite
-            if (_inviteRecord && _inviteRecord.contact_id) {
-              puData.contact_id = _inviteRecord.contact_id;
-            }
-            await Portal.supabase.from('portal_users').insert(puData);
+            var puIns = await Portal.supabase.from('portal_users').insert(puData).select('id').single();
+            if (puIns.error) throw puIns.error;
+            portalUserId = puIns.data ? puIns.data.id : null;
           } catch (puErr) { console.warn('portal_users insert:', puErr); }
-        }
 
-        // 3. Contact: update existing (invite) or create new
-        if (userId) {
-          try {
-            if (_inviteRecord && _inviteRecord.contact_id) {
-              // Invite flow: link existing contact to this portal user
-              await Portal.supabase.from('contacts').update({portal_user_id: userId, has_portal_access: true}).eq('id', _inviteRecord.contact_id);
-            } else {
-            await Portal.supabase.from('contacts').insert({
-              first_name:        formData.firstName,
-              last_name:         formData.lastName,
-              email:             formData.email,
-              phone:             formData.phone || null,
-              contact_type:      '["buyer"]',
-              has_portal_access: true,
-              portal_email:      formData.email,
-              portal_user_id:    userId,
-              custom_fields: {
-                estimated_liquidity: formData.liquidity || null,
-                terms_agreed_at:     new Date().toISOString(),
-                terms_signed_name:   legalName,
-                terms_version:       'DOM-v1.0-2026'
+          // Step 2: Call CRM-hosted function to create-or-link the contact (bypasses RLS via service role)
+          if (portalUserId) {
+            try {
+              var linkRes = await fetch('https://ai.directoffmarket.com/.netlify/functions/portal-signup-link-contact', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-dom-internal-token': '3byyhnlM7IDnAMtvi4cAYQpApbbGCeco_9-KMZ8la0I',
+                },
+                body: JSON.stringify({
+                  first_name:       formData.firstName,
+                  last_name:        formData.lastName,
+                  email:            formData.email,
+                  phone:            formData.phone || null,
+                  portal_user_id:   portalUserId,
+                  liquidity:        formData.liquidity || null,
+                  legal_name:       legalName,
+                  terms_signed_name: legalName,
+                  invite_contact_id: (_inviteRecord && _inviteRecord.contact_id) ? _inviteRecord.contact_id : null,
+                }),
+              });
+              if (linkRes.ok) {
+                var linkData = await linkRes.json();
+                contactId = linkData.contact_id || null;
+              } else {
+                console.warn('portal-signup-link-contact HTTP', linkRes.status);
               }
-            });
-            } // end else (new contact)
-          } catch (contactErr) { console.warn('Contact op failed:', contactErr); }
+            } catch (linkErr) { console.warn('portal-signup-link-contact failed:', linkErr); }
+          }
+
+          // Step 3: Write contact_id back to portal_users
+          if (portalUserId && contactId) {
+            try {
+              await Portal.supabase
+                .from('portal_users')
+                .update({ contact_id: contactId })
+                .eq('id', portalUserId);
+            } catch (puUpdErr) { console.warn('portal_users contact_id update:', puUpdErr); }
+          }
         }
 
         // Mark invite as accepted
@@ -553,20 +567,8 @@
         var signedAt = new Date().toISOString();
         var signedDate = signedAt.split('T')[0];
         var agreementId = null;
-        var portalUserId = null;
-        var contactIdForAgreement = null;
-
-        // Get portal_users id
-        try {
-          var puRes = await Portal.supabase.from('portal_users').select('id').eq('user_id', userId).maybeSingle();
-          if (puRes.data) portalUserId = puRes.data.id;
-        } catch(e) {}
-
-        // Get contact id
-        try {
-          var cRes = await Portal.supabase.from('contacts').select('id').eq('email', formData.email).maybeSingle();
-          if (cRes.data) contactIdForAgreement = cRes.data.id;
-        } catch(e) {}
+        // portalUserId and contactId already captured above
+        var contactIdForAgreement = contactId;
 
         // Get IP
         var ipAddr = 'unknown';
