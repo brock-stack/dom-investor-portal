@@ -1239,14 +1239,7 @@
           <span style="font-size:14px;font-weight:600;color:var(--text);">SMS notifications</span>
           <div class="toggle-switch" id="st_notifSms" onclick="this.classList.toggle('active');SettingsTab._markDirty();"></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <span style="font-size:14px;font-weight:600;color:var(--text);">New deal alerts</span>
-          <div class="toggle-switch active" id="st_notifNewDeals" onclick="this.classList.toggle('active');SettingsTab._markDirty();"></div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <span style="font-size:14px;font-weight:600;color:var(--text);">Price drop alerts</span>
-          <div class="toggle-switch active" id="st_notifPriceDrop" onclick="this.classList.toggle('active');SettingsTab._markDirty();"></div>
-        </div>
+
       </div>
     </div>
 
@@ -1360,7 +1353,7 @@
     // Load profile — try portal_users first, fallback to getProfile
     let portalUser = null; window._portalUser = null;
     try {
-      const { data: pu } = await Portal.supabase.from('portal_users').select('id,contact_id,first_name,last_name,email,phone,investor_type,entity_type,company,birthdate,mailing_street,mailing_city,mailing_state,mailing_zip,business_phone,business_email,business_street,business_city,business_state,business_zip,working_with_realtor,realtor_name,realtor_company,realtor_phone,realtor_email,avatar_url,created_at,onboarding_complete,notif_email,notif_sms,notif_new_deals,notif_price_drop').eq('user_id', session.user.id).maybeSingle();
+      const { data: pu } = await Portal.supabase.from('portal_users').select('id,contact_id,first_name,last_name,email,phone,investor_type,entity_type,company,birthdate,mailing_street,mailing_city,mailing_state,mailing_zip,business_phone,business_email,business_street,business_city,business_state,business_zip,working_with_realtor,realtor_name,realtor_company,realtor_phone,realtor_email,avatar_url,created_at,onboarding_complete,notif_email,notif_sms').eq('user_id', session.user.id).maybeSingle();
       portalUser = pu; window._portalUser = pu;
     } catch(e) {}
     const profile = portalUser || (await Portal.getProfile(session.user.id));
@@ -2651,8 +2644,6 @@
       // Notifications
       _tog('st_notifEmail', pu.notif_email !== false);
       _tog('st_notifSms', pu.notif_sms);
-      _tog('st_notifNewDeals', pu.notif_new_deals !== false);
-      _tog('st_notifPriceDrop', pu.notif_price_drop !== false);
     }
 
     async function save() {
@@ -2685,8 +2676,6 @@
           realtor_email: (document.getElementById('st_realtorEmail').value||'').trim()||null,
           notif_email: document.getElementById('st_notifEmail').classList.contains('active'),
           notif_sms: document.getElementById('st_notifSms').classList.contains('active'),
-          notif_new_deals: document.getElementById('st_notifNewDeals').classList.contains('active'),
-          notif_price_drop: document.getElementById('st_notifPriceDrop').classList.contains('active')
         };
         // Birthdate
         var bdFp = (document.getElementById('st_birthdate')||{})._flatpickr;
