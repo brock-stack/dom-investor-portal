@@ -1193,6 +1193,32 @@
     </div>
 
 
+    <!-- Section 4: Change Password (v2.3.11) -->
+    <div class="form-section full-width" style="padding:24px;margin-bottom:20px;">
+      <div class="form-section-title" style="margin-bottom:6px;">Change Password</div>
+      <p style="color:var(--text-muted);font-size:13px;margin:0 0 20px;">Secure your account. We'll log out other sessions on password change.</p>
+      <div style="display:grid;gap:14px;max-width:440px;">
+        <div>
+          <label class="form-label">Current Password</label>
+          <input id="cpCurrent" class="form-input" type="password" autocomplete="current-password" placeholder="Current password">
+        </div>
+        <div>
+          <label class="form-label">New Password</label>
+          <input id="cpNew" class="form-input" type="password" autocomplete="new-password" minlength="10" placeholder="New password (min 10 chars)" oninput="cpUpdateStrength()">
+          <div id="cpStrengthBar" style="margin-top:6px;height:4px;border-radius:2px;background:var(--border);overflow:hidden;"><div id="cpStrengthFill" style="height:100%;width:0;border-radius:2px;transition:width .2s,background-color .2s;"></div></div>
+          <div id="cpStrengthLabel" style="font-size:11px;color:var(--text-muted);margin-top:3px;"></div>
+        </div>
+        <div>
+          <label class="form-label">Confirm New Password</label>
+          <input id="cpConfirm" class="form-input" type="password" autocomplete="new-password" minlength="10" placeholder="Repeat new password" oninput="cpValidate()">
+          <div id="cpMatchError" style="display:none;color:#ef4444;font-size:12px;margin-top:4px;"></div>
+        </div>
+        <div>
+          <button id="cpSubmitBtn" onclick="cpSubmit()" style="background:#0f2636;color:#fff;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer;opacity:0.4;pointer-events:none;transition:opacity .15s;font-family:inherit;">Update Password</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Section 4: Realtor -->
     <div class="form-section full-width" style="padding:24px;margin-bottom:20px;">
       <div class="form-section-title" style="margin-bottom:16px;">Realtor</div>
@@ -2294,9 +2320,13 @@
     }
     window.calcPf = calcPf;
 
+    var _pfSaving = false; // v2.3.11: debounce guard — prevents double-fire on rapid clicks
     async function savePf() {
+      if (_pfSaving) return; // v2.3.11: 1500ms debounce
+      _pfSaving = true;
+      setTimeout(function() { _pfSaving = false; }, 1500);
       var session = await Portal.getSession();
-      if (!session) { Portal.toast('Sign in to save', 'error'); return; }
+      if (!session) { Portal.toast('Sign in to save', 'error'); _pfSaving = false; return; }
       var name = (document.getElementById('pfName').value || '').trim() || 'Untitled Analysis';
       var inputs = {};
       ['pfPurchase','pfDown','pfRate','pfTerm','pfClosing','pfRehab','pfRent','pfVacancy','pfTax','pfInsurance','pfMaint','pfMgmt','pfArv','pfHold','pfSellCost'].forEach(function(id){
@@ -2309,12 +2339,18 @@
       });
       var pu = await Portal.supabase.from('portal_users').select('id').eq('user_id',session.user.id).maybeSingle();
       if (!pu.data) { Portal.toast('Profile not found', 'error'); return; }
-      var res = await Portal.supabase.from('investor_saved_proformas').insert([{
-        user_id: pu.data.id,
-        name: name,
-        inputs: JSON.stringify(inputs),
-        outputs: JSON.stringify(outputs)
-      }]);
+      // v2.3.11: UPSERT on (user_id, name) for untethered saves — prevents duplicate rows on rapid double-saves
+      var res = await Portal.supabase.from('investor_saved_proformas').upsert({  // investor_saved_proformas upsert v2.3.11
+          user_id: pu.data.id,
+          listing_id: null,
+          property_id: null,
+          name: name,
+          inputs: JSON.stringify(inputs),
+          outputs: JSON.stringify(outputs),
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,name', ignoreDuplicates: false })
+        .select('id')
+        .single();
       if (res.error) { Portal.toast('Error saving: ' + res.error.message, 'error'); return; }
       Portal.toast('Saved: ' + name, 'success');
       // Reset so Pro Formas tab reloads on next visit (v2.3.2)
@@ -2543,6 +2579,110 @@
 <script>
 
 
+
+// ── Change Password (v2.3.11) ───────────────────────────────
+  function cpUpdateStrength() {
+    var pw = (document.getElementById('cpNew').value || '');
+    var score = 0;
+    if (pw.length >= 10) score++;
+    if (pw.length >= 14) score++;
+    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    var fill = document.getElementById('cpStrengthFill');
+    var lbl  = document.getElementById('cpStrengthLabel');
+    var tier = score <= 1 ? 'weak' : score <= 3 ? 'fair' : 'strong';
+    var pct  = tier === 'weak' ? '33%' : tier === 'fair' ? '66%' : '100%';
+    var col  = tier === 'weak' ? '#ef4444' : tier === 'fair' ? '#f59e0b' : '#22c55e';
+    fill.style.width = pw.length ? pct : '0';
+    fill.style.backgroundColor = col;
+    lbl.textContent = pw.length ? ('Password strength: ' + tier) : '';
+    lbl.style.color = pw.length ? col : 'var(--text-muted)';
+    cpValidate();
+  }
+  function cpValidate() {
+    var cur  = (document.getElementById('cpCurrent').value || '');
+    var pw   = (document.getElementById('cpNew').value || '');
+    var conf = (document.getElementById('cpConfirm').value || '');
+    var errEl = document.getElementById('cpMatchError');
+    var btn   = document.getElementById('cpSubmitBtn');
+    var err = '';
+    if (pw && conf && pw !== conf)          err = 'Passwords don\'t match.';
+    else if (pw && cur && pw === cur)       err = 'New password must differ from current.';
+    else if (pw && pw.length < 10)         err = 'Minimum 10 characters required.';
+    errEl.textContent = err;
+    errEl.style.display = err ? 'block' : 'none';
+    var ok = cur && pw && conf && pw === conf && pw !== cur && pw.length >= 10;
+    btn.style.opacity = ok ? '1' : '0.4';
+    btn.style.pointerEvents = ok ? 'auto' : 'none';
+  }
+  // Wire validation to current password field too
+  document.addEventListener('DOMContentLoaded', function() {
+    var cpFields = ['cpCurrent','cpNew','cpConfirm'];
+    cpFields.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', cpValidate);
+    });
+  });
+  var _cpBusy = false;
+  async function cpSubmit() {
+    if (_cpBusy) return;
+    var cur  = (document.getElementById('cpCurrent').value || '');
+    var pw   = (document.getElementById('cpNew').value || '');
+    var conf = (document.getElementById('cpConfirm').value || '');
+    if (!cur || !pw || !conf || pw !== conf || pw === cur || pw.length < 10) return;
+    var btn = document.getElementById('cpSubmitBtn');
+    _cpBusy = true;
+    btn.disabled = true;
+    btn.textContent = 'Updating...';
+    try {
+      // Step A: re-auth with current password
+      var { data: { user } } = await Portal.supabase.auth.getUser();
+      if (!user) { Portal.toast('Not signed in.', 'error'); return; }
+      var reauth = await Portal.supabase.auth.signInWithPassword({ email: user.email, password: cur });
+      if (reauth.error) {
+        Portal.toast('Current password is incorrect.', 'error');
+        return;
+      }
+      // Step B: update password
+      var update = await Portal.supabase.auth.updateUser({ password: pw });
+      if (update.error) {
+        Portal.toast((update.error.message || 'Error updating password.').slice(0, 120), 'error');
+        return;
+      }
+      Portal.toast('Password updated. Other sessions have been signed out.', 'success');
+      // Clear fields
+      document.getElementById('cpCurrent').value = '';
+      document.getElementById('cpNew').value = '';
+      document.getElementById('cpConfirm').value = '';
+      cpUpdateStrength();
+      // Audit log (silent skip if table doesn't exist)
+      try {
+        var probe = await Portal.supabase.from('portal_audit_log').select('id').limit(1);
+        if (!probe.error || probe.error.code !== 'PGRST205') {
+          var puRow = await Portal.supabase.from('portal_users').select('id').eq('user_id', user.id).maybeSingle();
+          if (puRow.data) {
+            await Portal.supabase.from('portal_audit_log').insert({
+              portal_user_id: puRow.data.id,
+              event_type: 'password_change',
+              metadata: { source: 'settings_page' },
+              created_at: new Date().toISOString()
+            });
+          }
+        }
+      } catch(ae) { /* silent */ }
+    } catch(e) {
+      Portal.toast('Unexpected error. Please try again.', 'error');
+      console.error('[ChangePassword] error:', e);
+    } finally {
+      // Re-enable after 3s
+      setTimeout(function() {
+        _cpBusy = false;
+        if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
+        cpValidate();
+      }, 3000);
+    }
+  }
 
 // ── Settings Tab Controller ─────────────────────────────────
   window.SettingsTab = (function() {
