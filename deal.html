@@ -1089,7 +1089,7 @@
       <!-- 2x3 Financial Metrics -->
       <div class="hero-metrics-grid">
         <div class="hero-metric-card">
-          <div class="hero-metric-label">Asking Price</div>
+          <div class="hero-metric-label">Starting Price</div>
           <div class="hero-metric-value accent" id="hero_price">&mdash;</div>
         </div>
         <div class="hero-metric-card">
@@ -1415,7 +1415,7 @@
             </div>
           </div>
           <div class="form-group">
-            <div class="pf-label-row"><span class="pf-label-text">List Price (Asking)</span></div>
+            <div class="pf-label-row"><span class="pf-label-text">Starting Price</span></div>
             <div class="pf-readonly" id="pfro_listPrice">&mdash;</div>
           </div>
           <div class="form-group">
@@ -3455,7 +3455,7 @@
       if (financialEl) {
         var arv = (listing.properties && listing.properties.estimated_arv) || null;
         var price = listing.asking_price;
-        // Day 1 Equity = ARV - Asking Price - Closing Costs (0.5%) - Loan Fees (0.5%)
+        // Day 1 Equity = ARV - Starting Price - Closing Costs (0.5%) - Loan Fees (0.5%)
         var closingCostPct = (_listingsRow && _listingsRow.closing_cost_pct != null) ? _listingsRow.closing_cost_pct / 100 : 0.005;
         var loanCostPct = (_listingsRow && _listingsRow.loan_cost_pct != null) ? _listingsRow.loan_cost_pct / 100 : 0.005;
         var estCosts = price ? price * (closingCostPct + loanCostPct) : 0;
@@ -3490,7 +3490,7 @@
         }
 
         financialEl.innerHTML =
-          '<div class="financial-row"><span class="financial-label">Asking Price</span><span class="financial-value accent">' + (Portal.fc(price) || '&mdash;') + '</span></div>' +
+          '<div class="financial-row"><span class="financial-label">Starting Price</span><span class="financial-value accent">' + (Portal.fc(price) || '&mdash;') + '</span></div>' +
           '<div class="financial-row"><span class="financial-label">Retail Value (ARV)</span><span class="financial-value">' + (arv ? Portal.fc(arv) : 'Pending Analysis') + '</span></div>' +
           '<div class="financial-row"><span class="financial-label">Current Market Value</span><span class="financial-value">' + ((property.current_market_value && property.current_market_value > 0) ? Portal.fc(property.current_market_value) : '<span style="color:#94a3b8;font-style:italic;font-size:13px;">Pending Analysis</span>') + '</span></div>' +
           '<div class="financial-row"><span class="financial-label">Day 1 Equity</span><span class="financial-value" style="color:' + (equity > 0 ? '#16a34a' : (equity !== null && equity < 0 ? '#dc2626' : '')) + '">' + (equity !== null ? Portal.fc(equity) : 'TBD') + (equity !== null && equity < 0 ? '<br><em style="color:#dc2626;font-size:12px;font-weight:400;">ARV below asking price</em>' : '') + '</span></div>' +
@@ -3832,7 +3832,7 @@
         var ppDefault = pp ? Math.round(pp * 1.3 / 100) * 100 : 0;
         ppEl.value = ppDefault ? ppDefault.toLocaleString('en-US') : '';
       }
-      // List Price = asking price (the portal-facing price)
+      // Starting Price = portal-facing list price (column name asking_price)
       document.getElementById('pfro_listPrice').textContent = Portal.fc(pp);
 
       // Populate editable inputs from DB values (fallback to defaults)
