@@ -913,7 +913,7 @@
               '<div class="popup-city">' + [p.city, p.state].filter(Boolean).join(', ') + '</div>' +
               '<div class="popup-specs">' + [slugToLabel(p.property_type), p.bedrooms ? p.bedrooms + ' Bd' : null, p.bathrooms ? p.bathrooms + ' Ba' : null, p.sqft ? p.sqft.toLocaleString() + ' sqft' : null].filter(Boolean).join(' &middot; ') + '</div>' +
               '<div style="display:flex;gap:20px;align-items:flex-end;margin-bottom:12px;">' +
-                '<div><div class="popup-price-label">List Price</div><div class="popup-price">' + Portal.fc(listing.asking_price) + '</div></div>' +
+                '<div><div class="popup-price-label">Starting Price</div><div class="popup-price">' + Portal.fc(listing.asking_price) + '</div></div>' +
                 (p.estimated_arv ? '<div><div class="popup-arv-label">ARV</div><div class="popup-arv">' + Portal.fc(p.estimated_arv) + '</div></div>' : '') +
               '</div>' +
             '</div>' +
@@ -1086,7 +1086,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
               '<div style="display:flex;gap:14px;align-items:flex-end;margin-top:8px;">' +
                 (l.status === 'sold'
                   ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">Sold Price</div><div style="font-size:16px;font-weight:800;color:var(--accent);">' + (l.sold_price != null ? Portal.fc(l.sold_price) : '\u2014') + '</div></div>'
-                  : '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">List Price</div><div style="font-size:16px;font-weight:800;color:var(--accent);">' + Portal.fc(l.asking_price) + '</div></div>' + arvHtml
+                  : '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">Starting Price</div><div style="font-size:16px;font-weight:800;color:var(--accent);">' + Portal.fc(l.asking_price) + '</div></div>' + arvHtml
                 ) +
               '</div>' +
             '</div>' +
@@ -1610,7 +1610,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
                     '<div style="font-size:16px;font-weight:800;color:#4fc3f7;">$' + (l.sold_price != null ? Math.round(l.sold_price).toLocaleString('en-US') : '—') + '</div>' +
                   '</div>'
                 : '<div style="flex:1;min-width:80px;">' +
-                    '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">List Price</div>' +
+                    '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Starting Price</div>' +
                     '<div style="font-size:16px;font-weight:800;color:#4fc3f7;">$' + (l.asking_price ? Math.round(l.asking_price).toLocaleString('en-US') : '—') + '</div>' +
                   '</div>' +
                   (p.estimated_arv ? '<div style="flex:1;min-width:80px;">' +
