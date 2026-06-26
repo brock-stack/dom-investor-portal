@@ -60,8 +60,8 @@ body {
   right: 0;
   height: 70px;
   overflow: visible;
-  background: #1a1e38 !important;
-  border-bottom: 1px solid rgba(79,195,247,0.2) !important;
+  background: var(--chrome-bg-2);
+  border-bottom: 1px solid var(--accent-glow);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -70,7 +70,7 @@ body {
 }
 
 [data-theme="light"] .investor-nav {
-  background: #1a1e38;
+  background: var(--chrome-bg-2);
 }
 
 .nav-brand {

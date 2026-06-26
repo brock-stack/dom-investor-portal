@@ -7,6 +7,7 @@
   <meta name="description" content="Access curated off-market real estate investment deals in Florida. Verified, underwritten, and ready to analyze.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/investor.css">
   <script>
   (function() {
@@ -545,20 +546,20 @@
         ? '<div class="hp-closing-photo" style="height:160px;overflow:hidden;filter:blur(12px);"><img src="' + photoUrl + '" alt="' + c.city + '" style="width:100%;height:100%;object-fit:cover;"></div>'
         : (photoUrl
             ? '<div class="hp-closing-photo" style="height:160px;overflow:hidden;"><img src="' + photoUrl + '" alt="' + c.city + '" style="width:100%;height:100%;object-fit:cover;"></div>'
-            : '<div class="hp-closing-photo" style="height:160px;background:linear-gradient(135deg,var(--surface-2) 0%,var(--bg-primary) 100%);display:flex;align-items:center;justify-content:center;font-size:52px;">🏡</div>');
-      return '<div style="background:var(--surface);border:1px solid var(--border-color);border-radius:12px;overflow:hidden;">' +
+            : '<div class="hp-closing-photo" style="height:160px;background:linear-gradient(135deg,var(--surface-2) 0%,var(--bg) 100%);display:flex;align-items:center;justify-content:center;font-size:52px;">🏡</div>');
+      return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">' +
         photoZone +
         '<div style="padding:20px;">' +
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
             '<div style="display:inline-block;background:rgba(34,197,94,0.15);color:#22c55e;font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:100px;">CLOSED</div>' +
             '<div style="font-size:12px;color:var(--text-muted);">' + c.closed + '</div>' +
           '</div>' +
-          '<div class="hp-closing-location" style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">' + c.city + ', ' + c.state + '</div>' +
+          '<div class="hp-closing-location" style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;">' + c.city + ', ' + c.state + '</div>' +
           '<div class="hp-closing-specs" style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">' + c.type + ' &middot; ' + c.beds + ' Bd / ' + c.baths + ' Ba</div>' +
           '<div style="display:flex;justify-content:space-between;align-items:flex-end;">' +
             '<div>' +
               '<div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Sold Price</div>' +
-              '<div style="font-size:18px;font-weight:700;color:var(--text-primary);">$' + Number(c.price).toLocaleString() + '</div>' +
+              '<div style="font-size:18px;font-weight:700;color:var(--text);">$' + Number(c.price).toLocaleString() + '</div>' +
             '</div>' +
             (c.arv ? '<div style="text-align:right;">' +
               '<div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">ARV</div>' +

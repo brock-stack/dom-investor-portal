@@ -1,0 +1,147 @@
+/* ==========================================================================
+   tokens.css — Direct Off Market · SINGLE SOURCE OF TRUTH (v3)
+   Link FIRST: tokens.css → investor.css → pages.css
+   ☀️ :root = GULF COAST (light · PRIMARY) 🌙 [data-theme="dark"] = GULF AT NIGHT
+   Round-1/2/3 + full light & dark audits folded in. Never hardcode a hex
+   anywhere else — if a value is missing here, add it here, then reference it.
+   ========================================================================== */
+@layer tokens, components, pages, utilities;
+
+:root{
+  /* ── THEME-INDEPENDENT (declared once) ─────────────────────────────────── */
+  --r-lg:24px; --r-md:16px; --r-sm:12px;
+
+  --ease-out:cubic-bezier(.32,.72,0,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --ease-default:cubic-bezier(.4,0,.2,1);
+  --duration-fast:150ms; --duration-medium:250ms; --duration-slow:400ms;
+
+  --blur-sm:blur(6px); --blur-md:blur(12px); --blur-lg:blur(28px);
+
+  --z-base:0; --z-sticky:50; --z-nav:1000; --z-tooltip:1500;
+  --z-modal-backdrop:9000; --z-modal:9100; --z-modal-success:9200; --z-onboarding:9999;
+
+  --bp-sm:480px; --bp-md:768px; --bp-lg:1024px; --bp-xl:1280px;
+
+  /* brand chrome — nav / footer / EH-logo stay NAVY in BOTH themes (brand-locked) */
+  --chrome-bg:#16243F; --chrome-bg-2:#0F1A2E; --text-on-chrome:#E8EDF5;
+
+  /* text sitting on a filled accent/gold (both themes) */
+  --text-on-accent:#FFFFFF; /* on royal-blue fills */
+  --text-on-gold:#16243F;   /* navy on champagne fills */
+
+  /* always-dark surfaces (both themes) */
+  --overlay-backdrop:rgba(8,15,30,.72); /* modal/photo scrims */
+
+  /* royal-blue glow scale — REPLACES 110+ rgba(79,195,247,…) sky refs */
+  --accent-glow-soft:rgba(46,106,214,.10);
+  --accent-glow:rgba(46,106,214,.20);
+  --accent-glow-strong:rgba(46,106,214,.35);
+  --accent-glow-bloom:rgba(46,106,214,.45); /* button hover bloom */
+
+
+  /* ── ☀️ GULF COAST (light · PRIMARY) ───────────────────────────────────── */
+  --bg:#EAF5F6; --grad-a:#ECF6F7; --grad-b:#D9ECF0;
+  --surface:#FFFFFF; --surface-2:#F3FAFB; --surface-3:#E2EEF0; /* hover/pressed */
+  --surface-sunken:#F7FBFC; /* layered cards (was #f8fafc) */
+  --border:rgba(13,40,60,.10);
+  --divider-faint:rgba(13,40,60,.05); --divider:rgba(13,40,60,.10); --divider-strong:rgba(13,40,60,.16);
+
+  --glass:rgba(255,255,255,.42); --glass-edge:rgba(255,255,255,.92);
+  --field:rgba(255,255,255,.60); --field-edge:rgba(13,40,60,.12);
+  --card-shadow:0 18px 44px rgba(30,80,110,.14);
+
+  --text:#16263B; --text-muted:#566076; --text-faint:#8A93A8;
+
+  --navy:#16243F; --navy-dark:#0F1A2E;
+  --royal:#2E6AD6; --royal-hi:#3D78EA;
+  --sky:#3D9BE8;
+  --turquoise:#1FA6B8; --accent-teal:var(--turquoise); /* FIX: orphan BRRRR var */
+  --gold:#B8954F; --gold-2:#C9A25A; --gold-grad-a:#EAD9AE; --gold-grad-b:#C9A25A;
+  --purple:#6B46C1; --auburn:#E0A06A;
+
+  /* darker accent variants for AA contrast ON light (formalizes mini-card/eyebrow drift) */
+  --accent-on-light:#1B5FC4; /* accent text/figures on white cards */
+  --accent-text-on-tint:#0E6E7C; /* text on a tinted accent chip */
+  --eyebrow:#0E7A8C; /* section eyebrows */
+
+  --green:#2DBE74; --green-bg:rgba(45,190,116,.16); --green-edge:rgba(45,190,116,.36);
+  --red:#E2483D; --red-bg:rgba(226,72,61,.14); --red-edge:rgba(226,72,61,.34);
+  --amber:#C98A2E; --arv:#2D6A8F;
+  --tooltip-bg:#1E293B; --tooltip-text:#E2E8F0;
+
+  --pf-input-bg:#EAF3FF; --pf-input-text:#1E3A5F; /* pro-forma input baby-blue (preserve) */
+
+  --accent:var(--royal); --accent-hover:var(--royal-hi); --accent-soft:rgba(46,106,214,.10);
+
+  --focus-ring:0 0 0 3px rgba(184,149,79,.35);
+
+  --grad-hero:linear-gradient(180deg,var(--grad-a),var(--grad-b));
+  --grad-gold:linear-gradient(160deg,var(--gold-grad-a),var(--gold-grad-b));
+  --grad-royal:linear-gradient(160deg,var(--royal-hi),var(--royal));
+  --grad-glow:linear-gradient(135deg,var(--accent-soft),transparent);
+  --grad-overlay:linear-gradient(180deg,var(--overlay-backdrop),transparent);
+
+  /* light shadow scale (soft) */
+  --shadow-sm:0 2px 8px rgba(30,80,110,.06);
+  --shadow-md:0 6px 20px rgba(30,80,110,.10);
+  --shadow-lg:0 18px 44px rgba(30,80,110,.14);
+  --shadow-xl:0 30px 70px rgba(30,80,110,.18);
+  --shadow-bloom:0 4px 20px var(--accent-glow-bloom);
+
+  --t1:#7FD3DC; --t2:#A6CBF2; --t3:#D2C6EF; --t4:#EDD0A6; --glow-op:.5; --glow-blur:80px;
+}
+
+[data-theme="dark"]{
+  /* ── 🌙 GULF AT NIGHT (dark · alternate · Option A navy, canonical) ─────── */
+  --bg:#0F1A2E; --grad-a:#13213B; --grad-b:#080F1E;
+  --surface:#16243F; --surface-2:#1E2C49; --surface-3:#2D4070;
+  --surface-sunken:#0A1228;
+  --border:rgba(255,255,255,.12);
+  --divider-faint:rgba(255,255,255,.06); --divider:rgba(255,255,255,.10); --divider-strong:rgba(255,255,255,.15);
+
+  --glass:rgba(255,255,255,.06); --glass-edge:rgba(255,255,255,.20);
+  --field:rgba(255,255,255,.05); --field-edge:rgba(255,255,255,.16);
+  --card-shadow:0 26px 64px rgba(0,0,0,.55);
+
+  --text:#F4EFE4; --text-muted:#AEB8CC; --text-faint:#7E89A3;
+
+  --navy:#16243F; --navy-dark:#0F1A2E;
+  --royal:#2E6AD6; --royal-hi:#3D78EA;
+  --sky:#3D9BE8;
+  --turquoise:#3FC8DA; --accent-teal:var(--turquoise);
+  --gold:#E6CC86; --gold-2:#D8B25E; --gold-grad-a:#EAD9AE; --gold-grad-b:#D8B25E;
+  --purple:#9B7BE0; --auburn:#C99A52;
+
+  --accent-on-light:#5FA8FF; --accent-text-on-tint:#7FD3DC; --eyebrow:#3FC8DA;
+
+  --green:#4FD08A; --green-bg:rgba(79,208,138,.16); --green-edge:rgba(79,208,138,.36);
+  --red:#F0685E; --red-bg:rgba(240,104,94,.16); --red-edge:rgba(240,104,94,.4);
+  --amber:#E6B25C; --arv:#7FC4E0;
+  --tooltip-bg:#0B1A30; --tooltip-text:#E2E8F0;
+
+  --pf-input-bg:#13233F; --pf-input-text:#CFE0F5;
+
+  --accent:var(--royal); --accent-hover:var(--royal-hi); --accent-soft:rgba(46,106,214,.16);
+
+  --focus-ring:0 0 0 3px rgba(230,204,134,.40);
+
+  --grad-hero:linear-gradient(180deg,var(--grad-a),var(--grad-b));
+  --grad-gold:linear-gradient(160deg,var(--gold-grad-a),var(--gold-grad-b));
+  --grad-royal:linear-gradient(160deg,var(--royal-hi),var(--royal));
+  --grad-glow:linear-gradient(135deg,var(--accent-soft),transparent);
+  --grad-overlay:linear-gradient(180deg,var(--overlay-backdrop),transparent);
+
+  /* dark shadow scale (heavier — intentional, per audit) */
+  --shadow-sm:0 2px 8px rgba(0,0,0,.20);
+  --shadow-md:0 4px 20px rgba(0,0,0,.25);
+  --shadow-lg:0 8px 30px rgba(0,0,0,.30);
+  --shadow-xl:0 20px 60px rgba(0,0,0,.50);
+  --shadow-bloom:0 4px 20px var(--accent-glow-bloom);
+
+  --t1:#1FA6B8; --t2:#2E6AD6; --t3:#6B46C1; --t4:#C99A52; --glow-op:.5; --glow-blur:74px;
+}
+
+/* gold stays a real champagne token (NOT aliased to accent): the 27 inline
+   marketplace var(--gold) refs inherit it cleanly. ── Charts: read tokens via
+   getComputedStyle at chart-create + re-read on Portal.toggleTheme(). */
