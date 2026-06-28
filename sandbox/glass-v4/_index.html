@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glass v4 Sandbox — DOM Investor Portal</title>
+<script>
+(function(){var t=localStorage.getItem('dom_portal_theme');if(t)document.documentElement.setAttribute('data-theme',t)})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/glass.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',system-ui,sans-serif;color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;background:#06121F}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px;position:relative;z-index:1}
+h1{font-family:'Barlow Condensed',var(--font-ui);font-size:36px;font-weight:700;margin-bottom:6px;letter-spacing:.01em}
+.sub{color:var(--text-muted);font-size:15px;margin-bottom:32px}
+.tog{width:40px;height:40px;border-radius:50%;border:1px solid var(--glass-bd);background:var(--glass);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:grid;place-items:center;cursor:pointer;color:var(--gold);float:right;margin-top:-44px}
+.tog svg{width:18px;height:18px}
+.section-label{font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:28px 0 12px}
+[data-theme="light"] .section-label{color:var(--gold-deep)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+a.page-card{display:block;padding:16px 18px;text-decoration:none;color:var(--text);transition:transform .2s cubic-bezier(.32,.72,0,1)}
+a.page-card:hover{transform:translateY(-3px)}
+.page-name{font-weight:700;font-size:14px;margin-bottom:6px}
+.page-path{font-size:11px;color:var(--text-faint);font-family:'Inter',sans-serif;margin-bottom:10px}
+.tier{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+.tier-showcase{background:rgba(174,132,56,.15);border:1px solid rgba(174,132,56,.35);color:var(--gold)}
+[data-theme="light"] .tier-showcase{background:rgba(111,80,33,.1);color:var(--gold-deep);border-color:rgba(111,80,33,.3)}
+.tier-work{background:rgba(61,120,234,.12);border:1px solid rgba(61,120,234,.3);color:var(--accent)}
+.tier-mixed{background:rgba(70,214,149,.1);border:1px solid rgba(70,214,149,.28);color:var(--equity)}
+.phase-badge{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--tile-bg);border:1px solid var(--tile-bd);color:var(--text-faint);margin-left:6px}
+.demo-link{margin-bottom:24px}
+.demo-link a{color:var(--accent);font-weight:600;font-size:14px;text-decoration:none}
+.demo-link a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div class="scene scene-dark"><div class="rays"></div></div>
+<div class="scene scene-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%;width:3px;height:3px;--d:26s;--dl:0s"></span>
+  <span class="mote" style="left:34%;width:2px;height:2px;--d:34s;--dl:7s"></span>
+  <span class="mote" style="left:52%;width:3px;height:3px;--d:30s;--dl:13s"></span>
+  <span class="mote" style="left:69%;width:2px;height:2px;--d:38s;--dl:4s"></span>
+  <span class="mote" style="left:85%;width:3px;height:3px;--d:28s;--dl:10s"></span>
+</div>
+<div class="depth"></div>
+
+<div class="wrap">
+
+  <div class="lg" style="padding:28px 30px 24px;margin-bottom:28px">
+    <button class="tog" id="tog" aria-label="Toggle dark / light">
+      <svg id="togic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/></svg>
+    </button>
+    <h1>Glass v4 Sandbox</h1>
+    <div class="sub">DOM Investor Portal · 2026-06-28 · Sandbox-only branch. Never merged to production.</div>
+    <div class="demo-link">
+      <a href="_demo.html">→ Open Glass Demo (design reference)</a>
+    </div>
+    <div style="font-size:12px;color:var(--text-faint)">
+      Branch: <code style="font-family:'Inter',monospace;background:var(--tile-bg);padding:2px 6px;border-radius:5px;border:1px solid var(--tile-bd)">kong/glass-v4-sandbox</code>
+      &nbsp;·&nbsp;
+      <span class="tier tier-showcase">Showcase</span> = full liquid glass
+      &nbsp;·&nbsp;
+      <span class="tier tier-work">Work</span> = calmer + opaque
+      &nbsp;·&nbsp;
+      <span class="tier tier-mixed">Mixed</span> = both tiers on one page
+    </div>
+  </div>
+
+  <div class="section-label">Phase B1 — Money pages</div>
+  <div class="grid">
+    <a class="page-card lg" href="marketplace.html">
+      <div class="page-name">Marketplace</div>
+      <div class="page-path">marketplace.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B1</span>
+    </a>
+    <a class="page-card lg" href="deal.html">
+      <div class="page-name">Deal Detail</div>
+      <div class="page-path">deal.html</div>
+      <span class="tier tier-mixed">Mixed</span><span class="phase-badge">B1</span>
+    </a>
+    <a class="page-card lg" href="proforma.html">
+      <div class="page-name">Pro-forma</div>
+      <div class="page-path">proforma.html</div>
+      <span class="tier tier-work">Work</span><span class="phase-badge">B1</span>
+    </a>
+  </div>
+
+  <div class="section-label">Phase B2 — High-traffic pages</div>
+  <div class="grid">
+    <a class="page-card lg" href="dashboard.html">
+      <div class="page-name">Dashboard</div>
+      <div class="page-path">dashboard.html</div>
+      <span class="tier tier-work">Work</span><span class="phase-badge">B2</span>
+    </a>
+    <a class="page-card lg" href="homepage.html">
+      <div class="page-name">Homepage</div>
+      <div class="page-path">homepage.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B2</span>
+    </a>
+    <a class="page-card lg" href="index.html">
+      <div class="page-name">Index / Landing</div>
+      <div class="page-path">index.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B2</span>
+    </a>
+    <a class="page-card lg" href="offer.html">
+      <div class="page-name">Submit Offer</div>
+      <div class="page-path">offer.html</div>
+      <span class="tier tier-work">Work</span><span class="phase-badge">B2</span>
+    </a>
+  </div>
+
+  <div class="section-label">Phase B3 — Marketing, Auth, Legal, Error</div>
+  <div class="grid">
+    <a class="page-card lg" href="lender-marketplace.html">
+      <div class="page-name">Lender Marketplace</div>
+      <div class="page-path">lender-marketplace.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="preferred-partners.html">
+      <div class="page-name">Preferred Partners</div>
+      <div class="page-path">preferred-partners.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="preferred-partners/contractors.html">
+      <div class="page-name">Partners — Contractors</div>
+      <div class="page-path">preferred-partners/contractors.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="preferred-partners/insurance.html">
+      <div class="page-name">Partners — Insurance</div>
+      <div class="page-path">preferred-partners/insurance.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="preferred-partners/property-management.html">
+      <div class="page-name">Partners — Prop Mgmt</div>
+      <div class="page-path">preferred-partners/property-management.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="preferred-partners/title.html">
+      <div class="page-name">Partners — Title</div>
+      <div class="page-path">preferred-partners/title.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="signup.html">
+      <div class="page-name">Sign Up</div>
+      <div class="page-path">signup.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="login.html">
+      <div class="page-name">Login</div>
+      <div class="page-path">login.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="contact.html">
+      <div class="page-name">Contact</div>
+      <div class="page-path">contact.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="faq.html">
+      <div class="page-name">FAQ</div>
+      <div class="page-path">faq.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="privacy.html">
+      <div class="page-name">Privacy Policy</div>
+      <div class="page-path">privacy.html</div>
+      <span class="tier tier-work">Work</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="terms.html">
+      <div class="page-name">Terms</div>
+      <div class="page-path">terms.html</div>
+      <span class="tier tier-work">Work</span><span class="phase-badge">B3</span>
+    </a>
+    <a class="page-card lg" href="404.html">
+      <div class="page-name">404</div>
+      <div class="page-path">404.html</div>
+      <span class="tier tier-showcase">Showcase</span><span class="phase-badge">B3</span>
+    </a>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var tog=document.getElementById('tog');
+  var ic=document.getElementById('togic');
+  var moon='<path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/>';
+  var sun='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  function setTheme(t){
+    document.documentElement.setAttribute('data-theme',t);
+    localStorage.setItem('dom_portal_theme',t);
+    ic.innerHTML=t==='dark'?moon:sun;
+  }
+  tog.addEventListener('click',function(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    setTheme(cur==='dark'?'light':'dark');
+  });
+  // Set icon based on current theme
+  var cur=document.documentElement.getAttribute('data-theme')||'dark';
+  ic.innerHTML=cur==='dark'?moon:sun;
+})();
+</script>
+</body>
+</html>

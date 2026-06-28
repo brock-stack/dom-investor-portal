@@ -1,0 +1,303 @@
+/* ============================================================================
+   GULF LIQUID GLASS — influence stylesheet  ·  DOM Investor Portal
+   For Einstein → translate into Kong's build spec.
+   ----------------------------------------------------------------------------
+   CONCEPT: one ocean, two depths.
+     🌙 NIGHT = deep sea (PRIMARY / production default)  → floating over the deep
+     ☀️ DAY   = bright shallows                          → standing in sunlit water
+   MATERIAL: Apple-style liquid glass — edge-lit rim, optical depth, translucent.
+   TWO TIERS:
+     .lg        = SHOWCASE glass (hero, marketplace, deal hero, marketing) — full liquid
+     .lg--work  = WORK glass (proforma.html, dashboard, tables) — calmer, more opaque,
+                  scene dimmed behind, so dense numbers stay sharp.
+   DISCIPLINE (the rule that keeps it expensive, not busy):
+     • ONE dominant gradient per mode (deep blue / bright aqua)
+     • GOLD is the only metal  • GREEN appears ONLY on a gain
+   KEEP AS-IS: the logos and the production fonts (Barlow / Barlow Condensed / Inter).
+   This system is font-agnostic — it skins surfaces, it does not restyle type.
+   HOW IT FOLDS IN: additive. A fixed .scene-* background layer + the .lg recipe.
+   No page structure / JS changes required for the look.
+   ============================================================================ */
+
+/* ---- Fonts: ALREADY loaded in production. Do not change. Reference only. ---- */
+:root{
+  --font-ui:'Barlow', system-ui, sans-serif;          /* body / UI */
+  --font-display:'Barlow Condensed', var(--font-ui);  /* big headlines */
+  --font-num:'Inter', var(--font-ui);                 /* tabular numbers */
+}
+
+/* ============================ SHARED (both modes) =========================== */
+:root{
+  --r-lg:24px; --r-md:18px; --r-sm:12px;
+  --ease:cubic-bezier(.32,.72,0,1); --dur:.5s;
+
+  /* TREASURE GOLD — the only metal. Deep antique doubloon, more patina. */
+  --gold-hi:#EACE82; --gold:#AE8438; --gold-deep:#6F5021; --gold-text:#20150A;
+  --grad-gold:linear-gradient(180deg, var(--gold-hi), var(--gold) 50%, var(--gold-deep));
+  /* gauges / thin gold strokes */
+  --gold-stroke-a:#EACE82; --gold-stroke-b:#6F5021;
+}
+
+/* ===================== 🌙 NIGHT — DEEP SEA (default/primary) ================ */
+:root, [data-theme="dark"]{
+  color-scheme:dark;
+  --text:#EAF2F8; --text-muted:#A9BFD2; --text-faint:#74899E;
+  --hair:rgba(255,255,255,.12);
+
+  --royal:#3D78EA; --royal-hi:#5A8BEE; --accent:var(--royal);  /* TRANSACTIONAL primary stays royal */
+  --green:#46D695; --equity:#6FE3AC;
+  --equity-bg:rgba(70,214,149,.14); --equity-bd:rgba(70,214,149,.3);
+  --avail:#7BE6B3; --avail-bg:rgba(70,214,149,.14); --avail-bd:rgba(70,214,149,.32); --avail-dot:#46D695;
+  --tile-bg:rgba(255,255,255,.06); --tile-bd:rgba(255,255,255,.12); --tile-spec:rgba(255,255,255,.16);
+
+  /* showcase glass */
+  --glass:linear-gradient(157deg, rgba(22,44,74,.40), rgba(12,26,48,.20) 60%, rgba(12,26,48,.13));
+  --glass-bd:rgba(255,255,255,.13);
+  --glass-drop:0 30px 70px rgba(3,9,20,.55);
+  --glass-spec:rgba(255,255,255,.45);
+  --glass-shade:rgba(3,9,20,.34);
+  --glass-rim:linear-gradient(155deg, rgba(255,255,255,.9), rgba(170,210,235,.14) 28%, transparent 54%, var(--gold-hi) 96%);
+  --glass-pool:rgba(180,214,240,.15);
+  --glass-blur:22px; --glass-sat:150%;
+
+  /* work glass — opaque enough for dense numbers, but a faint hint of sea reads through */
+  --glassw:linear-gradient(157deg, rgba(16,32,54,.60), rgba(11,24,44,.50));
+  --glassw-bd:rgba(255,255,255,.10);
+  --glassw-blur:18px; --glassw-sat:130%;
+}
+
+/* ===================== ☀️ DAY — BRIGHT SHALLOWS ============================= */
+[data-theme="light"]{
+  color-scheme:light;
+  --text:#103A45; --text-muted:#4C6B73; --text-faint:#83A0A7;
+  --hair:rgba(16,60,70,.12);
+
+  --royal:#2E6AD6; --royal-hi:#3D78EA; --accent:var(--royal);  /* TRANSACTIONAL primary stays royal */
+  --green:#1FB872; --equity:#0E8552;
+  --equity-bg:rgba(36,170,110,.14); --equity-bd:rgba(36,170,110,.34);
+  --avail:#0E8552; --avail-bg:rgba(36,170,110,.14); --avail-bd:rgba(36,170,110,.34); --avail-dot:#1FB872;
+  --tile-bg:rgba(255,255,255,.42); --tile-bd:rgba(255,255,255,.62); --tile-spec:rgba(255,255,255,.85);
+
+  /* showcase glass */
+  --glass:linear-gradient(157deg, rgba(255,255,255,.52), rgba(255,255,255,.24) 60%, rgba(255,255,255,.18));
+  --glass-bd:rgba(255,255,255,.62);
+  --glass-drop:0 26px 60px rgba(26,92,112,.20);
+  --glass-spec:rgba(255,255,255,.95);
+  --glass-shade:rgba(30,90,110,.05);
+  --glass-rim:linear-gradient(155deg, rgba(255,255,255,1), rgba(255,255,255,.35) 30%, transparent 56%, var(--gold) 96%);
+  --glass-pool:rgba(255,255,255,.55);
+  --glass-blur:22px; --glass-sat:170%;
+
+  /* work glass */
+  --glassw:linear-gradient(157deg, rgba(255,255,255,.70), rgba(255,255,255,.60));
+  --glassw-bd:rgba(255,255,255,.7);
+  --glassw-blur:18px; --glassw-sat:140%;
+}
+
+/* ============================ THE SCENES ==================================== */
+/* Attach ONE of these as a fixed, full-viewport layer behind everything.
+   Swap by toggling [data-theme] on <html>. On WORK pages add .scene--dim. */
+.scene{position:fixed; inset:0; z-index:-4; overflow:hidden; transition:opacity var(--dur) var(--ease)}
+
+/* 🌙 deep sea: surface light up top → abyss at the bottom */
+.scene-dark{
+  background:
+    radial-gradient(82% 48% at 50% -10%, rgba(86,180,216,.5) 0%, transparent 56%),
+    linear-gradient(180deg, #1B5C84 0%, #114A72 13%, #0C3358 33%, #0A2645 54%, #071A33 76%, #04101F 100%);
+}
+.scene-dark .rays{position:absolute; inset:-10% 0 0 0; mix-blend-mode:screen; opacity:.55; filter:blur(8px); transform-origin:50% 0;
+  background:
+    linear-gradient(101deg, transparent 28%, rgba(150,212,236,.16) 33%, transparent 39%),
+    linear-gradient(95deg,  transparent 46%, rgba(150,212,236,.12) 51%, transparent 57%),
+    linear-gradient(110deg, transparent 60%, rgba(150,212,236,.1) 65%, transparent 72%);}
+@media (prefers-reduced-motion:no-preference){
+  .scene-dark .rays{animation:sway 16s var(--ease) infinite alternate}
+  @keyframes sway{to{transform:skewX(3deg) translateX(2%)}}}
+
+/* ☀️ bright shallows: same water, sunlit, light from above */
+.scene-light{
+  background:
+    radial-gradient(70% 50% at 50% -8%, rgba(255,255,255,.6) 0%, transparent 52%),
+    linear-gradient(180deg, #CDEBF1 0%, #8FD7DC 30%, #4FC2CC 56%, #79D2D2 80%, #BDE8E2 100%);
+}
+.scene-light .rays{position:absolute; inset:-10% 0 0 0; mix-blend-mode:screen; opacity:.5; filter:blur(10px);
+  background:linear-gradient(100deg, transparent 36%, rgba(255,255,255,.6) 49%, rgba(255,255,255,.75) 51%, transparent 66%); transform:skewY(-7deg);}
+
+/* depth vignette — seats the glass, deepens edges */
+.scene::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(120% 82% at 50% 20%, transparent 42%, rgba(2,8,18,.55) 100%)}
+.scene-light::after{background:radial-gradient(120% 82% at 50% 22%, transparent 52%, rgba(20,70,90,.14) 100%)}
+
+/* WORK pages: dim the scene so dense data reads. Put on the .scene element. */
+.scene--dim::before{content:""; position:absolute; inset:0; background:rgba(4,12,24,.28)}
+[data-theme="light"] .scene--dim::before{background:rgba(255,255,255,.30)}
+
+/* ============================ LIQUID GLASS ================================= */
+/* SHOWCASE tier */
+.lg{
+  position:relative; border-radius:var(--r-md); overflow:hidden;
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border:1px solid var(--glass-bd);
+  box-shadow:var(--glass-drop),
+             inset 0 1px 1px var(--glass-spec),     /* top specular */
+             inset 0 -26px 46px var(--glass-shade); /* bottom inner shade = thickness */
+  transition:background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.lg::before{ /* bright refractive edge rim (top white → faint gold kiss) */
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; padding:1.2px;
+  background:var(--glass-rim);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;}
+.lg::after{ /* soft specular pool, top-left */
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(58% 48% at 16% 4%, var(--glass-pool), transparent 60%);}
+
+/* WORK tier — same shape, calmer + more opaque (legibility on data screens) */
+.lg--work{
+  background:var(--glassw);
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  border:1px solid var(--glassw-bd);
+  box-shadow:0 14px 36px rgba(3,9,20,.32), inset 0 1px 0 var(--glass-spec);
+}
+.lg--work::before{opacity:.5}   /* dial the rim back so it doesn't compete with numbers */
+.lg--work::after{opacity:.5}
+
+/* ============================ ACCENTS (reference) ========================== */
+/* PRIMARY action = ROYAL (keep Kong's contract: "Primary = royal blue").
+   GOLD = Featured / marketing CTA + the only decorative metal. Don't swap these. */
+.btn-primary{font:600 14.5px/1 var(--font-ui); border:none; border-radius:14px; padding:14px 22px; cursor:pointer;
+  background:var(--accent); color:#fff;
+  box-shadow:0 10px 26px rgba(46,106,214,.38), inset 0 1px 0 rgba(255,255,255,.25);}
+.btn-primary:hover{transform:translateY(-1px)}
+
+.btn-gold{font:600 14.5px/1 var(--font-ui); border:none; border-radius:14px; padding:14px 22px; cursor:pointer;
+  background:var(--grad-gold); color:var(--gold-text);
+  box-shadow:0 10px 26px rgba(142,107,46,.42), inset 0 1px 0 rgba(255,255,255,.6);}
+.btn-gold:hover{transform:translateY(-1px)}
+
+.seg-on{background:var(--grad-gold); color:var(--gold-text);
+  box-shadow:0 6px 16px rgba(142,107,46,.4), inset 0 1px 0 rgba(255,255,255,.55);}
+
+.tile-equity{background:var(--equity-bg); border:1px solid var(--equity-bd)} /* .v → color:var(--equity) */
+
+/* gauges: single treasure-gold gradient stroke (define this <linearGradient> in markup)
+   <linearGradient id="gg"><stop 0 #F0DA98><stop 1 #9A7634></linearGradient>
+   ring stroke:url(#gg); track stroke:rgba(255,255,255,.10) (dark) / rgba(16,60,70,.12) (light) */
+
+/* ============================ NOTES FOR EINSTEIN ==========================
+   1. NIGHT is :root default (matches production's dark default). DAY = [data-theme="light"].
+      → Confirm production's pre-paint scripts: some fall back to 'dark'. Honor that.
+   2. Page → tier map (recommend):
+        SHOWCASE (.lg): index, homepage, marketplace, deal hero, lender-marketplace,
+                        preferred-partners, contact, login/signup, 404.
+        WORK (.lg--work + .scene--dim): proforma.html, dashboard, the deal pro-forma
+                        section, any heavy table.
+   3. Fold-in is additive: add one .scene layer + swap card backgrounds to .lg / .lg--work.
+      Do NOT change page structure, JS, ids, or the existing Barlow type — skin only.
+   4. Chrome (nav/footer) can be glass too, but keep it readable — use .lg--work weight.
+   5. Reduced-motion: rays/animation already gated. Keep it.
+   6. Keep the discipline rule visible in the spec: gold = only metal, green = only gains,
+      one dominant gradient per mode.
+   7. COLOR ROLES (from Kong's v3 contract — do NOT reassign):
+        • ROYAL BLUE = transactional primary (Submit offer, Confirm, primary links)
+        • GOLD = Featured deals + marketing CTA ("Get investor access") + decorative metal
+        • GREEN = gains only (equity, positive cashflow, Available/Sold-up states)
+        • ROSE/DANGER = destructive (Withdraw, errors) — leave as-is
+   8. The v3 contract (sandbox/v3.html) is the component source of truth — ~44 families:
+      buttons, pills/segmented/badges/tags, cards, lender cards, stats, pro-forma
+      gauges/KPIs/inputs, forms, comps table, overlays (popup/tooltip/toast/modal),
+      empty/loading states, 4 Chart.js charts, FAQ accordion, doc layout, slide-outs,
+      step wizard, confirmation panel, profile menu, mobile bottom sheet, comp markers.
+      Apply .lg / .lg--work as the SKIN over these; do not restructure them.
+   9. Charts: read tokens via getComputedStyle at create-time AND re-read on theme toggle
+      (the contract already notes "charts re-render with new colors").
+   ========================================================================== */
+/* ============================================================================
+   GLASS v4 — STYLE ADDENDUM (appended 2026-06-28 per Einstein Addendum 2)
+   ============================================================================ */
+
+/* --- A. Orphan-var shims: production references vars that were never defined.
+         Defining them here fixes 5 known render bugs (BRRRR callout, homepage). --- */
+:root, [data-theme="dark"]{
+  --turquoise:#3FC8DA;
+  --accent-teal:var(--turquoise); /* was undefined → broke BRRRR callouts */
+  --loss:#E08A6E; /* down-metrics / negative numbers */
+  --bg-primary:#06121F; /* homepage typo'd var */
+  --text-primary:var(--text);
+  --border-color:var(--glass-bd);
+}
+[data-theme="light"]{
+  --turquoise:#1C93A6;
+  --accent-teal:var(--turquoise);
+  --loss:#C2603F;
+  --bg-primary:#EDF4F8;
+  --text-primary:var(--text);
+  --border-color:var(--glass-bd);
+}
+
+/* --- B. Accessibility: visible keyboard focus (was missing entirely) --- */
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:none;
+  box-shadow:0 0 0 3px rgba(196,154,79,.55); /* treasure-gold ring */
+  border-radius:var(--r-sm);
+}
+
+/* --- C. Form controls: inputs/selects/textareas/checks --- */
+input[type=text], input[type=email], input[type=number], input[type=password],
+input[type=tel], input[type=search], input[type=date], select, textarea, .glass-input{
+  font:inherit; color:var(--text);
+  background:var(--tile-bg); border:1px solid var(--tile-bd);
+  border-radius:var(--r-sm); padding:11px 13px;
+  -webkit-backdrop-filter:blur(8px) saturate(140%); backdrop-filter:blur(8px) saturate(140%);
+  transition:border-color .15s var(--ease), box-shadow .15s var(--ease);
+}
+input:focus, select:focus, textarea:focus{
+  border-color:color-mix(in srgb, var(--accent) 60%, transparent);
+}
+::placeholder{color:var(--text-faint)}
+input[type=checkbox], input[type=radio]{accent-color:var(--accent)}
+select{appearance:none; background-image:linear-gradient(45deg,transparent 50%,var(--text-muted) 50%),
+  linear-gradient(135deg,var(--text-muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 52%, calc(100% - 13px) 52%;
+  background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:34px;}
+
+/* --- D. Badge / status / tag palette --- */
+.badge{display:inline-flex; align-items:center; gap:5px; padding:4px 11px; border-radius:999px;
+  font:700 11px/1 var(--font-ui); letter-spacing:.06em; text-transform:uppercase;}
+.badge-new{background:var(--avail-bg); border:1px solid var(--avail-bd); color:var(--avail)}
+.badge-active{background:rgba(61,120,234,.16); border:1px solid rgba(61,120,234,.36); color:var(--accent)}
+.badge-sold{background:var(--tile-bg); border:1px solid var(--tile-bd); color:var(--text-muted)}
+.badge-featured{background:var(--grad-gold); color:var(--gold-text)}
+.badge-preferred{background:transparent; border:1px solid var(--gold); color:var(--gold)}
+.tag-finance{background:var(--tile-bg); border:1px solid var(--tile-bd); color:var(--text-muted)}
+
+/* --- E. Metric direction: gains green, losses warm --- */
+.is-up, .metric-up, .num-pos{color:var(--equity)}
+.is-down, .metric-down, .num-neg{color:var(--loss)}
+
+/* --- F. Overlays: floating UI = showcase glass + backdrop scrim --- */
+.modal-backdrop, .overlay-scrim{position:fixed; inset:0; z-index:90;
+  background:rgba(3,9,20,.5); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);}
+[data-theme="light"] .modal-backdrop, [data-theme="light"] .overlay-scrim{background:rgba(20,50,70,.34)}
+
+/* --- G. Clickable cards get a hover lift --- */
+.lg--interactive{cursor:pointer; transition:transform .25s var(--ease), box-shadow .25s var(--ease)}
+.lg--interactive:hover{transform:translateY(-4px);
+  box-shadow:var(--glass-drop), 0 14px 30px rgba(3,9,20,.4), inset 0 1px 1px var(--glass-spec);}
+
+/* --- H. Chart palette --- */
+:root, [data-theme="dark"]{
+  --chart-grid:rgba(255,255,255,.10); --chart-tick:var(--text-muted);
+  --chart-pos:var(--equity); --chart-neg:var(--loss);
+  --chart-1:#3D78EA; --chart-2:#3FC8DA; --chart-3:#C49A41;
+  --chart-4:#6FA8C8; --chart-5:#4E7BA8; --chart-6:#9FC2D6;
+}
+[data-theme="light"]{
+  --chart-grid:rgba(16,60,70,.12); --chart-tick:var(--text-muted);
+  --chart-pos:var(--equity); --chart-neg:var(--loss);
+  --chart-1:#2E6AD6; --chart-2:#1C93A6; --chart-3:#AE8438;
+  --chart-4:#5E8FB0; --chart-5:#3E6E90; --chart-6:#86A8C0;
+}
