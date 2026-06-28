@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html data-sandbox-tier="showcase" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | Direct Off Market Investor Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/investor.css">
+  <script>
+  (function() {
+    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  </script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/favicon-32.png">
+  <style>
+    .logo-white { display: block; }
+    .logo-dark { display: none; }
+    [data-theme="light"] .logo-white { display: none !important; }
+    [data-theme="light"] .logo-dark { display: block !important; }
+  </style>
+<link rel="stylesheet" href="css/glass.css">
+</head>
+<body class="auth-page">
+<div class="scene scene-dark"><div class="rays"></div></div>
+<div class="scene scene-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/>
+  </linearGradient>
+</defs></svg>
+
+
+    <nav id="investorNav" class="investor-nav lg lg--work">
+    <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
+    </button>
+    <a class='nav-brand' href='/homepage'>
+      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:28px;width:auto;max-width:130px;object-fit:contain;vertical-align:middle;">
+    </a>
+    <div class="nav-right" id="navRight" style="margin-left:auto;min-width:44px;">
+    </div>
+  </nav>
+
+  <div class="auth-card lg">
+    <div class="auth-logo">
+      <img src="/img/dom-logo-white.png" class="logo-white" alt="Direct Off Market" style="height:52px;width:auto;max-width:200px;object-fit:contain;margin:0 auto 12px;">
+      <img src="/img/dom-logo-dark.png" class="logo-dark" alt="Direct Off Market" style="height:52px;width:auto;max-width:200px;object-fit:contain;margin:0 auto 12px;">
+      
+    </div>
+
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-subtitle">Sign in to access your investor account.</p>
+
+    <div id="errorBox" class="error-box"></div>
+    <div id="successBox" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:8px;padding:12px 16px;color:#22c55e;font-size:14px;margin-bottom:16px;"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="emailInput">Email address</label>
+        <input
+          type="email"
+          id="emailInput"
+          class="form-input"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="passwordInput">Password</label>
+        <input
+          type="password"
+          id="passwordInput"
+          class="form-input"
+          placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+      <button type="submit" class="btn-primary w-full" id="submitBtn" style="width:100%;justify-content:center;display:flex;">
+        Sign In
+      </button>
+    </form>
+
+    <div style="text-align:center;margin-top:16px;">
+      <button id="forgotBtn" style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit;">
+        Forgot password?
+      </button>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;padding-top:24px;border-top:1px solid var(--border);font-size:14px;color:var(--text-muted);">
+      Don't have an account? <a href='/signup' style='color:var(--gold);font-weight:600;'>Get Investor Access &rarr;</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/investor-auth.js"></script>
+  <div id="portalToast"></div>
+  <script>
+  (async function() {
+    // If already logged in, redirect immediately
+    try {
+      const session = await Portal.getSession();
+      if (session) {
+        var redir = new URLSearchParams(window.location.search).get('redirect');
+        window.location.href = redir || '/marketplace.html';
+        return;
+      }
+    } catch (e) {
+      // Continue to show form if session check fails
+    }
+
+    var form      = document.getElementById('loginForm');
+    var errorBox  = document.getElementById('errorBox');
+    var successBox = document.getElementById('successBox');
+    var submitBtn = document.getElementById('submitBtn');
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.classList.add('visible');
+      successBox.style.display = 'none';
+    }
+
+    function clearError() {
+      errorBox.classList.remove('visible');
+      errorBox.textContent = '';
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearError();
+
+      var email    = document.getElementById('emailInput').value.trim();
+      var password = document.getElementById('passwordInput').value;
+
+      if (!email) {
+        showError('Please enter your email address.');
+        return;
+      }
+      if (!password) {
+        showError('Please enter your password.');
+        return;
+      }
+
+      submitBtn.textContent = 'Signing in...';
+      submitBtn.disabled = true;
+
+      try {
+        var result = await Portal.supabase.auth.signInWithPassword({ email: email, password: password });
+
+        if (result.error) {
+          var msg = result.error.message;
+          if (msg === 'Invalid login credentials' || msg.toLowerCase().includes('invalid')) {
+            showError('Incorrect email or password. Please try again.');
+          } else {
+            showError(msg);
+          }
+          submitBtn.textContent = 'Sign In';
+          submitBtn.disabled = false;
+          return;
+        }
+
+        // Update last_login_at (non-blocking)
+        try {
+          var uid = result.data.user ? result.data.user.id : null;
+          if (uid) await Portal.supabase.from('portal_users').update({ last_login_at: new Date().toISOString() }).eq('user_id', uid);
+        } catch(e) {}
+        // Success — redirect
+        var redir = new URLSearchParams(window.location.search).get('redirect');
+        window.location.href = redir || '/dashboard.html';
+
+      } catch (err) {
+        showError('Something went wrong. Please try again.');
+        submitBtn.textContent = 'Sign In';
+        submitBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('forgotBtn').addEventListener('click', async function() {
+      var email = document.getElementById('emailInput').value.trim();
+      if (!email) {
+        showError('Enter your email address first, then click Forgot password.');
+        return;
+      }
+      clearError();
+
+      try {
+        var result = await Portal.supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/login.html'
+        });
+
+        if (result.error) {
+          showError(result.error.message);
+        } else {
+          successBox.style.display = 'block';
+          successBox.textContent = 'Check your email for a password reset link.';
+        }
+      } catch (err) {
+        showError('Could not send reset email. Please try again.');
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

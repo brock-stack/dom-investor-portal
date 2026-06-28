@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html data-sandbox-tier="work" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit an Offer — Direct Off Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/investor.css">
+  <script>
+  (function() {
+    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  </script>
+  <style>
+    .offer-page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .offer-page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .offer-page-sub {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 40px;
+    }
+
+    /* Step Indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+      gap: 0;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .step-item:last-child {
+      flex: 0 0 auto;
+    }
+
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .step-circle.active {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: #0f1a2e;
+    }
+
+    .step-circle.complete {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .step-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .step-label.active {
+      color: var(--text);
+    }
+
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 12px;
+    }
+
+    .step-connector.complete {
+      background: var(--green);
+    }
+
+    /* Step Panels */
+    .step-panel {
+      display: none;
+    }
+
+    .step-panel.active {
+      display: block;
+    }
+
+    /* Property Summary Card */
+    .property-summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .property-summary-loading {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .property-summary-address {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .property-summary-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .property-summary-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* Disclaimer */
+    .offer-disclaimer {
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 10px;
+      padding: 18px 20px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .offer-disclaimer strong {
+      color: var(--gold);
+      display: block;
+      margin-bottom: 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Offer Form Sections */
+    .offer-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .offer-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 7px;
+    }
+
+    .form-label .form-note {
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+    }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Radio Groups */
+    .radio-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 10px 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+
+    .radio-option input[type="radio"] {
+      accent-color: var(--gold);
+    }
+
+    .radio-option:has(input:checked) {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.08);
+      color: var(--text);
+    }
+
+    /* Agent Fields (collapsible) */
+    .agent-fields {
+      display: none;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .agent-fields.visible {
+      display: block;
+    }
+
+    .agent-fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .agent-fields-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Error message */
+    .form-error {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .offer-error-banner {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--red);
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* Step Actions */
+    .step-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      align-items: center;
+    }
+
+    /* Confirmation */
+    .confirmation-panel {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .confirmation-check {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a8872f);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 28px;
+      box-shadow: 0 8px 32px rgba(201,168,76,0.35);
+    }
+
+    .confirmation-heading {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .confirmation-sub {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    .confirmation-table {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 36px;
+      text-align: left;
+    }
+
+    .confirmation-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .confirmation-row:last-child {
+      border-bottom: none;
+    }
+
+    .confirmation-row-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .confirmation-row-value {
+      color: var(--text);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .confirmation-row-value.gold {
+      color: var(--gold);
+    }
+
+    .confirmation-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: #0f1a2e;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--gold);
+      border: 1.5px solid var(--gold);
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(201,168,76,0.1);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    /* Status badges */
+    .badge-available {
+      background: rgba(34,197,94,0.15);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-pending {
+      background: rgba(245,158,11,0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245,158,11,0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-sold {
+      background: rgba(148,163,184,0.15);
+      color: #94a3b8;
+      border: 1px solid rgba(148,163,184,0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/favicon-32.png">
+<link rel="stylesheet" href="css/glass.css">
+</head>
+<body>
+<div class="scene scene-dark scene--dim"><div class="rays"></div></div>
+<div class="scene scene-light scene--dim"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/>
+  </linearGradient>
+</defs></svg>
+
+  <nav id="investorNav" class="investor-nav lg lg--work">
+    <a class='nav-brand' href='/homepage'>
+      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:44px;width:auto;max-width:160px;object-fit:contain;">
+    </a>
+    <div class="nav-right" id="navRight">
+      <button class="theme-toggle" onclick="Portal.toggleTheme()"></button>
+    </div>
+  </nav>
+
+  <div style="margin-top: 64px; padding: 40px 24px;">
+    <div class="offer-page lg lg--work">
+      <h1 class="offer-page-title">Submit an Offer</h1>
+      <p class="offer-page-sub">Complete the steps below to submit your offer for review.</p>
+
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step-item">
+          <div class="step-circle active" id="stepCircle1">1</div>
+          <span class="step-label active" id="stepLabel1">Property</span>
+        </div>
+        <div class="step-connector" id="stepConnector1"></div>
+        <div class="step-item">
+          <div class="step-circle" id="stepCircle2">2</div>
+          <span class="step-label" id="stepLabel2">Offer Details</span>
+        </div>
+        <div class="step-connector" id="stepConnector2"></div>
+        <div class="step-item">
+          <div class="step-circle" id="stepCircle3">3</div>
+          <span class="step-label" id="stepLabel3">Confirmation</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Property Summary + Disclaimer -->
+      <div class="step-panel active" id="stepPanel1">
+        <div class="property-summary-card lg" id="propertySummaryCard">
+          <div class="property-summary-loading" id="summaryLoading">Loading property details...</div>
+          <div id="summaryContent" style="display:none;">
+            <div class="property-summary-meta" style="margin-bottom:12px;">
+              <span id="summaryBadge" class="badge-available">Available</span>
+            </div>
+            <div class="property-summary-address" id="summaryAddress">—</div>
+            <div class="property-summary-meta">
+              <span class="property-summary-price" id="summaryPrice">—</span>
+              <span id="summarySpecs" style="color:var(--text-muted);font-size:14px;"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="offer-disclaimer">
+          <strong>Important Notice</strong>
+          By submitting an offer, you confirm that you have reviewed all available property information and understand that this is a binding offer to purchase subject to an executed purchase agreement. Direct Off Market, LLC is not a licensed real estate broker and does not represent buyers or sellers.
+        </div>
+
+        <div class="step-actions">
+          <button class="btn-primary" id="step1ContinueBtn">Continue to Offer Details &rarr;</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Offer Details Form -->
+      <div class="step-panel" id="stepPanel2">
+        <div class="offer-error-banner" id="step2ErrorBanner"></div>
+
+        <!-- Price & Entity -->
+        <div class="offer-section lg lg--work">
+          <div class="offer-section-title">Purchase Details</div>
+
+          <div class="form-group">
+            <label class="form-label" for="offerPrice">Offer Price</label>
+            <input type="number" class="form-input" id="offerPrice" placeholder="Enter your offer amount" min="1">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="deedName">Name on Deed / Entity</label>
+            <input type="text" class="form-input" id="deedName" placeholder="e.g. John Smith or Smith Investments LLC">
+          </div>
+        </div>
+
+        <!-- Financing & Qualifications -->
+        <div class="offer-section lg lg--work">
+          <div class="offer-section-title">Qualifications</div>
+
+          <div class="form-group">
+            <label class="form-label">Do you have proof of funds or pre-approval?</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="hasPof" value="yes"> Yes
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="hasPof" value="no"> No
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Will you be using financing?</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="useFinancing" value="yes"> Yes
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="useFinancing" value="no"> No — Cash
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property Management Interest -->
+        <div class="offer-section lg lg--work">
+          <div class="offer-section-title">Additional Services</div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Are you interested in property management services?
+              <span class="form-note">(My New Rental, our sister company, manages 275+ units in FL)</span>
+            </label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="pmInterest" value="yes"> Yes, I'm interested
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="pmInterest" value="no"> No thanks
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buyer's Agent -->
+        <div class="offer-section lg lg--work">
+          <div class="offer-section-title">Representation</div>
+
+          <div class="form-group">
+            <label class="form-label">Are you working with a buyer's agent?</label>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="hasAgent" value="yes" id="agentYes"> Yes
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="hasAgent" value="no" id="agentNo"> No
+              </label>
+            </div>
+          </div>
+
+          <div class="agent-fields" id="agentFields">
+            <div class="agent-fields-grid">
+              <div class="form-group">
+                <label class="form-label" for="agentName">Agent Name</label>
+                <input type="text" class="form-input" id="agentName" placeholder="Full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="agentEmail">Agent Email</label>
+                <input type="email" class="form-input" id="agentEmail" placeholder="agent@brokerage.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="agentPhone">Agent Phone</label>
+                <input type="tel" class="form-input" id="agentPhone" placeholder="(555) 000-0000">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="brokerageName">Brokerage Name</label>
+                <input type="text" class="form-input" id="brokerageName" placeholder="Brokerage name">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="offer-section lg lg--work">
+          <div class="offer-section-title">Additional Notes</div>
+          <div class="form-group">
+            <textarea class="form-input" id="additionalNotes" rows="4" placeholder="Any additional information, contingencies, or questions for our team..."></textarea>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn-secondary" id="step2BackBtn">← Back</button>
+          <button class="btn-primary" id="step2SubmitBtn">Review &amp; Submit</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Confirmation -->
+      <div class="step-panel" id="stepPanel3">
+        <div class="confirmation-panel">
+          <div class="confirmation-check">✓</div>
+          <h2 class="confirmation-heading">Offer Submitted!</h2>
+          <p class="confirmation-sub" id="confirmationMessage">
+            Our team will review your offer and respond within 24 hours.
+          </p>
+
+          <div class="confirmation-table">
+            <div class="confirmation-row">
+              <span class="confirmation-row-label">Offer Price</span>
+              <span class="confirmation-row-value gold" id="confirmOfferPrice">—</span>
+            </div>
+            <div class="confirmation-row">
+              <span class="confirmation-row-label">Property</span>
+              <span class="confirmation-row-value" id="confirmProperty">—</span>
+            </div>
+            <div class="confirmation-row">
+              <span class="confirmation-row-label">Submitted At</span>
+              <span class="confirmation-row-value" id="confirmSubmittedAt">—</span>
+            </div>
+          </div>
+
+          <div class="confirmation-actions">
+            <a class='btn-secondary' href='/marketplace'>Back to Marketplace</a>
+            <a href="#" class="btn-ghost" id="viewDealBtn">View Deal</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/investor-auth.js"></script>
+  <div id="portalToast"></div>
+  <script>
+  (async function() {
+    const session = await Portal.requireAuth();
+    if (!session) return;
+
+    const _navProfile = await Portal.getProfile(session.user.id);
+    const _navFirstName = _navProfile ? (_navProfile.first_name || '') : '';
+    document.getElementById('navRight').innerHTML =
+      '<a href="javascript:history.back()" class="nav-link">&larr; Back</a>' +
+      (_navFirstName ? '<span style="color:var(--text-muted);font-size:13px">' + _navFirstName + '</span>' : '') +      '<button class="theme-toggle" onclick="Portal.toggleTheme()"></button>';
+    Portal.updateThemeBtn();
+
+    const params = new URLSearchParams(window.location.search);
+    const listingId = params.get('listing');
+
+    let listing = null;
+    let profile = null;
+    let submittedAt = null;
+
+    // Load profile for confirmation step
+    profile = await Portal.getProfile(session.user.id);
+
+    // Load listing data
+    if (listingId) {
+      try {
+        const { data, error } = await Portal.supabase
+          .from('portal_listings')
+          .select(`
+            id,
+            asking_price,
+            status,
+            notes,
+            properties (
+              id,
+              address,
+              city,
+              state,
+              zip,
+              bedrooms,
+              bathrooms,
+              sqft,
+              property_type
+            )
+          `)
+          .eq('id', listingId)
+          .maybeSingle();
+
+        if (!error && data) {
+          listing = data;
+        }
+      } catch (e) {
+        console.warn('Could not load listing:', e);
+      }
+    }
+
+    // Render property summary
+    const summaryLoading = document.getElementById('summaryLoading');
+    const summaryContent = document.getElementById('summaryContent');
+    const summaryAddress = document.getElementById('summaryAddress');
+    const summaryPrice = document.getElementById('summaryPrice');
+    const summaryBadge = document.getElementById('summaryBadge');
+    const summarySpecs = document.getElementById('summarySpecs');
+
+    if (listing) {
+      const prop = listing.properties || {};
+      const addressParts = [prop.address, prop.city, prop.state, prop.zip].filter(Boolean);
+      summaryAddress.textContent = addressParts.join(', ') || 'Address on file';
+      summaryPrice.textContent = Portal.fc(listing.asking_price);
+
+      const specs = [];
+      if (prop.property_type) specs.push(prop.property_type);
+      if (prop.bedrooms) specs.push(prop.bedrooms + ' Bd');
+      if (prop.bathrooms) specs.push(prop.bathrooms + ' Ba');
+      if (prop.sqft) specs.push(Number(prop.sqft).toLocaleString() + ' sqft');
+      summarySpecs.textContent = specs.join(' · ');
+
+      const statusMap = {
+        published: { label: 'Available', cls: 'badge-available' },
+        pending: { label: 'Pending', cls: 'badge-pending' },
+        sold: { label: 'Sold', cls: 'badge-sold' },
+        coming_soon: { label: 'Coming Soon', cls: 'badge-coming-soon' }
+      };
+      const s = statusMap[listing.status] || { label: listing.status, cls: 'badge-available' };
+      summaryBadge.textContent = s.label;
+      summaryBadge.className = s.cls;
+
+      // Pre-fill offer price
+      const offerPriceInput = document.getElementById('offerPrice');
+      if (listing.asking_price) offerPriceInput.value = listing.asking_price;
+
+      summaryLoading.style.display = 'none';
+      summaryContent.style.display = 'block';
+    } else {
+      summaryLoading.textContent = listingId
+        ? 'Could not load property details.'
+        : 'No listing specified. Please return to the marketplace.';
+    }
+
+    // Set up deal link
+    document.getElementById('viewDealBtn').href = listingId ? '/deal.html?id=' + listingId : '/marketplace.html';
+
+    // ── Step Navigation ──────────────────────────────────────────
+
+    let currentStep = 1;
+
+    function goToStep(step) {
+      // Hide all panels
+      document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('stepPanel' + step).classList.add('active');
+
+      // Update step circles
+      for (let i = 1; i <= 3; i++) {
+        const circle = document.getElementById('stepCircle' + i);
+        const label = document.getElementById('stepLabel' + i);
+        circle.classList.remove('active', 'complete');
+        label.classList.remove('active');
+
+        if (i < step) {
+          circle.classList.add('complete');
+          circle.textContent = '✓';
+        } else if (i === step) {
+          circle.classList.add('active');
+          circle.textContent = i;
+          label.classList.add('active');
+        } else {
+          circle.textContent = i;
+        }
+      }
+
+      // Update connectors
+      for (let i = 1; i <= 2; i++) {
+        const conn = document.getElementById('stepConnector' + i);
+        if (i < step) {
+          conn.classList.add('complete');
+        } else {
+          conn.classList.remove('complete');
+        }
+      }
+
+      currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Step 1 → Step 2
+    document.getElementById('step1ContinueBtn').addEventListener('click', function() {
+      goToStep(2);
+    });
+
+    // Step 2 → Step 1 (back)
+    document.getElementById('step2BackBtn').addEventListener('click', function() {
+      goToStep(1);
+    });
+
+    // Agent field toggle
+    document.querySelectorAll('input[name="hasAgent"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const agentFields = document.getElementById('agentFields');
+        if (this.value === 'yes') {
+          agentFields.classList.add('visible');
+        } else {
+          agentFields.classList.remove('visible');
+        }
+      });
+    });
+
+    // Step 2 Submit → Step 3
+    document.getElementById('step2SubmitBtn').addEventListener('click', async function() {
+      const errorBanner = document.getElementById('step2ErrorBanner');
+      errorBanner.style.display = 'none';
+
+      const offerPrice = parseFloat(document.getElementById('offerPrice').value);
+      const deedName = document.getElementById('deedName').value.trim();
+
+      // Validate
+      if (!offerPrice || offerPrice <= 0) {
+        errorBanner.textContent = 'Please enter a valid offer price greater than $0.';
+        errorBanner.style.display = 'block';
+        return;
+      }
+
+      if (!deedName) {
+        errorBanner.textContent = 'Please enter the name on deed or entity name.';
+        errorBanner.style.display = 'block';
+        return;
+      }
+
+      if (!listingId) {
+        errorBanner.textContent = 'No listing specified. Please return to the marketplace.';
+        errorBanner.style.display = 'block';
+        return;
+      }
+
+      const hasPofEl = document.querySelector('input[name="hasPof"]:checked');
+      const financeEl = document.querySelector('input[name="useFinancing"]:checked');
+      const pmEl = document.querySelector('input[name="pmInterest"]:checked');
+      const agentEl = document.querySelector('input[name="hasAgent"]:checked');
+
+      const hasPof = hasPofEl ? hasPofEl.value : null;
+      const useFinancing = financeEl ? financeEl.value : null;
+      const pmInterest = pmEl ? pmEl.value : null;
+      const hasAgent = agentEl ? agentEl.value : null;
+
+      const agentName = document.getElementById('agentName').value.trim();
+      const agentEmail = document.getElementById('agentEmail').value.trim();
+      const agentPhone = document.getElementById('agentPhone').value.trim();
+      const brokerage = document.getElementById('brokerageName').value.trim();
+      const notes = document.getElementById('additionalNotes').value.trim();
+
+      const submitBtn = document.getElementById('step2SubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        const { error } = await Portal.supabase
+          .from('investor_interest')
+          .insert({
+            listing_id: listingId,
+            investor_user_id: session.user.id,
+            interest_type: 'offer',
+            offer_price: offerPrice,
+            notes: JSON.stringify({
+              deed_name: deedName,
+              has_pof: hasPof,
+              financing: useFinancing,
+              pm_interest: pmInterest,
+              has_agent: hasAgent,
+              agent_name: agentName,
+              agent_email: agentEmail,
+              agent_phone: agentPhone,
+              brokerage: brokerage,
+              additional_notes: notes
+            })
+          });
+
+        // TODO: Auto-create agent contact in contacts table when has_agent='yes'
+        // Requires Supabase service role or edge function to bypass RLS.
+        // When implemented: INSERT into contacts (first_name, last_name, email, phone, contact_type, source)
+        // WHERE has_agent === 'yes' && agentEmail is non-empty.
+
+        if (error) {
+          throw error;
+        }
+
+        submittedAt = new Date();
+
+        // Build confirmation
+        const firstName = profile ? (profile.first_name || '') : '';
+        const confirmMsg = document.getElementById('confirmationMessage');
+        confirmMsg.textContent = firstName
+          ? 'Thank you ' + firstName + '! Our team will review your offer and respond within 24 hours.'
+          : 'Our team will review your offer and respond within 24 hours.';
+
+        document.getElementById('confirmOfferPrice').textContent = Portal.fc(offerPrice);
+
+        const prop = listing && listing.properties ? listing.properties : {};
+        const addrParts = [prop.address, prop.city, prop.state].filter(Boolean);
+        document.getElementById('confirmProperty').textContent = addrParts.join(', ') || 'Property on file';
+
+        document.getElementById('confirmSubmittedAt').textContent = submittedAt.toLocaleString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        });
+
+        goToStep(3);
+        Portal.toast('Offer submitted successfully!', 'success');
+
+      } catch (err) {
+        console.error('Offer submit error:', err);
+        errorBanner.textContent = err.message || 'Failed to submit offer. Please try again.';
+        errorBanner.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Review & Submit';
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

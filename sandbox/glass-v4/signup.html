@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html data-sandbox-tier="showcase" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Investor Access | Direct Off Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/investor.css">
+  <script>
+  (function() {
+    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  </script>
+  <style>
+    /* Signup-specific overrides */
+    .auth-page {
+      align-items: center;
+      padding-top: 80px;
+      padding-bottom: 40px;
+    }
+    .logo-white { display: block; }
+    .logo-dark { display: none; }
+    [data-theme="light"] .logo-white { display: none !important; }
+    [data-theme="light"] .logo-dark { display: block !important; }
+    #phase2 {
+      max-width: 640px;
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+    }
+    /* Override terms-container to use surface-2 from existing CSS */
+    .terms-container {
+      max-height: 460px;
+      background: var(--surface-2);
+    }
+    .terms-section {
+      background: var(--bg);
+    }
+    @media (max-width: 660px) {
+      #phase2 { padding: 24px 16px; }
+      .sign-row { flex-direction: column; }
+    }
+  .inv-pill { padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:transparent; color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s; }
+  .inv-pill.selected { background:var(--accent); color:#0f172a; border-color:var(--accent); }
+  .inv-pill:hover:not(.selected) { border-color:var(--accent); color:var(--accent); }
+  </style>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/favicon-32.png">
+<link rel="stylesheet" href="css/glass.css">
+</head>
+<body class="auth-page">
+<div class="scene scene-dark"><div class="rays"></div></div>
+<div class="scene scene-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/>
+  </linearGradient>
+</defs></svg>
+
+
+    <nav id="investorNav" class="investor-nav lg lg--work">
+    <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
+    </button>
+    <a class='nav-brand' href='/homepage'>
+      <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:28px;width:auto;max-width:130px;object-fit:contain;vertical-align:middle;">
+    </a>
+    <div class="nav-right" id="navRight" style="margin-left:auto;min-width:44px;">
+    </div>
+  </nav>
+
+  <!-- ============================
+       PHASE 1 — Registration Form
+       ============================ -->
+  <div id="phase1" class="auth-card lg" style="max-width:520px;width:100%;">
+    <div class="auth-logo">
+      <img src="/img/dom-logo-white.png" class="logo-white" alt="Direct Off Market" style="height:52px;width:auto;max-width:200px;object-fit:contain;margin:0 auto 12px;">
+      <img src="/img/dom-logo-dark.png" class="logo-dark" alt="Direct Off Market" style="height:52px;width:auto;max-width:200px;object-fit:contain;margin:0 auto 12px;">
+      
+    </div>
+
+    <h1 class="auth-title" style="text-align:center;">Create Your Investor Account</h1>
+    <p class="auth-subtitle" style="text-align:center;">Get instant access to off-market investment deals.</p>
+
+    <div id="p1Error" class="error-box"></div>
+
+    <form id="regForm" novalidate>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+          <label class="form-label" for="firstName">First Name</label>
+          <input type="text" id="firstName" class="form-input" placeholder="John" autocomplete="given-name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="lastName">Last Name</label>
+          <input type="text" id="lastName" class="form-input" placeholder="Smith" autocomplete="family-name" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regEmail">Email Address</label>
+        <input type="email" id="regEmail" class="form-input" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regPhone">Phone Number</label>
+        <input type="tel" id="regPhone" class="form-input" placeholder="(555) 000-0000" autocomplete="tel" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regPassword">Password</label>
+        <input type="password" id="regPassword" class="form-input" placeholder="Minimum 8 characters" autocomplete="new-password" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regConfirm">Confirm Password</label>
+        <input type="password" id="regConfirm" class="form-input" placeholder="Re-enter password" autocomplete="new-password" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regCompany">Company Name <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <input type="text" id="regCompany" class="form-input" placeholder="Your LLC or company name" autocomplete="organization">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Investor Type <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <div id="investorTypePills" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+          <button type="button" class="inv-pill" data-val="Cash Buyer">Cash Buyer</button>
+          <button type="button" class="inv-pill" data-val="Fix &amp; Flip">Fix &amp; Flip</button>
+          <button type="button" class="inv-pill" data-val="Buy &amp; Hold">Buy &amp; Hold</button>
+          <button type="button" class="inv-pill" data-val="BRRRR">BRRRR</button>
+          <button type="button" class="inv-pill" data-val="Wholesaler">Wholesaler</button>
+          <button type="button" class="inv-pill" data-val="Developer">Developer</button>
+          <button type="button" class="inv-pill" data-val="Other">Other</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regLiquidity">Estimated Liquidity <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+        <select id="regLiquidity" class="form-select">
+          <option value="">Select range...</option>
+          <option value="under_50k">Under $50K</option>
+          <option value="50k_100k">$50K &ndash; $100K</option>
+          <option value="100k_250k">$100K &ndash; $250K</option>
+          <option value="250k_500k">$250K &ndash; $500K</option>
+          <option value="500k_plus">$500K+</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;">Continue to Terms Agreement &rarr;</button>
+    </form>
+
+    <div style="text-align:center;margin-top:20px;font-size:14px;color:var(--text-muted);">
+      Already have an account? <a href='/login' style='color:var(--gold);font-weight:600;'>Sign in</a>
+    </div>
+  </div>
+
+  <!-- =============================
+       PHASE 2 — Terms Agreement
+       ============================= -->
+  <div id="phase2" style="display:none;">
+    <div class="auth-logo">
+      <div class="auth-logo-text">INVESTOR ACCESS AGREEMENT</div>
+      <div class="auth-logo-sub">DIRECT OFF MARKET, LLC</div>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px;">
+      Please read each section carefully and check the box to acknowledge your agreement before signing.
+    </p>
+
+    <div id="p2Error" class="error-box"></div>
+
+    <div class="terms-container">
+
+      <!-- Section 1 -->
+      <div class="terms-section">
+        <h3>Section 1: Confidentiality &amp; Non-Circumvention</h3>
+        <p>Investor agrees to maintain strict confidentiality regarding all deal information, seller identities, and pricing provided through this platform. Circumvention of Direct Off Market, LLC in any transaction will result in liquidated damages of $75,000 per occurrence. This obligation survives termination of this agreement and applies to all transactions sourced through the platform, whether or not they are ultimately completed through Direct Off Market, LLC.</p>
+        <div class="terms-check">
+          <input type="checkbox" id="c1" name="checks">
+          <label for="c1">I have read and agree to Section 1: Confidentiality &amp; Non-Circumvention</label>
+        </div>
+      </div>
+
+      <!-- Section 2 -->
+      <div class="terms-section">
+        <h3>Section 2: Property Types &amp; Transaction Terms</h3>
+        <p>Properties offered through this marketplace include wholesale assignments, turnkey rentals, and new construction opportunities. Investor understands that wholesale assignments transfer equitable interest only, not title, and that Investor must complete their own due diligence. All properties are offered as-is and Direct Off Market, LLC makes no representations or warranties regarding the condition, value, or income potential of any property.</p>
+        <div class="terms-check">
+          <input type="checkbox" id="c2" name="checks">
+          <label for="c2">I have read and agree to Section 2: Property Types &amp; Transaction Terms</label>
+        </div>
+      </div>
+
+      <!-- Section 3 -->
+      <div class="terms-section">
+        <h3>Section 3: Transaction Fees &amp; Closing Costs</h3>
+        <p>Transaction fees, if any, are disclosed per transaction and reflected in the assignment agreement. Investor is responsible for their own closing costs unless otherwise specified in writing.</p>
+        <div class="terms-check">
+          <input type="checkbox" id="c3" name="checks">
+          <label for="c3">I have read and agree to Section 3: Transaction Fees &amp; Closing Costs</label>
+        </div>
+      </div>
+
+      <!-- Section 4 -->
+      <div class="terms-section">
+        <h3>Section 4: Communication Consent</h3>
+        <p>Investor consents to receive communications via email and SMS regarding new listings, deal updates, and portal notifications. Standard message and data rates may apply. Investor may opt out at any time by contacting Direct Off Market, LLC or using the unsubscribe link in any email communication.</p>
+        <div class="terms-check">
+          <input type="checkbox" id="c4" name="checks">
+          <label for="c4">I have read and agree to Section 4: Communication Consent</label>
+        </div>
+      </div>
+
+      <!-- Section 5 -->
+      <div class="terms-section">
+        <h3>Section 5: Electronic Signatures &amp; Records</h3>
+        <p>Investor consents to the use of electronic signatures and agrees that this agreement executed electronically is legally binding. Records of this agreement including timestamp, IP address, and user agent will be stored securely. This consent is made pursuant to the Electronic Signatures in Global and National Commerce Act (E-SIGN Act).</p>
+        <div class="terms-check">
+          <input type="checkbox" id="c5" name="checks">
+          <label for="c5">I have read and agree to Section 5: Electronic Signatures &amp; Records</label>
+        </div>
+      </div>
+
+      <!-- Section 6 -->
+      <div class="terms-section">
+        <h3>Section 6: Governing Law</h3>
+        <p>This agreement shall be governed by the laws of the State of Florida. Any disputes shall be resolved in Sarasota County, Florida. Investor waives any right to a jury trial and agrees that disputes shall be resolved through binding arbitration where permitted by law.</p>
+        <div class="terms-check">
+          <input type="checkbox" id="c6" name="checks">
+          <label for="c6">I have read and agree to Section 6: Governing Law</label>
+        </div>
+      </div>
+
+      <!-- Section 7 -->
+      <div class="terms-section">
+        <h3>Section 7: Final Acknowledgment</h3>
+        <p>Investor acknowledges they have read, understood, and agree to all terms above, and that this platform provides investment opportunities only and does not constitute financial, legal, or tax advice. Investor is encouraged to consult with their own legal, financial, and tax advisors before making any investment decisions.</p>
+        <div class="terms-check">
+          <input type="checkbox" id="c7" name="checks">
+          <label for="c7">I have read and agree to Section 7: Final Acknowledgment</label>
+        </div>
+      </div>
+
+    </div><!-- /terms-container -->
+
+    <div class="sign-row">
+      <div class="sign-field form-group">
+        <label class="form-label" for="legalName">Type your full legal name to sign</label>
+        <input type="text" id="legalName" class="form-input" placeholder="John Smith" autocomplete="name">
+      </div>
+      <div class="sign-field form-group">
+        <label class="form-label">Date</label>
+        <div class="date-display" id="signDate"></div>
+      </div>
+    </div>
+
+    <button id="agreeBtn" class="btn-primary" style="width:100%;font-size:16px;padding:16px;">
+      I Agree &amp; Get Instant Access
+    </button>
+    <button id="backBtn" style="width:100%;background:none;border:none;color:var(--text-muted);cursor:pointer;margin-top:12px;font-size:13px;font-family:inherit;padding:8px;">
+      &larr; Back to registration
+    </button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="/js/investor-auth.js"></script>
+  <div id="portalToast"></div>
+  <script>
+  (async function() {
+
+    // Redirect if already logged in
+    try {
+      var session = await Portal.getSession();
+      if (session) {
+        window.location.href = '/marketplace.html';
+        return;
+      }
+    } catch (e) {
+      // Continue
+    }
+
+    // Set today's date in the signature field
+    document.getElementById('signDate').textContent = new Date().toLocaleDateString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric'
+    });
+
+    // Storage for phase 1 data
+    var formData = {};
+    var _inviteRecord = null;
+    var _inviteToken = null;
+
+    // Invite token detection
+    (async function() {
+      var params = new URLSearchParams(window.location.search);
+      var token = params.get('invite');
+      var urlEmail = params.get('email');
+      var urlName = params.get('name');
+      console.log('[Invite] URL params:', { invite: token, email: urlEmail, name: urlName });
+
+      // Pre-fill from URL params immediately (even if no token)
+      var urlFirstName = params.get('first_name') || params.get('name') || '';
+      var urlLastName = params.get('last_name') || '';
+      var urlPhone = params.get('phone') || '';
+      if (urlFirstName) { var el = document.getElementById('firstName'); if(el) el.value = urlFirstName; }
+      if (urlLastName) { var el = document.getElementById('lastName'); if(el) el.value = urlLastName; }
+      if (urlEmail) { var el = document.getElementById('regEmail'); if(el) el.value = urlEmail; }
+      if (urlPhone) { var el = document.getElementById('regPhone'); if(el) el.value = urlPhone; }
+
+      if (!token) return;
+
+      try {
+        var { data: invite, error: invErr } = await Portal.supabase
+          .from('portal_invites').select('*').eq('token', token).single();
+
+        if (invErr || !invite) {
+          console.log('[Invite] DB fetch failed:', invErr);
+          // Show welcome banner using URL params as fallback
+          if (urlEmail || urlName) {
+            var fbBanner = document.createElement('div');
+            fbBanner.style.cssText = 'background:rgba(61,120,234,0.1);border:1px solid rgba(61,120,234,0.3);border-radius:10px;padding:14px 16px;margin-bottom:20px;text-align:center;';
+            fbBanner.innerHTML = '<div style="font-size:18px;margin-bottom:4px;">&#127881;</div><div style="font-size:14px;font-weight:700;color:var(--accent);">You\'ve been invited to the DOM Investor Portal!</div><div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Complete your registration below to access exclusive off-market deals.</div>';
+            var p1 = document.getElementById('phase1');
+            var h1 = p1.querySelector('h1');
+            if (h1) p1.insertBefore(fbBanner, h1); else p1.insertBefore(fbBanner, document.getElementById('p1Error'));
+            // Lock email
+            if (urlEmail) { var eEl = document.getElementById('regEmail'); if(eEl){eEl.readOnly=true;eEl.style.background='var(--surface-2)';eEl.style.cursor='not-allowed';} }
+          }
+          return;
+        }
+
+        _inviteRecord = invite;
+
+        // Mark as opened
+        if (invite.status === 'sent') {
+          await Portal.supabase.from('portal_invites').update({status:'opened',opened_at:new Date().toISOString()}).eq('id',invite.id);
+        }
+
+        // Welcome banner
+        var banner = document.createElement('div');
+        banner.style.cssText = 'background:rgba(61,120,234,0.1);border:1px solid rgba(61,120,234,0.3);border-radius:10px;padding:14px 16px;margin-bottom:20px;text-align:center;';
+        var invitedBy = invite.invited_by_name || invite.invited_by || 'the Direct Off Market team';
+        banner.innerHTML = '<div style="font-size:18px;margin-bottom:4px;">&#127881;</div>' +
+          '<div style="font-size:14px;font-weight:700;color:var(--accent);">You\'ve been invited by ' + invitedBy + '!</div>' +
+          '<div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Complete your registration below to access exclusive off-market deals.</div>';
+        document.getElementById('phase1').insertBefore(banner, document.getElementById('phase1').querySelector('h1'));
+
+        // Pre-fill fields
+        var firstName = invite.first_name || urlName || '';
+        var lastName = invite.last_name || '';
+        var email = invite.email || urlEmail || '';
+        if (firstName) document.getElementById('firstName').value = firstName;
+        if (lastName) document.getElementById('lastName').value = lastName;
+        if (email) {
+          var emailEl = document.getElementById('regEmail');
+          emailEl.value = email;
+          emailEl.readOnly = true;
+          emailEl.style.background = 'var(--surface-2)';
+          emailEl.style.color = 'var(--text-muted)';
+          emailEl.style.cursor = 'not-allowed';
+        }
+      } catch(e) { console.warn('Invite detection:', e); }
+    })();
+
+    // ---- Phase 1 submit ----
+    // Phone auto-format
+    document.getElementById('regPhone').addEventListener('input', function(e) {
+      var x = e.target.value.replace(/\D/g, '').substring(0, 10);
+      var f = '';
+      if (x.length > 0) f = '(' + x.substring(0, 3);
+      if (x.length >= 3) f += ') ' + x.substring(3, 6);
+      if (x.length >= 6) f += '-' + x.substring(6, 10);
+      e.target.value = f;
+    });
+
+    // Investor type pill toggle
+    document.getElementById('investorTypePills').addEventListener('click', function(e) {
+      var pill = e.target.closest('.inv-pill');
+      if (!pill) return;
+      pill.classList.toggle('selected');
+    });
+
+    document.getElementById('regForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var p1Error = document.getElementById('p1Error');
+      p1Error.classList.remove('visible');
+      p1Error.textContent = '';
+
+      var firstName = document.getElementById('firstName').value.trim();
+      var lastName  = document.getElementById('lastName').value.trim();
+      var email     = document.getElementById('regEmail').value.trim();
+      var phoneRaw  = document.getElementById('regPhone').value.replace(/\D/g,'');
+      var phone     = phoneRaw.length === 10 ? '+1' + phoneRaw : document.getElementById('regPhone').value.trim();
+      var pw        = document.getElementById('regPassword').value;
+      var confirm   = document.getElementById('regConfirm').value;
+      var liquidity = document.getElementById('regLiquidity').value;
+
+      // Validation
+      if (!firstName || !lastName) {
+        p1Error.textContent = 'Please enter your first and last name.';
+        p1Error.classList.add('visible');
+        return;
+      }
+      if (!email || !email.includes('@')) {
+        p1Error.textContent = 'Please enter a valid email address.';
+        p1Error.classList.add('visible');
+        return;
+      }
+      if (pw.length < 8) {
+        p1Error.textContent = 'Password must be at least 8 characters.';
+        p1Error.classList.add('visible');
+        return;
+      }
+      if (!phone || phoneRaw.length < 10) {
+        p1Error.textContent = 'Please enter a valid 10-digit phone number.';
+        p1Error.classList.add('visible');
+        return;
+      }
+      if (pw !== confirm) {
+        p1Error.textContent = 'Passwords do not match.';
+        p1Error.classList.add('visible');
+        return;
+      }
+
+      // Store and advance to phase 2
+      formData = {
+        firstName:    firstName,
+        lastName:     lastName,
+        email:        email,
+        phone:        phone,
+        password:     pw,
+        liquidity:    liquidity,
+        company:      document.getElementById('regCompany').value.trim(),
+        investorType: Array.from(document.querySelectorAll('.inv-pill.selected')).map(function(p){return p.dataset.val;})
+      };
+
+      document.getElementById('phase1').style.display = 'none';
+      document.getElementById('phase2').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ---- Back button ----
+    document.getElementById('backBtn').addEventListener('click', function() {
+      document.getElementById('phase2').style.display = 'none';
+      document.getElementById('phase1').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ---- Phase 2 submit (agree + create account) ----
+    document.getElementById('agreeBtn').addEventListener('click', async function() {
+      var p2Error = document.getElementById('p2Error');
+      p2Error.classList.remove('visible');
+      p2Error.textContent = '';
+
+      // Validate all 7 checkboxes
+      var checks = document.querySelectorAll('input[name="checks"]');
+      var allChecked = true;
+      for (var i = 0; i < checks.length; i++) {
+        if (!checks[i].checked) { allChecked = false; break; }
+      }
+      if (!allChecked) {
+        p2Error.textContent = 'Please review and check all sections before continuing.';
+        p2Error.classList.add('visible');
+        return;
+      }
+
+      var legalName = document.getElementById('legalName').value.trim();
+      if (!legalName) {
+        p2Error.textContent = 'Please type your full legal name to sign.';
+        p2Error.classList.add('visible');
+        return;
+      }
+
+      var btn = document.getElementById('agreeBtn');
+      btn.textContent = 'Creating your account...';
+      btn.disabled = true;
+
+      try {
+        // 1. Create Supabase auth user
+        var authResult = await Portal.supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              first_name: formData.firstName,
+              last_name:  formData.lastName
+            }
+          }
+        });
+
+        if (authResult.error) {
+          var errMsg = authResult.error.message || '';
+          var errCode = authResult.error.code || '';
+          if (
+            errMsg.toLowerCase().includes('already registered') ||
+            errMsg.toLowerCase().includes('already exists') ||
+            errCode === 'user_already_exists'
+          ) {
+            p2Error.innerHTML = 'That email is already registered. <a href="/login.html" style="color:var(--gold);">Sign in instead &rarr;</a>';
+          } else {
+            p2Error.textContent = errMsg || 'Registration failed. Please try again.';
+          }
+          p2Error.classList.add('visible');
+          btn.textContent = 'I Agree & Get Instant Access';
+          btn.disabled = false;
+          return;
+        }
+
+        var userId = authResult.data && authResult.data.user ? authResult.data.user.id : null;
+
+        var portalUserId = null;
+        var contactId = null;
+
+        // Step 1: Insert portal_users (no contact_id yet — server function returns it)
+        if (userId) {
+          try {
+            var puData = {
+              user_id:       userId,
+              email:         formData.email,
+              first_name:    formData.firstName,
+              last_name:     formData.lastName,
+              phone:         formData.phone || null,
+              company:       formData.company || null,
+              investor_type: Array.isArray(formData.investorType) ? (formData.investorType.length ? formData.investorType : null) : (formData.investorType || null),
+            };
+            var puIns = await Portal.supabase.from('portal_users').insert(puData).select('id').single();
+            if (puIns.error) throw puIns.error;
+            portalUserId = puIns.data ? puIns.data.id : null;
+          } catch (puErr) { console.warn('portal_users insert:', puErr); }
+
+          // Step 2: Call CRM-hosted function to create-or-link the contact (bypasses RLS via service role)
+          if (portalUserId) {
+            try {
+              var linkRes = await fetch('https://ai.directoffmarket.com/.netlify/functions/portal-signup-link-contact', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-dom-internal-token': '3byyhnlM7IDnAMtvi4cAYQpApbbGCeco_9-KMZ8la0I',
+                },
+                body: JSON.stringify({
+                  first_name:       formData.firstName,
+                  last_name:        formData.lastName,
+                  email:            formData.email,
+                  phone:            formData.phone || null,
+                  portal_user_id:   portalUserId,
+                  liquidity:        formData.liquidity || null,
+                  legal_name:       legalName,
+                  terms_signed_name: legalName,
+                  invite_contact_id: (_inviteRecord && _inviteRecord.contact_id) ? _inviteRecord.contact_id : null,
+                }),
+              });
+              if (linkRes.ok) {
+                var linkData = await linkRes.json();
+                contactId = linkData.contact_id || null;
+              } else {
+                console.warn('portal-signup-link-contact HTTP', linkRes.status);
+              }
+            } catch (linkErr) { console.warn('portal-signup-link-contact failed:', linkErr); }
+          }
+
+          // Step 3: Write contact_id back to portal_users
+          if (portalUserId && contactId) {
+            try {
+              await Portal.supabase
+                .from('portal_users')
+                .update({ contact_id: contactId })
+                .eq('id', portalUserId);
+            } catch (puUpdErr) { console.warn('portal_users contact_id update:', puUpdErr); }
+          }
+        }
+
+        // Mark invite as accepted
+        if (_inviteToken) {
+          try { await Portal.supabase.from('portal_invites').update({status:'accepted',accepted_at:new Date().toISOString()}).eq('token',_inviteToken); } catch(e) {}
+        }
+
+        // 4. Sign agreement, generate PDF, upload to storage
+        btn.textContent = 'Generating your signed agreement...';
+        var signedAt = new Date().toISOString();
+        var signedDate = signedAt.split('T')[0];
+        var agreementId = null;
+        // portalUserId and contactId already captured above
+        var contactIdForAgreement = contactId;
+
+        // Get IP
+        var ipAddr = 'unknown';
+        try { var ipRes = await fetch('https://api.ipify.org?format=json'); var ipJson = await ipRes.json(); ipAddr = ipJson.ip; } catch(e) {}
+
+        // Insert investor_agreements record
+        try {
+          var agreeRes = await Portal.supabase.from('investor_agreements').insert({
+            user_id: portalUserId, contact_id: contactIdForAgreement,
+            agreement_type: 'investor_access', signed_name: legalName,
+            signed_date: signedDate, signed_at: signedAt,
+            ip_address: ipAddr, user_agent: navigator.userAgent,
+            checkboxes: {section_1:true,section_2:true,section_3:true,section_4:true,section_5:true,section_6:true,section_7:true}
+          }).select('id').maybeSingle();
+          if (agreeRes.data) agreementId = agreeRes.data.id;
+        } catch(e) { console.warn('investor_agreements insert:', e); }
+
+        // Generate PDF via html2pdf.js
+        try {
+          if (typeof html2pdf !== 'undefined') {
+            var pdfHtml = '<div style="font-family:Arial,sans-serif;padding:40px;max-width:700px;margin:0 auto;">' +
+              '<div style="text-align:center;margin-bottom:24px;"><h1 style="font-size:20px;font-weight:900;">INVESTOR ACCESS AGREEMENT</h1>' +
+              '<h2 style="font-size:15px;font-weight:700;color:#555;">DIRECT OFF MARKET, LLC</h2></div>' +
+              '<h3>Section 1: Confidentiality & Non-Circumvention</h3><p>Investor agrees to maintain strict confidentiality regarding all deal information, seller identities, and pricing provided through this platform. Circumvention of Direct Off Market, LLC in any transaction will result in liquidated damages of $75,000 per occurrence.</p>' +
+              '<h3>Section 2: No Guarantee of Returns</h3><p>Direct Off Market makes no representations or guarantees regarding investment returns, property values, or market conditions. All investment decisions are made solely at the investor\'s own risk and discretion.</p>' +
+              '<h3>Section 3: Transaction Fees & Closing Costs</h3><p>Transaction fees, if any, are disclosed per transaction and reflected in the assignment agreement. Investor is responsible for their own closing costs unless otherwise specified in writing.</p>' +
+              '<h3>Section 4: Platform Terms</h3><p>Access to this platform is granted for legitimate investment purposes only. Sharing login credentials, scraping deal data, or any unauthorized use will result in immediate account termination.</p>' +
+              '<h3>Section 5: Electronic Signature</h3><p>This agreement may be executed electronically. An electronic signature has the same legal effect as a handwritten signature pursuant to the Electronic Signatures in Global and National Commerce Act (E-SIGN).</p>' +
+              '<h3>Section 6: Governing Law</h3><p>This agreement shall be governed by the laws of the State of Florida. Any disputes shall be resolved in the courts of Hillsborough County, Florida.</p>' +
+              '<h3>Section 7: Entire Agreement</h3><p>This agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior agreements.</p>' +
+              '<div style="margin-top:40px;border-top:2px solid #000;padding-top:20px;">' +
+              '<p><strong>Signed by:</strong> ' + legalName + '</p>' +
+              '<p><strong>Date:</strong> ' + signedDate + '</p>' +
+              '<p><strong>Timestamp:</strong> ' + signedAt + '</p>' +
+              '<p><strong>IP Address:</strong> ' + ipAddr + '</p>' +
+              (agreementId ? '<p><strong>Agreement ID:</strong> ' + agreementId + '</p>' : '') +
+              '</div>' +
+              '<p style="margin-top:24px;font-size:11px;color:#888;text-align:center;">This document was electronically signed pursuant to the E-SIGN Act.</p>' +
+              '</div>';
+
+            var fileName = 'investor-agreement-' + legalName.replace(/\s+/g,'-') + '-' + signedDate + '.pdf';
+            var pdfBlob = await html2pdf().from(pdfHtml).set({filename:fileName,margin:0,image:{type:'jpeg',quality:0.95},html2canvas:{scale:2},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).outputPdf('blob');
+
+            // Upload to Supabase Storage
+            try {
+              var upRes = await Portal.supabase.storage.from('agreements').upload(fileName, pdfBlob, {contentType:'application/pdf',upsert:true});
+              if (!upRes.error) {
+                var pubUrl = Portal.supabase.storage.from('agreements').getPublicUrl(fileName).data.publicUrl;
+                // Update agreement record with pdf_url
+                if (agreementId) {
+                  await Portal.supabase.from('investor_agreements').update({pdf_url:pubUrl,pdf_storage_path:fileName}).eq('id',agreementId);
+                }
+                // Add to CRM attachments
+                if (contactIdForAgreement) {
+                  await Portal.supabase.from('attachments').insert({record_type:'contacts',record_id:contactIdForAgreement,file_name:fileName,file_url:pubUrl,file_type:'application/pdf',category:'Agreements',uploaded_by:'system',created_at:signedAt});
+                }
+              }
+            } catch(storErr) { console.warn('PDF upload:', storErr); }
+          }
+        } catch(pdfErr) { console.warn('PDF gen:', pdfErr); }
+
+        // 4. Sign in immediately (in case email confirmation is disabled)
+        try {
+          await Portal.supabase.auth.signInWithPassword({
+            email:    formData.email,
+            password: formData.password
+          });
+        } catch (signInErr) {
+          console.warn('Auto sign-in failed:', signInErr);
+        }
+
+        // 5. Redirect to marketplace
+        btn.textContent = 'Welcome! Redirecting to marketplace...';
+        btn.style.background = '#22c55e';
+
+        setTimeout(function() {
+          window.location.href = '/marketplace.html';
+        }, 1500);
+
+      } catch (err) {
+        p2Error.textContent = 'Something went wrong. Please try again.';
+        p2Error.classList.add('visible');
+        btn.textContent = 'I Agree & Get Instant Access';
+        btn.disabled = false;
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>
