@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-sandbox-tier="showcase" lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,13 +31,13 @@
     .lender-hero::before {
       content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(79,195,247,0.08) 0%, transparent 70%);
+      background: radial-gradient(ellipse at 50% 0%, rgba(61,120,234,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
     .lender-hero-eyebrow {
       display: inline-block;
-      background: rgba(79,195,247,0.12);
-      border: 1px solid rgba(79,195,247,0.25);
+      background: rgba(61,120,234,0.12);
+      border: 1px solid rgba(61,120,234,0.25);
       color: var(--accent);
       font-size: 12px;
       font-weight: 700;
@@ -108,13 +108,13 @@
       gap: 14px;
       transition: border-color 0.2s, transform 0.2s;
     }
-    .lender-card:hover { border-color: rgba(79,195,247,0.3); transform: translateY(-2px); }
+    .lender-card:hover { border-color: rgba(61,120,234,0.3); transform: translateY(-2px); }
 
     .lender-card-icon {
       width: 48px; height: 48px;
       border-radius: 12px;
-      background: rgba(79,195,247,0.12);
-      border: 1px solid rgba(79,195,247,0.2);
+      background: rgba(61,120,234,0.12);
+      border: 1px solid rgba(61,120,234,0.2);
       display: flex; align-items: center; justify-content: center;
       font-size: 22px;
     }
@@ -252,7 +252,7 @@
       color: var(--text-muted); cursor: pointer; transition: all 0.15s;
     }
     .loan-pill.active, .loan-pill:hover {
-      background: rgba(79,195,247,0.12); border-color: rgba(79,195,247,0.4); color: var(--accent);
+      background: rgba(61,120,234,0.12); border-color: rgba(61,120,234,0.4); color: var(--accent);
     }
     .preferred-toggle {
       display: flex; align-items: center; gap: 8px;
@@ -290,7 +290,7 @@
       cursor: pointer; transition: border-color 0.2s, transform 0.15s;
       position: relative;
     }
-    .lender-dir-card:hover { border-color: rgba(79,195,247,0.35); transform: translateY(-2px); }
+    .lender-dir-card:hover { border-color: rgba(61,120,234,0.35); transform: translateY(-2px); }
     .lender-dir-card-top { display: flex; align-items: center; gap: 14px; }
     .lender-logo {
       width: 48px; height: 48px; border-radius: 10px; object-fit: contain;
@@ -312,8 +312,8 @@
     .lender-dir-types { display: flex; flex-wrap: wrap; gap: 5px; }
     .lender-type-tag {
       font-size: 11px; font-weight: 600; padding: 3px 9px;
-      border-radius: 20px; background: rgba(79,195,247,0.1);
-      border: 1px solid rgba(79,195,247,0.2); color: var(--accent);
+      border-radius: 20px; background: rgba(61,120,234,0.1);
+      border: 1px solid rgba(61,120,234,0.2); color: var(--accent);
     }
     .lender-dir-stats {
       display: flex; gap: 16px; border-top: 1px solid var(--border); padding-top: 12px;
@@ -379,8 +379,8 @@
     .lender-panel-tags { display: flex; flex-wrap: wrap; gap: 7px; }
     .lender-panel-tag {
       font-size: 12px; font-weight: 600; padding: 4px 11px;
-      border-radius: 20px; background: rgba(79,195,247,0.1);
-      border: 1px solid rgba(79,195,247,0.2); color: var(--accent);
+      border-radius: 20px; background: rgba(61,120,234,0.1);
+      border: 1px solid rgba(61,120,234,0.2); color: var(--accent);
     }
     .lender-contact-row {
       display: flex; align-items: center; gap: 10px;
@@ -393,8 +393,8 @@
       display: flex; align-items: center; gap: 12px;
     }
     .lender-officer-avatar {
-      width: 38px; height: 38px; border-radius: 50%; background: rgba(79,195,247,0.15);
-      border: 1px solid rgba(79,195,247,0.25); display: flex; align-items: center;
+      width: 38px; height: 38px; border-radius: 50%; background: rgba(61,120,234,0.15);
+      border: 1px solid rgba(61,120,234,0.25); display: flex; align-items: center;
       justify-content: center; font-size: 14px; font-weight: 700; color: var(--accent);
       flex-shrink: 0;
     }
@@ -466,9 +466,26 @@
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+<link rel="stylesheet" href="css/glass.css">
 </head>
 <body>
-    <nav id="investorNav" class="investor-nav">
+<div class="scene scene-dark"><div class="rays"></div></div>
+<div class="scene scene-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/>
+  </linearGradient>
+</defs></svg>
+
+    <nav id="investorNav" class="investor-nav lg lg--work">
     <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
     </button>
@@ -487,7 +504,7 @@
     </div>
 
     <!-- Hero -->
-    <div class="lender-hero">
+    <div class="lender-hero lg">
       <div class="lender-hero-eyebrow">DOM Verified Lender Network</div>
       <h1>Lender Marketplace</h1>
       <p>Hard money, private capital, and portfolio lenders — all vetted, all investor-focused, all ready to close Florida deals fast.</p>
@@ -513,7 +530,7 @@
       </div>
     </div>
 
-    <div class="lender-body">
+    <div class="lender-body lg lg--work">
 
       <!-- Lender Directory Header + Filter Bar -->
       <div style="margin-bottom: 20px;">
@@ -555,17 +572,17 @@
 
         <div class="why-grid">
           <div class="why-card">
-            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
             <div class="why-title">Investor-First Underwriting</div>
             <div class="why-desc">These lenders are experienced with as-is properties, assignment closings, and wholesale timelines — no friction, no surprises.</div>
           </div>
           <div class="why-card">
-            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
             <div class="why-title">Pre-Vetted &amp; Reviewed</div>
             <div class="why-desc">DOM only recommends lenders who have funded real deals in our network. Every lender is reviewed for reliability, speed, and fair terms.</div>
           </div>
           <div class="why-card">
-            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
             <div class="why-title">Seamless Deal Integration</div>
             <div class="why-desc">When the lender marketplace launches, you'll be able to connect a lender directly to a deal you're working on — streamlining the entire process.</div>
           </div>

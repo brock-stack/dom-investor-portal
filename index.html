@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-sandbox-tier="showcase" lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,9 +15,26 @@
   </script>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
+<link rel="stylesheet" href="css/glass.css">
 </head>
 <body>
-  <div class="index-loading">
+<div class="scene scene-dark"><div class="rays"></div></div>
+<div class="scene scene-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/>
+  </linearGradient>
+</defs></svg>
+
+  <div class="index-loading lg">
     <img src="/img/dom-icon.gif" alt="Direct Off Market" style="width:96px;height:96px;object-fit:contain;">
     <p style="color:var(--text-muted);font-size:13px;font-weight:500;letter-spacing:0.04em;">Loading portal...</p>
   </div>

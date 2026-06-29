@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-sandbox-tier="showcase" lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,13 +31,13 @@
     .pp-hero::before {
       content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(79,195,247,0.08) 0%, transparent 70%);
+      background: radial-gradient(ellipse at 50% 0%, rgba(61,120,234,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
     .pp-hero-eyebrow {
       display: inline-block;
-      background: rgba(79,195,247,0.12);
-      border: 1px solid rgba(79,195,247,0.25);
+      background: rgba(61,120,234,0.12);
+      border: 1px solid rgba(61,120,234,0.25);
       color: var(--accent);
       font-size: 12px;
       font-weight: 700;
@@ -102,7 +102,7 @@
     .pp-card:hover {
       border-color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(79,195,247,0.1);
+      box-shadow: 0 8px 32px rgba(61,120,234,0.1);
     }
     .pp-card.coming-soon {
       opacity: 0.72;
@@ -124,8 +124,8 @@
       border-radius: 20px;
     }
     .pp-status.live {
-      background: rgba(79,195,247,0.15);
-      border: 1px solid rgba(79,195,247,0.3);
+      background: rgba(61,120,234,0.15);
+      border: 1px solid rgba(61,120,234,0.3);
       color: var(--accent);
     }
     .pp-status.coming-soon {
@@ -139,8 +139,8 @@
       width: 48px;
       height: 48px;
       border-radius: 12px;
-      background: rgba(79,195,247,0.1);
-      border: 1px solid rgba(79,195,247,0.18);
+      background: rgba(61,120,234,0.1);
+      border: 1px solid rgba(61,120,234,0.18);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -172,9 +172,26 @@
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+<link rel="stylesheet" href="css/glass.css">
 </head>
 <body>
-  <nav id="investorNav" class="investor-nav">
+<div class="scene scene-dark"><div class="rays"></div></div>
+<div class="scene scene-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/>
+  </linearGradient>
+</defs></svg>
+
+  <nav id="investorNav" class="investor-nav lg lg--work">
     <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
     </button>
@@ -187,7 +204,7 @@
   <div class="page-wrap">
 
     <!-- Hero -->
-    <div class="pp-hero">
+    <div class="pp-hero lg">
       <div class="pp-hero-eyebrow">DOM Verified Partners</div>
       <h1>Preferred Partners</h1>
       <p>Your all-in-one solution.</p>
@@ -198,7 +215,7 @@
       <div class="pp-grid">
 
         <!-- Lenders — Live -->
-        <a href="/lender-marketplace.html" class="pp-card">
+        <a href="/lender-marketplace.html" class="pp-card lg lg--interactive">
           <span class="pp-status live">Live</span>
           <div class="pp-card-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -215,7 +232,7 @@
         </a>
 
         <!-- Insurance — Coming Soon -->
-        <a href="/preferred-partners/insurance.html" class="pp-card coming-soon">
+        <a href="/preferred-partners/insurance.html" class="pp-card coming-soon lg">
           <span class="pp-status coming-soon">Coming Soon</span>
           <div class="pp-card-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -227,7 +244,7 @@
         </a>
 
         <!-- Title — Coming Soon -->
-        <a href="/preferred-partners/title.html" class="pp-card coming-soon">
+        <a href="/preferred-partners/title.html" class="pp-card coming-soon lg">
           <span class="pp-status coming-soon">Coming Soon</span>
           <div class="pp-card-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -243,7 +260,7 @@
         </a>
 
         <!-- Property Management — Coming Soon -->
-        <a href="/preferred-partners/property-management.html" class="pp-card coming-soon">
+        <a href="/preferred-partners/property-management.html" class="pp-card coming-soon lg">
           <span class="pp-status coming-soon">Coming Soon</span>
           <div class="pp-card-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -255,7 +272,7 @@
         </a>
 
         <!-- Contractors — Coming Soon -->
-        <a href="/preferred-partners/contractors.html" class="pp-card coming-soon">
+        <a href="/preferred-partners/contractors.html" class="pp-card coming-soon lg">
           <span class="pp-status coming-soon">Coming Soon</span>
           <div class="pp-card-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

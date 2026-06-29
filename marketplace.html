@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-sandbox-tier="showcase" lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -118,8 +118,8 @@
       transition: all 0.15s;
     }
 
-    .filter-pill:hover { border-color: #4fc3f7; color: var(--text); }
-    .filter-pill.active { background: #4fc3f7; border-color: #4fc3f7; color: #1a2744; font-weight: 700; }
+    .filter-pill:hover { border-color: var(--accent); color: var(--text); }
+    .filter-pill.active { background: var(--accent); border-color: var(--accent); color: #1a2744; font-weight: 700; }
 
     .panel-title-row {
       display: flex;
@@ -145,8 +145,8 @@
       display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .view-btn:hover { border-color: #4fc3f7; color: #4fc3f7; }
-    .view-btn.active { background: var(--surface-2); border-color: #4fc3f7; color: #4fc3f7; }
+    .view-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .view-btn.active { background: var(--surface-2); border-color: var(--accent); color: var(--accent); }
 
     .listings-panel {
       flex: 1;
@@ -217,8 +217,8 @@
       z-index: 1;
     }
     .card-wrapper:hover::after {
-      border-color: #4fc3f7;
-      box-shadow: 0 4px 20px rgba(79,195,247,0.18);
+      border-color: var(--accent);
+      box-shadow: 0 4px 20px rgba(61,120,234,0.18);
     }
 
     .card-photo {
@@ -239,7 +239,7 @@
     }
     .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
     .badge-pending { background: #f97316; color: #fff; font-weight: 700; }
-    .badge-coming-soon { background: #4fc3f7; color: #1a2744; font-weight: 700; }
+    .badge-coming-soon { background: var(--accent); color: #1a2744; font-weight: 700; }
     .badge-sold { background: #64748b; color: #fff; font-weight: 700; }
 
     /* Map controls */
@@ -253,24 +253,24 @@
       background: #1a2744;
       border-radius: 8px;
       padding: 4px;
-      border: 1px solid rgba(79,195,247,0.2);
+      border: 1px solid rgba(61,120,234,0.2);
       backdrop-filter: blur(8px);
     }
 
     .map-style-btn {
       padding: 5px 12px;
       border-radius: 5px;
-      border: 1px solid rgba(79,195,247,0.25);
+      border: 1px solid rgba(61,120,234,0.25);
       background: rgba(26,39,68,0.9);
-      color: #4fc3f7;
+      color: var(--accent);
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       transition: all 0.15s;
     }
-.map-style-btn:hover { background: rgba(79,195,247,0.12) !important; border-color: #4fc3f7 !important; color: #4fc3f7 !important; }
-    .map-style-btn.active { background: #4fc3f7; color: #1a2744; border-color: #4fc3f7; font-weight: 700; }
+.map-style-btn:hover { background: rgba(61,120,234,0.12) !important; border-color: var(--accent) !important; color: var(--accent) !important; }
+    .map-style-btn.active { background: var(--accent); color: #1a2744; border-color: var(--accent); font-weight: 700; }
 
     .map-legend {
       position: absolute;
@@ -278,7 +278,7 @@
       left: 12px;
       z-index: 10;
       background: #1a2744;
-      border: 1px solid rgba(79,195,247,0.2);
+      border: 1px solid rgba(61,120,234,0.2);
       border-radius: 8px;
       padding: 10px 12px;
       font-size: 12px;
@@ -286,7 +286,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      color: #4fc3f7;
+      color: var(--accent);
       font-weight: 600;
       box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
@@ -297,16 +297,16 @@
       border: 2px solid white;
       flex-shrink: 0;
     }
-    .legend-dot.orange { background: #4fc3f7; }
+    .legend-dot.orange { background: var(--accent); }
     .legend-dot.red { background: #ef4444; }
     .legend-dot.purple { background: #8b5cf6; }
 
     .map-reset-btn, .map-flood-btn {
       position: absolute;
       z-index: 10;
-      border: 1px solid rgba(79,195,247,0.25);
+      border: 1px solid rgba(61,120,234,0.25);
       background: #1a2744;
-      color: #4fc3f7;
+      color: var(--accent);
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 12px;
@@ -316,7 +316,7 @@
       backdrop-filter: blur(8px);
       transition: all 0.15s;
     }
-    .map-reset-btn:hover, .map-flood-btn:hover { background: rgba(79,195,247,0.15); border-color: #4fc3f7; }
+    .map-reset-btn:hover, .map-flood-btn:hover { background: rgba(61,120,234,0.15); border-color: var(--accent); }
     .map-reset-btn { }
     .map-flood-btn { }
 
@@ -324,7 +324,7 @@
     /* Mapbox NavigationControl - match site style */
     .mapboxgl-ctrl-group {
       background: #1a2744 !important;
-      border: 1px solid rgba(79,195,247,0.2) !important;
+      border: 1px solid rgba(61,120,234,0.2) !important;
       border-radius: 8px !important;
       box-shadow: none !important;
       backdrop-filter: blur(8px) !important;
@@ -333,12 +333,12 @@
     .mapboxgl-ctrl-group button {
       background-color: transparent !important;
       border: none !important;
-      border-bottom: 1px solid rgba(79,195,247,0.15) !important;
+      border-bottom: 1px solid rgba(61,120,234,0.15) !important;
       width: 30px !important;
       height: 30px !important;
     }
     .mapboxgl-ctrl-group button:last-child { border-bottom: none !important; }
-    .mapboxgl-ctrl-group button:hover { background: rgba(79,195,247,0.15) !important; }
+    .mapboxgl-ctrl-group button:hover { background: rgba(61,120,234,0.15) !important; }
     .mapboxgl-ctrl-icon { filter: brightness(0) saturate(100%) invert(72%) sepia(47%) saturate(450%) hue-rotate(165deg) brightness(105%) contrast(93%) !important; }
 
     /* Mapbox popup */
@@ -361,12 +361,12 @@
     .map-popup .popup-price-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; }
 .map-popup .popup-arv { font-size: 17px; font-weight: 800; color: #2d6a8f; }
     .map-popup .popup-arv-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; white-space: nowrap; }
-.map-popup .popup-link { display: block; background: #1a2744; color: #4fc3f7; font-size: 13px; font-weight: 700; text-align: center; padding: 10px; text-decoration: none; transition: background 0.15s; }
+.map-popup .popup-link { display: block; background: #1a2744; color: var(--accent); font-size: 13px; font-weight: 700; text-align: center; padding: 10px; text-decoration: none; transition: background 0.15s; }
 .map-popup .popup-link:hover { background: #243560; }
     .popup-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; }
     .popup-status-published { background: #22c55e; color: #fff; }
     .popup-status-pending { background: #f97316; color: #fff; }
-    .popup-status-coming_soon { background: #4fc3f7; color: #1a2744; }
+    .popup-status-coming_soon { background: var(--accent); color: #1a2744; }
     .popup-status-sold { background: #64748b; color: #fff; }
 
     /* Empty state */
@@ -581,8 +581,8 @@
         transform: translateX(-50%);
         z-index: 300;
         background: #1a2744;
-        color: #4fc3f7;
-        border: 1.5px solid #4fc3f7;
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
         border-radius: 24px;
         padding: 10px 22px;
         font-size: 14px;
@@ -612,7 +612,7 @@
       }
 
       .map-price-pin.active {
-        background: #4fc3f7;
+        background: var(--accent);
         color: #0f172a;
         transform: scale(1.15);
       }
@@ -637,9 +637,26 @@
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
+<link rel="stylesheet" href="css/glass.css">
 </head>
 <body>
-    <nav id="investorNav" class="investor-nav">
+<div class="scene scene-dark"><div class="rays"></div></div>
+<div class="scene scene-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/>
+  </linearGradient>
+</defs></svg>
+
+    <nav id="investorNav" class="investor-nav lg lg--work">
     <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
     </button>
@@ -676,8 +693,8 @@
     </div>
 
     <div class="map-panel-barrier"></div>
-    <div class="marketplace-panel">
-      <div class="panel-header">
+    <div class="marketplace-panel lg">
+      <div class="panel-header lg lg--work">
         <div class="filter-bar">
           <button class="filter-pill active" data-status="all">All</button>
           <button class="filter-pill" data-status="published">Available</button>
@@ -901,12 +918,12 @@
 
       var el = document.createElement('div');
       el.className = 'dom-map-marker';
-      el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (listing.status === 'sold' ? '#64748b' : '#4fc3f7') + ';border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
+      el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (listing.status === 'sold' ? '#64748b' : 'var(--accent)') + ';border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
       el.dataset.id = listing.id;
 
       var popup = new mapboxgl.Popup({ offset: 25, closeButton: true })
         .setHTML(
-          '<div class="map-popup">' +
+          '<div class="map-popup lg">' +
             (listing._photo ? '<div style="position:relative;"><img src="' + listing._photo + '" alt="property" style="width:100%;height:140px;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">' + '<span class="popup-status popup-status-' + (listing.status||'published') + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(listing.status, listing.closed_at) + '</span></div>' : '') +
             '<div style="padding:12px 14px 0;">' +
               '<div class="popup-address">' + (p.address || '') + '</div>' +
@@ -1055,7 +1072,7 @@
 
       if (filtered.length === 0) {
         var filterLabel = currentFilter === 'all' ? 'active' : getStatusLabel(currentFilter, null).toLowerCase();
-        panel.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p style="margin-top:12px;color:var(--text-muted);">No ' + filterLabel + ' deals right now.<br>Check back soon.</p></div>';
+        panel.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="var(--accent)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--accent)"/></svg><p style="margin-top:12px;color:var(--text-muted);">No ' + filterLabel + ' deals right now.<br>Check back soon.</p></div>';
         panel.style.cssText = '';
         return;
       }
@@ -1072,23 +1089,23 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           var addressHtml = p.address
             ? '<div style="font-size:13px;font-weight:600;color:var(--text);">' + p.address + '</div><div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>'
             : '<div style="font-size:13px;font-weight:600;color:var(--text);">' + loc + '</div>';
-          var arvHtml = p.estimated_arv
-            ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">ARV</div><div style="font-size:16px;font-weight:800;color:var(--text);">' + Portal.fc(p.estimated_arv) + '</div></div>'
-            : '';
-          return '<div class="card-wrapper"><div class="deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;' + (l.status === 'sold' ? 'opacity:0.75;' : '') + '">' +
+          var startingPrice = l.asking_price || (l.listings && l.listings.list_price) || (p && p.mao_wholesale);
+          var arv = p.estimated_arv;
+          var equity = (arv != null && p.mao_flip != null) ? (arv - p.mao_flip) : null;
+          var statusVariant = l.status === 'sold' ? 'status-sold' : l.status === 'pending' ? 'status-pending' : '';
+          var statusLabel = l.status === 'sold' ? 'Sold' : l.status === 'pending' ? 'Pending' : 'Available';
+          return '<div class="card-wrapper"><div class="lg card lg--interactive deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;' + (l.status === 'sold' ? 'opacity:0.75;' : '') + '">' +
             '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status, l.closed_at) + '</span>' +
             '<button onclick="event.stopPropagation();toggleMktFavorite(this,\'' + l.id + '\')" data-lid="' + l.id + '" class="mkt-heart-btn" title="Save to Favorites" style="position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:background .15s;z-index:5;"">&#9825;</button>' +
           '</div>' +
-            '<div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">' +
-              addressHtml +
-              (tileSpecsRow1 ? '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow1 + '</div>' : '') +
-              (tileSpecsRow2 ? '<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow2 + '</div>' : '') +
-              '<div style="display:flex;gap:14px;align-items:flex-end;margin-top:8px;">' +
-                (l.status === 'sold'
-                  ? '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">Sold Price</div><div style="font-size:16px;font-weight:800;color:var(--accent);">' + (l.sold_price != null ? Portal.fc(l.sold_price) : '\u2014') + '</div></div>'
-                  : '<div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;">Starting Price</div><div style="font-size:16px;font-weight:800;color:var(--accent);">' + Portal.fc(l.asking_price) + '</div></div>' + arvHtml
-                ) +
-              '</div>' +
+            '<span class="status ' + statusVariant + '"><span class="d"></span>' + statusLabel + '</span>' +
+            addressHtml +
+            (tileSpecsRow1 ? '<div class="meta" style="font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow1 + '</div>' : '') +
+            (tileSpecsRow2 ? '<div class="meta" style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + tileSpecsRow2 + '</div>' : '') +
+            '<div class="tiles">' +
+              '<div class="tile"><div class="l">Starting</div><div class="v num">' + (startingPrice != null ? Portal.fc(startingPrice) : '\u2014') + '</div></div>' +
+              '<div class="tile"><div class="l">ARV</div><div class="v num">' + (arv != null ? Portal.fc(arv) : '\u2014') + '</div></div>' +
+              '<div class="tile equity"><div class="l">Equity</div><div class="v num">' + (equity != null && equity > 0 ? Portal.fc(equity) : '\u2014') + '</div></div>' +
             '</div>' +
           '</div></div>';
         }).join('');
@@ -1134,17 +1151,17 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
       modal.id = 'mktFavModal';
       modal.style.cssText = 'position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;pointer-events:none;';
       modal.innerHTML = added
-        ? '<div style="background:#1a2744;border:1px solid rgba(79,195,247,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
+        ? '<div style="background:#1a2744;border:1px solid rgba(61,120,234,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
           '<div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e8476a,#c0254a);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;">&#9829;</div>' +
           '<div style="font-size:18px;font-weight:800;color:#f0f4ff;margin-bottom:8px;">Added to Favorites</div>' +
           '<div style="font-size:13px;color:#8a9bbf;">Find this deal anytime in your Favorites tab.</div>' +
-          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#e8476a,#4fc3f7);margin-top:20px;width:100%;transform-origin:left;"></div>' +
+          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#e8476a,var(--accent));margin-top:20px;width:100%;transform-origin:left;"></div>' +
           '</div>'
-        : '<div style="background:#1a2744;border:1px solid rgba(79,195,247,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
+        : '<div style="background:#1a2744;border:1px solid rgba(61,120,234,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
           '<div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.07);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#8a9bbf;">&#9825;</div>' +
           '<div style="font-size:18px;font-weight:800;color:#f0f4ff;margin-bottom:8px;">Removed from Favorites</div>' +
           '<div style="font-size:13px;color:#8a9bbf;">This deal has been removed from your saved list.</div>' +
-          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#4fc3f7,#2563eb);margin-top:20px;width:100%;transform-origin:left;"></div>' +
+          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,var(--accent),#2563eb);margin-top:20px;width:100%;transform-origin:left;"></div>' +
           '</div>';
       document.body.appendChild(modal);
       // Animate countdown bar
@@ -1310,7 +1327,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
     }
 
     function showEmpty(msg) {
-      document.getElementById('listingsPanel').innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p style="margin-top:12px;">' + msg + '</p></div>';
+      document.getElementById('listingsPanel').innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="var(--accent)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--accent)"/></svg><p style="margin-top:12px;">' + msg + '</p></div>';
       document.getElementById('listingCount').textContent = '0 listings';
     }
 
@@ -1331,7 +1348,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
       sheet.innerHTML =
         '<div id="sheetDragArea" style="cursor:pointer;padding:8px 0 12px;">' +
           '<div class="sheet-handle" id="sheetHandle"></div>' +
-          '<div class="sheet-count" id="sheetCount" style="color:#4fc3f7;font-weight:700;font-size:15px;text-align:center;">Loading deals...</div>' +
+          '<div class="sheet-count" id="sheetCount" style="color:var(--accent);font-weight:700;font-size:15px;text-align:center;">Loading deals...</div>' +
         '</div>' +
         '<div class="sheet-cards" id="sheetCards"></div>';
       document.body.appendChild(sheet);
@@ -1341,7 +1358,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
       if (!hamburgerExists) {
         var hamburger = document.createElement('button');
         hamburger.id = 'mapHamburger';
-        hamburger.style.cssText = 'position:fixed;top:12px;right:12px;z-index:300;background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);color:#4fc3f7;border:1.5px solid rgba(79,195,247,0.5);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.3);';
+        hamburger.style.cssText = 'position:fixed;top:12px;right:12px;z-index:300;background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);color:var(--accent);border:1.5px solid rgba(61,120,234,0.5);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.3);';
         hamburger.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>';
         hamburger.onclick = function() { Portal.openPinMenu(); };
         document.body.appendChild(hamburger);
@@ -1364,20 +1381,20 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         var wrap = document.createElement('div');
         wrap.style.cssText = 'position:relative;';
         var pill = document.createElement('div');
-        pill.style.cssText = 'background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);border:1.5px solid #4fc3f7;border-radius:20px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(0,0,0,0.3);white-space:nowrap;';
+        pill.style.cssText = 'background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);border:1.5px solid var(--accent);border-radius:20px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(0,0,0,0.3);white-space:nowrap;';
         var lbl = document.createElement('span');
         lbl.textContent = labelText;
-        lbl.style.cssText = 'color:#4fc3f7;font-size:13px;font-weight:700;';
+        lbl.style.cssText = 'color:var(--accent);font-size:13px;font-weight:700;';
         var arr = document.createElement('span');
-        arr.innerHTML = '<svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 1L5 5L9 1" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round"/></svg>';
+        arr.innerHTML = '<svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 1L5 5L9 1" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>';
         pill.appendChild(lbl); pill.appendChild(arr);
         var menu = document.createElement('div');
-        menu.style.cssText = 'display:none;position:absolute;top:44px;left:0;background:#1a2744;border:1px solid rgba(79,195,247,0.3);border-radius:12px;overflow:hidden;min-width:150px;box-shadow:0 4px 24px rgba(0,0,0,0.5);z-index:100;';
+        menu.style.cssText = 'display:none;position:absolute;top:44px;left:0;background:#1a2744;border:1px solid rgba(61,120,234,0.3);border-radius:12px;overflow:hidden;min-width:150px;box-shadow:0 4px 24px rgba(0,0,0,0.5);z-index:100;';
         options.forEach(function(opt) {
           var item = document.createElement('div');
           item.style.cssText = 'padding:12px 16px;color:#f0f4ff;font-size:14px;font-weight:600;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);';
           item.textContent = opt.label;
-          item.addEventListener('touchstart', function(){item.style.background='rgba(79,195,247,0.15)';},{passive:true});
+          item.addEventListener('touchstart', function(){item.style.background='rgba(61,120,234,0.15)';},{passive:true});
           item.addEventListener('touchend', function(){item.style.background='';},{passive:true});
           item.onclick = function(e) { e.stopPropagation(); lbl.textContent = opt.label; menu.style.display = 'none'; onChange(opt.value); };
           menu.appendChild(item);
@@ -1425,18 +1442,18 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           s.style.maxHeight = peekHeight;
           s.style.transition = 'height 0.25s cubic-bezier(0.32,0.72,0,1), max-height 0.25s cubic-bezier(0.32,0.72,0,1)';
           if (f) f.style.display = 'none';
-          var ce2 = document.getElementById('sheetCount'); if (ce2 && window._mobileDealsLabel) { ce2.textContent = window._mobileDealsLabel; ce2.style.color = '#4fc3f7'; }
+          var ce2 = document.getElementById('sheetCount'); if (ce2 && window._mobileDealsLabel) { ce2.textContent = window._mobileDealsLabel; ce2.style.color = 'var(--accent)'; }
         } else if (state === 'half') {
           s.style.height = 'auto';
           s.style.maxHeight = '65vh';
           if (f) f.style.display = 'none';
-          var ceH = document.getElementById('sheetCount'); if (ceH) { ceH.textContent = 'View Map'; ceH.style.color = '#4fc3f7'; }
+          var ceH = document.getElementById('sheetCount'); if (ceH) { ceH.textContent = 'View Map'; ceH.style.color = 'var(--accent)'; }
         } else if (state === 'full') {
           // Redirect full to half — only two states allowed
           s.style.height = 'auto';
           s.style.maxHeight = '65vh';
           if (f) f.style.display = 'none';
-          var ce = document.getElementById('sheetCount'); if (ce) { ce.textContent = 'View Map'; ce.style.color = '#4fc3f7'; }
+          var ce = document.getElementById('sheetCount'); if (ce) { ce.textContent = 'View Map'; ce.style.color = 'var(--accent)'; }
         }
       }
 
@@ -1518,7 +1535,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         renderMobileCards();
         // Correct label: deals are showing, so button = View Map
         var countEl = document.getElementById('sheetCount');
-        if (countEl) { countEl.textContent = 'View Map'; countEl.style.color = '#4fc3f7'; }
+        if (countEl) { countEl.textContent = 'View Map'; countEl.style.color = 'var(--accent)'; }
       }, 500);
     }
 
@@ -1568,7 +1585,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         : allListings.filter(function(l) { return l.status === currentFilter; });
 
       window._mobileDealsLabel = 'View Deals';
-      if (countEl) { countEl.textContent = 'View Deals'; countEl.style.color = '#4fc3f7'; countEl.style.fontWeight = '700'; countEl.style.fontSize = '15px'; }
+      if (countEl) { countEl.textContent = 'View Deals'; countEl.style.color = 'var(--accent)'; countEl.style.fontWeight = '700'; countEl.style.fontSize = '15px'; }
 
       if (filtered.length === 0) {
         container.innerHTML = '<div style="text-align:center;padding:32px 16px;color:var(--text-muted);">No deals match this filter.<br>Check back soon.</div>';
@@ -1587,8 +1604,8 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         ].filter(Boolean).join(' | ');
         var photo = l._photo
           ? '<img src="' + l._photo + '" alt="property" loading="lazy">'
-          : '<div style="position:absolute;inset:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg></div>';
-        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? '#f97316' : (l.status === 'sold' ? '#64748b' : '#4fc3f7'));
+          : '<div style="position:absolute;inset:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--accent)"/></svg></div>';
+        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? '#f97316' : (l.status === 'sold' ? '#64748b' : 'var(--accent)'));
         var statusLabel = getStatusLabel(l.status, l.closed_at).toUpperCase();
         var isFav = (JSON.parse(localStorage.getItem('dom_portal_favorites') || '[]')).some(function(f){return f.id === l.id;});
 
@@ -1607,11 +1624,11 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
               (l.status === 'sold'
                 ? '<div style="flex:1;min-width:80px;">' +
                     '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Sold Price</div>' +
-                    '<div style="font-size:16px;font-weight:800;color:#4fc3f7;">$' + (l.sold_price != null ? Math.round(l.sold_price).toLocaleString('en-US') : '—') + '</div>' +
+                    '<div style="font-size:16px;font-weight:800;color:var(--accent);">$' + (l.sold_price != null ? Math.round(l.sold_price).toLocaleString('en-US') : '—') + '</div>' +
                   '</div>'
                 : '<div style="flex:1;min-width:80px;">' +
                     '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Starting Price</div>' +
-                    '<div style="font-size:16px;font-weight:800;color:#4fc3f7;">$' + (l.asking_price ? Math.round(l.asking_price).toLocaleString('en-US') : '—') + '</div>' +
+                    '<div style="font-size:16px;font-weight:800;color:var(--accent);">$' + (l.asking_price ? Math.round(l.asking_price).toLocaleString('en-US') : '—') + '</div>' +
                   '</div>' +
                   (p.estimated_arv ? '<div style="flex:1;min-width:80px;">' +
                     '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">ARV</div>' +
