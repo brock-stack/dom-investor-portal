@@ -98,8 +98,6 @@
     @media (max-width: 580px) { .lender-cards-grid { grid-template-columns: 1fr; } }
 
     .lender-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
       border-radius: 14px;
       padding: 28px 24px;
       position: relative;
@@ -140,8 +138,6 @@
     }
     @media (max-width: 768px) { .why-grid { grid-template-columns: 1fr; } }
     .why-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 22px 20px;
     }
@@ -203,8 +199,10 @@
   
     /* Mortgage Rate Bar */
     .rate-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      background: var(--glassw);
+      -webkit-backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+      backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+      border-bottom: 1px solid var(--glassw-bd);
       padding: 12px 24px;
       display: flex;
       align-items: center;
@@ -217,7 +215,8 @@
       font-size: 13px;
     }
     .rate-label { color: var(--text-muted); font-weight: 600; }
-    .rate-value { color: var(--accent); font-size: 16px; font-weight: 800; }
+    .rate-value { color: var(--em); font-size: 16px; font-weight: 800; }
+    [data-theme="dark"] .rate-value { color: var(--em-hi); }
     .rate-change { font-size: 11px; font-weight: 600; }
     .rate-change.up { color: #ef4444; }
     .rate-change.down { color: #22c55e; }
@@ -238,7 +237,7 @@
     .lender-search {
       flex: 1; min-width: 200px; max-width: 320px;
       padding: 9px 14px 9px 38px;
-      background: var(--surface); border: 1px solid var(--border);
+      background: var(--field); border: 1px solid var(--field-bd);
       border-radius: 8px; color: var(--text); font-size: 14px;
       font-family: inherit; outline: none; transition: border-color 0.2s;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a9bbf' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
@@ -248,12 +247,15 @@
     .loan-type-pills { display: flex; gap: 8px; flex-wrap: wrap; }
     .loan-pill {
       padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
-      background: var(--surface); border: 1px solid var(--border);
+      background: var(--tile-bg); border: 1px solid var(--tile-bd);
       color: var(--text-muted); cursor: pointer; transition: all 0.15s;
     }
-    .loan-pill.active, .loan-pill:hover {
-      background: rgba(61,120,234,0.12); border-color: rgba(61,120,234,0.4); color: var(--accent);
+    .loan-pill.active {
+      background: var(--grad-gold); color: var(--gold-text);
+      box-shadow: 0 6px 16px rgba(142,107,46,.4), inset 0 1px 0 rgba(255,255,255,.55);
+      border-color: transparent;
     }
+    .loan-pill:hover:not(.active) { background: rgba(61,120,234,0.12); border-color: rgba(61,120,234,0.4); color: var(--accent); }
     .preferred-toggle {
       display: flex; align-items: center; gap: 8px;
       font-size: 13px; font-weight: 600; color: var(--text-muted);
@@ -267,7 +269,7 @@
     .toggle-switch::after {
       content: ''; position: absolute; top: 3px; left: 3px;
       width: 14px; height: 14px; border-radius: 50%;
-      background: #fff; transition: transform 0.2s;
+      background: var(--tile-bg); transition: transform 0.2s;
     }
     .toggle-switch.on { background: var(--accent); }
     .toggle-switch.on::after { transform: translateX(16px); }
@@ -284,10 +286,9 @@
     @media (max-width: 900px) { .lender-dir-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 580px) { .lender-dir-grid { grid-template-columns: 1fr; } }
     .lender-dir-card {
-      background: var(--surface); border: 1px solid var(--border);
       border-radius: 14px; padding: 22px 20px;
       display: flex; flex-direction: column; gap: 12px;
-      cursor: pointer; transition: border-color 0.2s, transform 0.15s;
+      cursor: pointer; transition: transform 0.15s;
       position: relative;
     }
     .lender-dir-card:hover { border-color: rgba(61,120,234,0.35); transform: translateY(-2px); }
@@ -304,8 +305,8 @@
     .lender-dir-location { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .preferred-badge {
       position: absolute; top: 14px; right: 14px;
-      background: linear-gradient(135deg, #f97316, #ea580c);
-      color: #fff; font-size: 10px; font-weight: 700;
+      background: var(--grad-gold);
+      color: var(--gold-text); font-size: 10px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.06em;
       padding: 3px 9px; border-radius: 20px;
     }
@@ -322,14 +323,14 @@
     .lender-stat strong { color: var(--text); display: block; font-size: 14px; font-weight: 700; }
     .lender-empty {
       grid-column: 1 / -1; text-align: center; padding: 64px 24px;
-      background: var(--surface); border: 1px dashed var(--border); border-radius: 14px;
+      border-radius: 14px;
     }
     .lender-empty-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.5; }
     .lender-empty h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
     .lender-empty p { font-size: 14px; color: var(--text-muted); max-width: 380px; margin: 0 auto; line-height: 1.6; }
     /* Skeleton */
     .lender-skeleton {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      background: var(--glassw); border: 1px solid var(--glassw-bd); border-radius: 14px;
       padding: 22px 20px; display: flex; flex-direction: column; gap: 12px;
     }
     .skel { background: var(--border); border-radius: 6px; animation: skelPulse 1.5s ease-in-out infinite; }
@@ -344,15 +345,15 @@
     .lender-panel-overlay.open { display: block; }
     .lender-panel {
       position: fixed; top: 0; right: -480px; width: 460px; max-width: 100vw;
-      height: 100vh; background: var(--surface); border-left: 1px solid var(--border);
+      height: 100vh; background: var(--glassw); -webkit-backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat)); backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat)); border-left: 1px solid var(--glassw-bd);
       z-index: 9001; overflow-y: auto; transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
       display: flex; flex-direction: column;
     }
     .lender-panel.open { right: 0; }
     .lender-panel-header {
-      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--glassw-bd);
       display: flex; align-items: center; gap: 14px; position: sticky; top: 0;
-      background: var(--surface); z-index: 2;
+      background: var(--glassw); z-index: 2;
     }
     .lender-panel-logo {
       width: 52px; height: 52px; border-radius: 12px; flex-shrink: 0;
@@ -402,18 +403,18 @@
     .lender-officer-title { font-size: 12px; color: var(--text-muted); }
     .lender-panel-cta {
       display: flex; gap: 10px; padding: 20px 24px;
-      border-top: 1px solid var(--border); position: sticky; bottom: 0;
-      background: var(--surface);
+      border-top: 1px solid var(--glassw-bd); position: sticky; bottom: 0;
+      background: var(--glassw);
     }
     .btn-panel-primary {
       flex: 1; padding: 11px; border-radius: 8px; font-size: 14px; font-weight: 700;
-      background: var(--accent); color: #0f1a2e; border: none; cursor: pointer;
-      font-family: inherit; transition: background 0.2s;
+      background: var(--accent); color: #fff; border: none; cursor: pointer;
+      font-family: inherit; transition: opacity 0.2s;
     }
-    .btn-panel-primary:hover { background: #3aa8d8; }
+    .btn-panel-primary:hover { opacity: .88; }
     .btn-panel-secondary {
       padding: 11px 16px; border-radius: 8px; font-size: 14px; font-weight: 700;
-      background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+      background: var(--tile-bg); color: var(--text); border: 1px solid var(--tile-bd);
       cursor: pointer; font-family: inherit; transition: border-color 0.2s;
     }
     .btn-panel-secondary:hover { border-color: var(--accent); color: var(--accent); }
@@ -428,7 +429,7 @@
     }
     .lender-modal-overlay.open { display: flex; }
     .lender-modal {
-      background: var(--surface); border: 1px solid var(--border);
+      background: var(--glassw); -webkit-backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat)); backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat)); border: 1px solid var(--glassw-bd);
       border-radius: 20px; width: 100%; max-width: 480px;
       max-height: 90vh; overflow-y: auto;
       box-shadow: 0 24px 80px rgba(0,0,0,0.5);
