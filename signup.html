@@ -27,8 +27,10 @@
     #phase2 {
       max-width: 640px;
       width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: var(--glassw);
+      -webkit-backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+      backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+      border: 1px solid var(--glassw-bd);
       border-radius: 16px;
       padding: 40px;
     }
