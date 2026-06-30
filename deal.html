@@ -35,15 +35,14 @@
       --text-muted: #8a9bbf;
       --green: #22c55e;
       --red: #ef4444;
-      --orange: #f97316;
     }
 
     [data-theme="light"] {
-      --bg: #f1f5f9;
+      --bg: transparent;
       --navy: #1a2744;
-      --surface: #ffffff;
-      --surface-2: #e8eef6;
-      --border: #cbd5e1;
+      --surface: rgba(255,255,255,.62);
+      --surface-2: rgba(255,255,255,.42);
+      --border: rgba(16,60,70,.14);
       --text: #0f172a;
       --text-muted: #64748b;
     }
@@ -165,7 +164,7 @@
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
     }
-    .btn-header-cta:hover { background: white; color: #1a2744; }
+    .btn-header-cta:hover { background: var(--glassw); color: var(--text); -webkit-backdrop-filter: blur(var(--glassw-blur)); backdrop-filter: blur(var(--glassw-blur)); }
 
     /* ---- Gallery split layout ---- */
     .deal-gallery {
@@ -524,14 +523,16 @@
       text-transform: uppercase;
     }
     .badge-available { background: #22c55e; color: #ffffff; border-radius: 20px; padding: 4px 10px; }
-    .badge-pending { background: rgba(249,115,22,0.15); color: #f97316; }
+    .badge-pending { background: var(--grad-gold); color: var(--gold-text); }
     .badge-coming-soon { background: rgba(139,92,246,0.15); color: #8b5cf6; }
     .badge-sold { background: rgba(239,68,68,0.15); color: #ef4444; }
 
     /* Mapbox popup */
     .mapboxgl-popup-content {
-      background: #ffffff !important;
-      color: #1a2744 !important;
+      background: var(--glassw) !important;
+      -webkit-backdrop-filter: blur(var(--glassw-blur)); backdrop-filter: blur(var(--glassw-blur));
+      border: 1px solid var(--glassw-bd) !important;
+      color: var(--text) !important;
       border-radius: 12px !important;
       padding: 16px !important;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
@@ -722,7 +723,7 @@
     @media (max-width:500px) { .pf-kpi-grid { grid-template-columns:1fr; } }
     .pf-input-row { display:flex; gap:6px; align-items:center; }
     .pf-input-row .pro-forma-input { flex:1; min-width:0; }
-    .pf-reset-field-btn { background:none; border:1px solid var(--border); border-radius:6px; padding:5px 8px; color:var(--text-muted); cursor:pointer; font-size:13px; flex-shrink:0; line-height:1; font-family:inherit; }
+    .pf-reset-field-btn { background:var(--tile-bg); border:1px solid var(--border); border-radius:6px; padding:5px 8px; color:var(--text-muted); cursor:pointer; font-size:13px; flex-shrink:0; line-height:1; font-family:inherit; }
     .pf-reset-field-btn:hover { color:var(--text); background:var(--surface-2); }
     .pf-input-wrap.has-reset-btn { padding-left: 0; }
     .pf-input-wrap.has-reset-btn .pf-reset-field-btn {
@@ -891,7 +892,7 @@
       .flip-section-grid { grid-template-columns:1fr; }
     }
     /* === V2 LAYOUT === */
-    [data-theme="light"] { --bg: #f8fafc; }
+    [data-theme="light"] { --bg: transparent; }
 
     /* Hero Split */
     .hero-split { display:flex; margin-top:0; min-height:500px; overflow:hidden; }
@@ -929,7 +930,7 @@
 
     .hero-metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .hero-metric-card { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:13px 16px; }
-    [data-theme="light"] .hero-metric-card { background:#f8fafc; }
+    [data-theme="light"] .hero-metric-card { background:var(--tile-bg); }
     .hero-metric-label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
     .hero-metric-value { font-size:20px; font-weight:800; color:var(--text); }
     .hero-metric-value.accent { color:var(--accent); }
@@ -968,8 +969,8 @@
     .deal-content-col { flex:1; min-width:0; }
     .deal-body-v2.map-hidden .deal-map-sticky { display:none !important; }
     .deal-body-v2.map-hidden .deal-content-col { flex:1; max-width:100% !important; }
-    .content-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
-    [data-theme="light"] .content-card { background:#ffffff; }
+    .content-card { background:var(--glassw); -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)); backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)); border:1px solid var(--glassw-bd); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 14px 36px rgba(3,9,20,.32), inset 0 1px 0 var(--glass-spec); }
+    [data-theme="light"] .content-card { background:var(--glassw); }
 
     /* Mobile sticky CTA + hide-on-scroll nav */
     @media (max-width:768px) {
@@ -1036,8 +1037,8 @@
 <link rel="stylesheet" href="css/glass.css">
 </head>
 <body style="padding-top:64px;">
-<div class="scene scene-dark"><div class="rays"></div></div>
-<div class="scene scene-light"><div class="glint"></div></div>
+<div class="scene scene-dark scene--dim"><div class="rays"></div></div>
+<div class="scene scene-light scene--dim"><div class="glint"></div></div>
 <div class="motes" aria-hidden="true">
   <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
   <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
@@ -1093,8 +1094,8 @@
         </div>
       </div>
       <div id="heroEventBadges" style="display:flex;gap:6px;flex-wrap:nowrap;margin-top:4px;align-items:center;">
-        <span id="hero_oh_badge" style="display:none;background:#fff7ed;border:1px solid #f97316;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:#f97316;white-space:nowrap;flex:1;text-align:center;"></span>
-        <span id="hero_od_badge" style="display:none;background:#fff7ed;border:1px solid #f97316;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:#f97316;white-space:nowrap;flex:1;text-align:center;"></span>
+        <span id="hero_oh_badge" style="display:none;background:rgba(174,132,56,.15);border:1px solid var(--gold);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:var(--gold);white-space:nowrap;flex:1;text-align:center;"></span>
+        <span id="hero_od_badge" style="display:none;background:rgba(174,132,56,.15);border:1px solid var(--gold);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:var(--gold);white-space:nowrap;flex:1;text-align:center;"></span>
       </div>
       <h1 id="dealAddress" class="hero-address">Loading...</h1>
       <div id="dealTitle" class="hero-listing-title"></div>
