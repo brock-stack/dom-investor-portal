@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOM · Liquid Glass — Gold lead + emerald accent · full coverage · fixed sizing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================================
+   v3 TARGET — gold lead + emerald accent.
+   - Treasure GOLD is the lead decorative metal (rims, gauges, Featured, brand,
+     marketing CTA, segmented-on). Royal blue stays the transactional action color.
+   - EMERALD is the secondary accent (info / "New" chips, partner-rate figures).
+   - Showcase glass is more translucent so the sea reads through.
+   - GAINS keep a distinct brighter mint so a profit still reads as a gain.
+   - Marketplace MAP VIEW: compact rail cards that fit the 480px panel using a
+     frosted fill (NOT live backdrop-blur) so scrolling over the map doesn't lag.
+   ============================================================================ */
+:root{
+  --font-ui:'Barlow',system-ui,sans-serif; --font-display:'Barlow Condensed',var(--font-ui); --font-num:'Inter',var(--font-ui);
+  --r-lg:24px; --r-md:18px; --r-sm:12px; --ease:cubic-bezier(.32,.72,0,1); --dur:.5s;
+}
+/* NIGHT — deep sea (default / primary) */
+:root,[data-theme="dark"]{
+  color-scheme:dark;
+  --text:#EAF2F8; --text-muted:#A9BFD2; --text-faint:#74899E; --hair:rgba(255,255,255,.12);
+  --royal:#3D78EA; --royal-hi:#5A8BEE; --accent:var(--royal);
+  /* TREASURE GOLD — the lead metal */
+  --gold-hi:#EACE82; --gold:#AE8438; --gold-deep:#6F5021; --gold-text:#20150A;
+  --grad-gold:linear-gradient(180deg,var(--gold-hi),var(--gold) 52%,var(--gold-deep));
+  /* EMERALD — secondary accent (info, secondary highlights) */
+  --em-hi:#8FF0CE; --em:#16B98A; --em-deep:#0A6B4E; --em-text:#04140D;
+  --grad-em:linear-gradient(180deg,var(--em-hi),var(--em) 52%,var(--em-deep));
+  /* GAINS — distinct brighter spring mint, used ONLY on a gain */
+  --gain:#62F0A8; --equity:#62F0A8; --equity-bg:rgba(70,224,150,.13); --equity-bd:rgba(70,224,150,.30);
+  --avail:#7BE6B3; --avail-bg:rgba(70,214,149,.13); --avail-bd:rgba(70,214,149,.30); --avail-dot:#46D695;
+  --rose:#F0685E; --rose-bg:rgba(240,104,94,.13); --rose-bd:rgba(240,104,94,.3);
+  --tile-bg:rgba(255,255,255,.06); --tile-bd:rgba(255,255,255,.12); --tile-spec:rgba(255,255,255,.16);
+  /* showcase glass — pushed more translucent so the sea reads through */
+  --glass:linear-gradient(157deg, rgba(20,42,72,.30), rgba(12,26,48,.15) 60%, rgba(12,26,48,.09));
+  --glass-bd:rgba(255,255,255,.14); --glass-drop:0 30px 70px rgba(3,9,20,.55);
+  --glass-spec:rgba(255,255,255,.45); --glass-shade:rgba(3,9,20,.34);
+  --glass-rim:linear-gradient(155deg, rgba(255,255,255,.9), rgba(170,210,235,.14) 28%, transparent 52%, var(--gold-hi) 96%);
+  --glass-pool:rgba(180,214,240,.16); --glass-blur:24px; --glass-sat:160%;
+  --glassw:linear-gradient(157deg, rgba(16,32,54,.58), rgba(11,24,44,.48));
+  --glassw-bd:rgba(255,255,255,.10); --glassw-blur:18px; --glassw-sat:130%;
+  /* frosted fill for over-map cards — NO backdrop-filter (no lag) */
+  --frost:rgba(17,33,56,.82); --frost-bd:rgba(255,255,255,.1);
+  --field:rgba(255,255,255,.05); --field-bd:rgba(255,255,255,.14); --field-focus:rgba(61,120,234,.5);
+  --track:rgba(255,255,255,.1); --scrim:rgba(4,12,24,.55);
+}
+/* DAY — bright shallows */
+[data-theme="light"]{
+  color-scheme:light;
+  --text:#103A45; --text-muted:#4C6B73; --text-faint:#83A0A7; --hair:rgba(16,60,70,.12);
+  --royal:#2E6AD6; --royal-hi:#3D78EA; --accent:var(--royal);
+  --gold-hi:#EACE82; --gold:#AE8438; --gold-deep:#6F5021; --gold-text:#20150A;
+  --grad-gold:linear-gradient(180deg,var(--gold-hi),var(--gold) 52%,var(--gold-deep));
+  --em-hi:#5FD9A8; --em:#0E9B6E; --em-deep:#0A5C44; --em-text:#04140D;
+  --grad-em:linear-gradient(180deg,var(--em-hi),var(--em) 52%,var(--em-deep));
+  --gain:#0E9B5E; --equity:#0E9B5E; --equity-bg:rgba(20,170,110,.14); --equity-bd:rgba(20,170,110,.34);
+  --avail:#0E8552; --avail-bg:rgba(36,170,110,.14); --avail-bd:rgba(36,170,110,.34); --avail-dot:#1FB872;
+  --rose:#D6453B; --rose-bg:rgba(214,69,59,.1); --rose-bd:rgba(214,69,59,.28);
+  --tile-bg:rgba(255,255,255,.42); --tile-bd:rgba(255,255,255,.62); --tile-spec:rgba(255,255,255,.85);
+  --glass:linear-gradient(157deg, rgba(255,255,255,.44), rgba(255,255,255,.18) 60%, rgba(255,255,255,.12));
+  --glass-bd:rgba(255,255,255,.62); --glass-drop:0 26px 60px rgba(26,92,112,.20);
+  --glass-spec:rgba(255,255,255,.95); --glass-shade:rgba(30,90,110,.05);
+  --glass-rim:linear-gradient(155deg, rgba(255,255,255,1), rgba(255,255,255,.35) 30%, transparent 54%, var(--gold) 96%);
+  --glass-pool:rgba(255,255,255,.55); --glass-blur:24px; --glass-sat:175%;
+  --glassw:linear-gradient(157deg, rgba(255,255,255,.70), rgba(255,255,255,.60));
+  --glassw-bd:rgba(255,255,255,.7); --glassw-blur:18px; --glassw-sat:140%;
+  --frost:rgba(255,255,255,.92); --frost-bd:rgba(16,60,70,.14);
+  --field:rgba(255,255,255,.55); --field-bd:rgba(16,60,70,.16); --field-focus:rgba(46,106,214,.45);
+  --track:rgba(16,60,70,.12); --scrim:rgba(20,50,70,.34);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui); color:var(--text); line-height:1.5; -webkit-font-smoothing:antialiased;
+  min-height:100vh; position:relative; overflow-x:hidden; background:#06121F; transition:color var(--dur) var(--ease)}
+
+/* ===== scenes ===== */
+.scene{position:fixed; inset:0; z-index:-4; overflow:hidden; transition:opacity var(--dur) var(--ease)}
+[data-theme="light"] .s-dark{opacity:0} [data-theme="dark"] .s-light{opacity:0}
+.s-dark{background:radial-gradient(82% 48% at 50% -10%, rgba(86,180,216,.5) 0%, transparent 56%),
+  linear-gradient(180deg,#1B5C84 0%,#114A72 13%,#0C3358 33%,#0A2645 54%,#071A33 76%,#04101F 100%)}
+.s-dark .rays{position:absolute; inset:-10% 0 0 0; mix-blend-mode:screen; opacity:.55; filter:blur(8px); transform-origin:50% 0;
+  background:linear-gradient(101deg,transparent 28%,rgba(150,212,236,.16) 33%,transparent 39%),
+  linear-gradient(95deg,transparent 46%,rgba(150,212,236,.12) 51%,transparent 57%),
+  linear-gradient(110deg,transparent 60%,rgba(150,212,236,.1) 65%,transparent 72%)}
+@media (prefers-reduced-motion:no-preference){.s-dark .rays{animation:sway 16s var(--ease) infinite alternate}
+  @keyframes sway{to{transform:skewX(3deg) translateX(2%)}}}
+.s-light{background:radial-gradient(70% 50% at 50% -8%, rgba(255,255,255,.6) 0%, transparent 52%),
+  linear-gradient(180deg,#CDEBF1 0%,#8FD7DC 30%,#4FC2CC 56%,#79D2D2 80%,#BDE8E2 100%)}
+.s-light .glint{position:absolute; inset:-10% 0 0 0; mix-blend-mode:screen; opacity:.5; filter:blur(10px);
+  background:linear-gradient(100deg,transparent 36%,rgba(255,255,255,.6) 49%,rgba(255,255,255,.75) 51%,transparent 66%); transform:skewY(-7deg)}
+.motes{position:fixed; inset:0; z-index:-3; pointer-events:none} [data-theme="light"] .motes{opacity:0}
+.mote{position:absolute; border-radius:50%; background:rgba(190,222,240,.5); opacity:0}
+@media (prefers-reduced-motion:no-preference){.mote{animation:fall var(--d) linear infinite; animation-delay:var(--dl)}
+  @keyframes fall{0%{transform:translateY(-8vh);opacity:0}12%{opacity:.5}88%{opacity:.4}100%{transform:translateY(86vh);opacity:0}}}
+.depth{position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:radial-gradient(120% 82% at 50% 20%, transparent 42%, rgba(2,8,18,.55) 100%)}
+[data-theme="light"] .depth{background:radial-gradient(120% 82% at 50% 22%, transparent 52%, rgba(20,70,90,.14) 100%)}
+
+/* ===== liquid glass ===== */
+.lg{position:relative; border-radius:var(--r-md); overflow:hidden; background:var(--glass);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat)); backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border:1px solid var(--glass-bd);
+  box-shadow:var(--glass-drop), inset 0 1px 1px var(--glass-spec), inset 0 -26px 46px var(--glass-shade);
+  transition:background var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform .25s var(--ease)}
+.lg::before{content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; padding:1.2px;
+  background:var(--glass-rim); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude}
+.lg::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(58% 48% at 16% 4%, var(--glass-pool), transparent 60%)}
+.lg--interactive{cursor:pointer} .lg--interactive:hover{transform:translateY(-3px)}
+.lg--work{background:var(--glassw); -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)); backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  border:1px solid var(--glassw-bd); box-shadow:0 14px 36px rgba(3,9,20,.32), inset 0 1px 0 var(--glass-spec)}
+.lg--work::before{opacity:.5} .lg--work::after{opacity:.5}
+/* FROSTED tier — solid translucent fill, NO backdrop-filter. For cards over a live map. */
+.lg--frost{position:relative; border-radius:var(--r-sm); background:var(--frost); border:1px solid var(--frost-bd);
+  box-shadow:0 6px 18px rgba(3,9,20,.3), inset 0 1px 0 var(--glass-spec); transition:transform .2s var(--ease), box-shadow .2s var(--ease)}
+.lg--frost:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(3,9,20,.4), inset 0 1px 0 var(--glass-spec)}
+
+/* ===== layout ===== */
+.wrap{max-width:600px; margin:0 auto; padding:18px 18px 70px; position:relative; z-index:1}
+.num{font-family:var(--font-num); font-variant-numeric:tabular-nums}
+.row{display:flex; gap:12px; align-items:center}
+.eyebrow{font-size:11px; font-weight:700; letter-spacing:.26em; text-transform:uppercase; color:var(--gold)}
+[data-theme="dark"] .eyebrow{color:var(--gold-hi)}
+.tierlbl{display:flex; align-items:center; gap:8px; font-size:10.5px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:var(--text-faint); margin:34px 4px 12px}
+.tierlbl b{color:var(--gold)} [data-theme="dark"] .tierlbl b{color:var(--gold-hi)}
+.tierlbl::after{content:""; flex:1; height:1px; background:var(--hair)}
+
+.banner{padding:13px 16px; margin-bottom:16px; display:flex; gap:10px; align-items:flex-start; font-size:12.5px; color:var(--text-muted)}
+.banner b{color:var(--text)} .banner .dot{width:8px;height:8px;border-radius:50%;background:var(--em);margin-top:5px;flex:none}
+
+/* nav */
+.nav{padding:12px 16px; display:flex; align-items:center; gap:12px; margin-bottom:16px; border-radius:16px}
+.brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.04em; font-size:14.5px}
+.brand .mark{width:30px; height:30px; border-radius:9px; background:var(--grad-gold); display:grid; place-items:center; box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.brand .mark svg{width:15px; height:15px} .brand .off{color:var(--gold)} [data-theme="dark"] .brand .off{color:var(--gold-hi)}
+.nav .links{display:flex; gap:4px; margin-left:auto}
+.nav .links a{font-size:12.5px; font-weight:600; color:var(--text-muted); padding:7px 11px; border-radius:9px; text-decoration:none; transition:.2s}
+.nav .links a:hover, .nav .links a.on{color:var(--text); background:var(--tile-bg)}
+.tog{width:42px; height:42px; border-radius:50%; border:1px solid var(--glass-bd); background:var(--glass); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); display:grid; place-items:center; cursor:pointer; color:var(--gold); flex:none}
+[data-theme="dark"] .tog{color:var(--gold-hi)} .tog svg{width:19px; height:19px}
+
+/* buttons */
+.btn{font:600 14px/1 var(--font-ui); border:none; border-radius:13px; padding:12px 18px; cursor:pointer; transition:.2s var(--ease)}
+.btn-primary{background:var(--accent); color:#fff; box-shadow:0 10px 26px rgba(46,106,214,.36), inset 0 1px 0 rgba(255,255,255,.2)}
+.btn-gold{background:var(--grad-gold); color:var(--gold-text); box-shadow:0 10px 26px rgba(142,107,46,.42), inset 0 1px 0 rgba(255,255,255,.6)}
+.btn-emerald{background:var(--grad-em); color:var(--em-text); box-shadow:0 10px 26px rgba(16,120,90,.42), inset 0 1px 0 rgba(255,255,255,.5)}
+.btn-ghost{background:var(--tile-bg); color:var(--text); border:1px solid var(--tile-bd)}
+.btn-danger{background:var(--rose-bg); color:var(--rose); border:1px solid var(--rose-bd)}
+.btn:hover{transform:translateY(-1px)}
+.btn-sm{padding:9px 14px; font-size:13px; border-radius:11px}
+
+/* hero */
+.hero{padding:40px 30px 30px; text-align:center; margin-bottom:6px}
+.hero .eyebrow{display:block; margin-bottom:16px}
+.hero h1{font-family:var(--font-display); font-size:52px; font-weight:700; line-height:.96}
+.hero .rule{width:64px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:20px auto}
+.hero .sub{color:var(--text-muted); font-size:17px}
+.hero .cta{display:flex; gap:12px; margin-top:24px; justify-content:center; flex-wrap:wrap}
+
+.card{padding:20px} .pad{padding:20px}
+
+/* pills / badges */
+.pill{display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border-radius:999px; font-size:12.5px; font-weight:600}
+.pill-avail{background:var(--avail-bg); border:1px solid var(--avail-bd); color:var(--avail)}
+.pill-avail .d{width:8px; height:8px; border-radius:50%; background:var(--avail-dot)}
+.pill-featured{background:var(--grad-gold); color:var(--gold-text); box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.pill-pending{background:rgba(174,132,56,.16); border:1px solid var(--gold); color:var(--gold)}
+[data-theme="dark"] .pill-pending{color:var(--gold-hi)}
+.pill-sold{background:var(--tile-bg); border:1px solid var(--tile-bd); color:var(--text-muted)}
+.pill-info{background:rgba(22,185,138,.14); border:1px solid var(--em); color:var(--em)}
+[data-theme="dark"] .pill-info{color:var(--em-hi)}
+.badge-tag{display:inline-block; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700; letter-spacing:.04em; background:var(--tile-bg); border:1px solid var(--tile-bd); color:var(--text-muted)}
+
+.addr{font-size:21px; font-weight:800; letter-spacing:-.01em; margin-top:13px}
+.meta{color:var(--text-muted); font-size:14px; margin-top:4px}
+.tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px}
+.tile{padding:13px 9px; text-align:center; border-radius:14px; background:var(--tile-bg); border:1px solid var(--tile-bd); box-shadow:inset 0 1px 0 var(--tile-spec)}
+.tile .l{font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint)}
+.tile .v{font-size:17px; font-weight:800; margin-top:5px}
+.tile.equity{background:var(--equity-bg); border-color:var(--equity-bd)} .tile.equity .v{color:var(--equity)}
+
+/* marketplace GRID (full width — lush showcase card) */
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.mcard{overflow:hidden}
+.mcard .photo{height:120px; background:linear-gradient(135deg, rgba(120,170,210,.25), rgba(40,70,110,.3)); position:relative; display:grid; place-items:center}
+[data-theme="light"] .mcard .photo{background:linear-gradient(135deg, rgba(180,220,235,.6), rgba(120,190,200,.5))}
+.mcard .photo svg{width:34px; height:34px; opacity:.5; color:var(--text-faint)}
+.mcard .photo .badge{position:absolute; top:9px; left:9px}
+.mcard .body{padding:13px}
+.mcard .price{font-size:18px; font-weight:800} .mcard .body .meta{font-size:12.5px; margin-top:2px}
+.mcard .eq{font-size:12px; font-weight:700; color:var(--equity); margin-top:7px}
+
+/* ===== MARKETPLACE · MAP VIEW (the fix) ===== */
+.mapview{height:420px; display:flex; overflow:hidden; border-radius:var(--r-md)}
+.mapview .map{flex:1; min-width:0; position:relative;
+  background:radial-gradient(circle at 30% 40%, rgba(70,150,200,.25), transparent 40%),
+    radial-gradient(circle at 70% 65%, rgba(40,110,90,.25), transparent 45%),
+    linear-gradient(160deg,#0c2238,#0a1a2e);
+  background-color:#0a1a2e}
+[data-theme="light"] .mapview .map{background:radial-gradient(circle at 30% 40%, rgba(120,200,210,.4), transparent 40%),
+    radial-gradient(circle at 70% 65%, rgba(150,210,180,.4), transparent 45%),
+    linear-gradient(160deg,#cfeaf0,#aaddd6)}
+/* faux roads */
+.mapview .map::before{content:""; position:absolute; inset:0; opacity:.4;
+  background:linear-gradient(90deg,transparent 49.6%,rgba(255,255,255,.12) 50%,transparent 50.4%),
+    linear-gradient(0deg,transparent 39.6%,rgba(255,255,255,.1) 40%,transparent 40.4%),
+    linear-gradient(58deg,transparent 69.6%,rgba(255,255,255,.08) 70%,transparent 70.4%)}
+.pin{position:absolute; transform:translate(-50%,-100%); font-family:var(--font-num); font-weight:800; font-size:12px;
+  color:var(--gold-text); background:var(--grad-gold); padding:5px 9px; border-radius:11px 11px 11px 2px;
+  box-shadow:0 4px 12px rgba(3,9,20,.5), inset 0 1px 0 rgba(255,255,255,.5); cursor:pointer; white-space:nowrap}
+.pin.active{background:var(--accent); color:#fff; z-index:3}
+.pin::after{content:""; position:absolute; bottom:-4px; left:8px; width:8px; height:8px; background:inherit; transform:rotate(45deg)}
+.mapview .rail{width:268px; flex-shrink:0; display:flex; flex-direction:column; background:var(--glassw);
+  -webkit-backdrop-filter:blur(var(--glassw-blur)); backdrop-filter:blur(var(--glassw-blur)); border-left:1px solid var(--glassw-bd)}
+.rail .rhead{padding:11px 14px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); border-bottom:1px solid var(--hair); flex-shrink:0}
+.rail .rlist{flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:9px}
+/* COMPACT list card — fits the rail, frosted (no map re-blur = no lag) */
+.lc{display:flex; gap:10px; padding:8px}
+.lc .ph{width:84px; height:64px; border-radius:9px; flex:none; overflow:hidden; position:relative;
+  background:linear-gradient(135deg, rgba(120,170,210,.3), rgba(40,70,110,.35)); display:grid; place-items:center}
+.lc .ph svg{width:22px; height:22px; opacity:.5; color:var(--text-faint)}
+.lc .cbody{min-width:0; flex:1; display:flex; flex-direction:column; justify-content:center}
+.lc .price{font-family:var(--font-num); font-weight:800; font-size:15px}
+.lc .ad{font-size:12px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px}
+.lc .foot{display:flex; align-items:center; gap:7px; margin-top:5px}
+.lc .eq{font-family:var(--font-num); font-size:11.5px; font-weight:700; color:var(--equity)}
+.lc .st{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--avail)}
+
+/* segmented */
+.seg{display:inline-flex; padding:4px; border-radius:13px; background:var(--tile-bg); border:1px solid var(--tile-bd); gap:4px}
+.seg button{border:none; background:transparent; color:var(--text-muted); font:600 13px var(--font-ui); padding:8px 16px; border-radius:9px; cursor:pointer}
+.seg button.on{background:var(--grad-gold); color:var(--gold-text); box-shadow:0 6px 16px rgba(142,107,46,.4), inset 0 1px 0 rgba(255,255,255,.55)}
+
+/* forms */
+.field{margin-top:14px}
+.field label{font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint)}
+.field .inp{margin-top:6px; display:flex; align-items:center; gap:8px; padding:12px 14px; border-radius:12px; background:var(--field); border:1px solid var(--field-bd); font-family:var(--font-num); font-weight:500; color:var(--text); transition:.2s}
+.field .inp:focus-within{border-color:var(--field-focus); box-shadow:0 0 0 3px var(--field-focus)}
+.field .inp span.pre{color:var(--text-faint)}
+.field .inp input{flex:1; border:none; background:transparent; color:var(--text); font:inherit; outline:none}
+.field .inp input::placeholder{color:var(--text-faint)}
+
+/* partner / lender cards */
+.pcard{display:flex; gap:13px; align-items:center; padding:15px}
+.pcard .logo{width:46px; height:46px; border-radius:12px; background:var(--tile-bg); border:1px solid var(--tile-bd); display:grid; place-items:center; color:var(--gold); flex:none}
+[data-theme="dark"] .pcard .logo{color:var(--gold-hi)} .pcard .logo svg{width:22px;height:22px}
+.pcard .nm{font-weight:700; font-size:15px} .pcard .sub{font-size:12.5px; color:var(--text-muted)}
+.pcard .rate{margin-left:auto; text-align:right} .pcard .rate .n{font-family:var(--font-num); font-weight:800; font-size:17px; color:var(--em)}
+[data-theme="dark"] .pcard .rate .n{color:var(--em-hi)}
+.pcard .rate .l{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint)}
+
+/* pro-forma */
+.pf h3{font-family:var(--font-display); font-weight:700; font-size:23px; letter-spacing:.01em}
+.gauges{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:16px 0 6px}
+.gauge{text-align:center}
+.gauge svg{width:78px; height:78px; transform:rotate(-90deg)}
+.gauge .tk{fill:none; stroke:var(--track); stroke-width:8}
+.gauge .rg{fill:none; stroke:url(#gg); stroke-width:8; stroke-linecap:round}
+.gauge .val{font-family:var(--font-num); font-size:15px; font-weight:700; margin-top:-50px; position:relative}
+.gauge .lab{font-size:9.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text-faint); margin-top:30px}
+table{width:100%; border-collapse:collapse; font-size:13px; margin-top:10px}
+th{text-align:left; font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text-faint); padding:9px; border-bottom:1px solid var(--tile-bd)}
+td{padding:9px; border-bottom:1px solid var(--tile-bd); font-family:var(--font-num); font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+.gain{color:var(--equity); font-weight:700}
+
+/* FAQ */
+.faq .q{padding:15px 16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:600; font-size:14.5px}
+.faq .q+.q{border-top:1px solid var(--hair)}
+.faq .q .ic{color:var(--gold); transition:transform .25s} [data-theme="dark"] .faq .q .ic{color:var(--gold-hi)}
+.faq .q.open .ic{transform:rotate(45deg)}
+.faq .a{padding:0 16px 15px; font-size:13.5px; color:var(--text-muted); display:none}
+.faq .q.open + .a{display:block}
+
+/* empty */
+.empty{padding:34px 24px; text-align:center}
+.empty .ic{width:54px;height:54px;border-radius:16px;background:var(--tile-bg);border:1px solid var(--tile-bd);display:grid;place-items:center;margin:0 auto 14px;color:var(--text-faint)}
+.empty .ic svg{width:26px;height:26px}
+.empty h4{font-family:var(--font-display);font-size:20px;font-weight:700}
+.empty p{color:var(--text-muted);font-size:13.5px;margin-top:6px}
+
+/* overlay */
+.scrim-demo{padding:24px; border-radius:18px; background:var(--scrim); position:relative}
+.modal{max-width:380px; margin:0 auto; padding:22px}
+.modal h3{font-family:var(--font-display); font-size:21px; font-weight:700}
+.modal p{color:var(--text-muted); font-size:13.5px; margin-top:8px}
+.modal .mf{display:flex; gap:10px; justify-content:flex-end; margin-top:18px}
+.toast{display:flex; align-items:center; gap:11px; padding:13px 16px; margin-top:14px; border-radius:13px; font-size:13.5px; font-weight:600}
+.toast .ic{width:24px;height:24px;border-radius:50%;background:var(--equity-bg);border:1px solid var(--equity-bd);color:var(--equity);display:grid;place-items:center;flex:none}
+.toast .ic svg{width:14px;height:14px}
+
+/* footer */
+.foot{margin-top:18px; padding:18px 20px; border-radius:16px; text-align:center}
+.foot .brand{justify-content:center; font-size:13px; margin-bottom:8px}
+.foot .legal{font-size:11.5px; color:var(--text-faint)}
+
+.cap{color:var(--text-muted); font-size:12.5px; margin-top:26px; text-align:center; line-height:1.65}
+@media (max-width:480px){.hero h1{font-size:40px} .grid2{grid-template-columns:1fr} .nav .links{display:none} .mapview .rail{width:200px}}
+</style>
+</head>
+<body>
+
+<div class="scene s-dark"><div class="rays"></div></div>
+<div class="scene s-light"><div class="glint"></div></div>
+<div class="motes" aria-hidden="true">
+  <span class="mote" style="left:16%; width:3px; height:3px; --d:26s; --dl:0s"></span>
+  <span class="mote" style="left:34%; width:2px; height:2px; --d:34s; --dl:7s"></span>
+  <span class="mote" style="left:52%; width:3px; height:3px; --d:30s; --dl:13s"></span>
+  <span class="mote" style="left:69%; width:2px; height:2px; --d:38s; --dl:4s"></span>
+  <span class="mote" style="left:85%; width:3px; height:3px; --d:28s; --dl:10s"></span>
+</div>
+<div class="depth"></div>
+
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EACE82"/><stop offset="1" stop-color="#6F5021"/></linearGradient></defs></svg>
+
+<div class="wrap">
+
+  <nav class="lg lg--work nav">
+    <span class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z" stroke="#20150A" stroke-width="2.2"/><circle cx="12" cy="9" r="2.4" fill="#20150A"/></svg></span><b>DIRECT</b> <span class="off">OFF MARKET</span></span>
+    <span class="links"><a href="#" class="on">Marketplace</a><a href="#">Partners</a><a href="#">Lenders</a><a href="#">FAQ</a></span>
+    <button class="tog" id="tog" aria-label="Toggle day / night">
+      <svg id="togic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/></svg>
+    </button>
+  </nav>
+
+  <div class="lg lg--work banner">
+    <span class="dot"></span>
+    <span><b>v3 · gold lead + emerald accent + fixed sizing.</b> Gold is the metal again; emerald is a secondary accent; showcase glass is more translucent. Scroll to <b>Marketplace · map view</b> — the rail cards now fit and don't lag. Toggle day/night top-right.</span>
+  </div>
+
+  <div class="tierlbl"><b>Showcase glass</b> · hero · marketplace · marketing</div>
+
+  <section class="lg hero">
+    <span class="eyebrow">By invitation · curated off-market</span>
+    <h1>Off-market<br>investment deals.</h1>
+    <div class="rule"></div>
+    <div class="sub">Real estate investing, made quietly.</div>
+    <div class="cta">
+      <button class="btn btn-gold">Get investor access →</button>
+      <button class="btn btn-primary">Browse inventory</button>
+    </div>
+  </section>
+
+  <article class="lg card" style="margin-top:14px">
+    <div class="row" style="gap:8px">
+      <span class="pill pill-avail"><span class="d"></span>Available</span>
+      <span class="pill pill-featured">Featured</span>
+    </div>
+    <div class="addr">3415 Overland Dr</div>
+    <div class="meta">Holiday, FL 34691 · 2 Bd · 1.5 Ba · 1,068 sqft</div>
+    <div class="tiles">
+      <div class="tile"><div class="l">Starting</div><div class="v num">$169k</div></div>
+      <div class="tile"><div class="l">ARV</div><div class="v num">$235k</div></div>
+      <div class="tile equity"><div class="l">Equity</div><div class="v num">$64.3k</div></div>
+    </div>
+  </article>
+
+  <div class="tierlbl"><b>Marketplace grid</b> · full-width lush cards</div>
+  <div class="grid2">
+    <article class="lg lg--interactive mcard">
+      <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+        <span class="pill pill-featured badge">Featured</span></div>
+      <div class="body"><div class="price num">$169k</div><div class="meta">3415 Overland Dr · Holiday</div><div class="eq num">+$64.3k equity</div></div>
+    </article>
+    <article class="lg lg--interactive mcard">
+      <div class="photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+        <span class="pill pill-info badge">New</span></div>
+      <div class="body"><div class="price num">$204k</div><div class="meta">812 Mariner Way · Tarpon</div><div class="eq num">+$51.0k equity</div></div>
+    </article>
+  </div>
+
+  <!-- MAP VIEW — the corrected sizing + no-lag rail -->
+  <div class="tierlbl"><b>Marketplace · map view</b> · fixed fit + frosted (no lag)</div>
+  <div class="lg lg--work mapview">
+    <div class="map">
+      <span class="pin active" style="left:34%; top:38%">$169k</span>
+      <span class="pin" style="left:58%; top:30%">$204k</span>
+      <span class="pin" style="left:46%; top:62%">$152k</span>
+      <span class="pin" style="left:72%; top:55%">$188k</span>
+      <span class="pin" style="left:24%; top:70%">$231k</span>
+    </div>
+    <div class="rail">
+      <div class="rhead">5 listings · Pasco County</div>
+      <div class="rlist">
+        <div class="lg--frost lc">
+          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
+          <div class="cbody"><div class="price num">$169,000</div><div class="ad">3415 Overland Dr, Holiday</div>
+            <div class="foot"><span class="st">Available</span><span class="eq num">+$64.3k</span></div></div>
+        </div>
+        <div class="lg--frost lc">
+          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
+          <div class="cbody"><div class="price num">$204,000</div><div class="ad">812 Mariner Way, Tarpon Springs</div>
+            <div class="foot"><span class="st">Available</span><span class="eq num">+$51.0k</span></div></div>
+        </div>
+        <div class="lg--frost lc">
+          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
+          <div class="cbody"><div class="price num">$152,000</div><div class="ad">27 Bayou Ct, New Port Richey</div>
+            <div class="foot"><span class="st">Available</span><span class="eq num">+$38.7k</span></div></div>
+        </div>
+        <div class="lg--frost lc">
+          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
+          <div class="cbody"><div class="price num">$188,000</div><div class="ad">5510 Gulf Trace Blvd, Holiday</div>
+            <div class="foot"><span class="st">Available</span><span class="eq num">+$47.2k</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tierlbl"><b>Controls</b> · segmented · tags · pills</div>
+  <div class="lg pad">
+    <div class="seg"><button class="on">Flip</button><button>BRRRR</button><button>Hold</button></div>
+    <div class="row" style="margin-top:14px; flex-wrap:wrap; gap:8px">
+      <span class="badge-tag">Single-family</span><span class="badge-tag">Off-market</span><span class="badge-tag">Value-add</span>
+      <span class="pill pill-pending">Pending</span><span class="pill pill-sold">Sold</span>
+    </div>
+  </div>
+
+  <div class="tierlbl"><b>Forms</b> · login · offer · contact</div>
+  <section class="lg card">
+    <div class="eyebrow" style="display:block;margin-bottom:4px">Investor login</div>
+    <div class="field"><label>Email</label><div class="inp"><input type="email" placeholder="you@firm.com"></div></div>
+    <div class="field"><label>Password</label><div class="inp"><input type="password" placeholder="••••••••"></div></div>
+    <div class="row" style="margin-top:18px; justify-content:space-between">
+      <button class="btn btn-ghost btn-sm">Create account</button>
+      <button class="btn btn-primary">Sign in</button>
+    </div>
+  </section>
+
+  <div class="tierlbl"><b>Partners &amp; lenders</b> · directory rows</div>
+  <article class="lg lg--interactive pcard">
+    <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg></span>
+    <div><div class="nm">Gulf Coast Capital</div><div class="sub">Hard money · 12-mo bridge</div></div>
+    <div class="rate"><div class="n num">9.5%</div><div class="l">from</div></div>
+  </article>
+  <article class="lg lg--interactive pcard" style="margin-top:10px">
+    <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7h18M3 12h18M3 17h18"/></svg></span>
+    <div><div class="nm">Bayshore Title Co.</div><div class="sub">Preferred partner · 48-hr close</div></div>
+    <div class="rate"><div class="n num">A+</div><div class="l">rated</div></div>
+  </article>
+
+  <div class="tierlbl"><b>Work glass</b> · pro-forma · dashboard · tables</div>
+  <section class="lg lg--work card pf">
+    <div class="meta">Pro-forma · 3415 Overland Dr</div>
+    <h3>Flip analysis</h3>
+    <div class="gauges">
+      <div class="gauge"><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="40"/><circle class="rg" cx="50" cy="50" r="40" stroke-dasharray="251" stroke-dashoffset="88"/></svg><div class="val num">8.4%</div><div class="lab">Cap rate</div></div>
+      <div class="gauge"><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="40"/><circle class="rg" cx="50" cy="50" r="40" stroke-dasharray="251" stroke-dashoffset="72"/></svg><div class="val num">12.1%</div><div class="lab">Cash-on-cash</div></div>
+      <div class="gauge"><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="40"/><circle class="rg" cx="50" cy="50" r="40" stroke-dasharray="251" stroke-dashoffset="55"/></svg><div class="val num">1.38</div><div class="lab">DSCR</div></div>
+    </div>
+    <table>
+      <thead><tr><th>Line item</th><th>Amount</th><th>% of ARV</th></tr></thead>
+      <tbody>
+        <tr><td>Purchase price</td><td>$169,000</td><td>71.9%</td></tr>
+        <tr><td>Rehab budget</td><td>$28,000</td><td>11.9%</td></tr>
+        <tr><td>Holding + closing</td><td>$11,400</td><td>4.9%</td></tr>
+        <tr><td class="gain">Net profit</td><td class="gain">$42,100</td><td class="gain">17.9%</td></tr>
+      </tbody>
+    </table>
+    <div class="field"><label>Purchase price</label><div class="inp"><span class="pre">$</span><input class="num" value="169,000"></div></div>
+    <div class="row" style="margin-top:16px; justify-content:flex-end"><button class="btn btn-primary">Save pro-forma</button></div>
+  </section>
+
+  <div class="tierlbl"><b>FAQ</b> · accordion</div>
+  <section class="lg lg--work faq">
+    <div class="q open">How do off-market deals get sourced?<span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></span></div>
+    <div class="a">Direct seller relationships and pre-foreclosure data, vetted before they ever hit the MLS. Members see them first.</div>
+    <div class="q">What's the typical close timeline?<span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></span></div>
+    <div class="a">Most close in 21–30 days with our preferred title partners.</div>
+  </section>
+
+  <div class="tierlbl"><b>Empty &amp; system states</b></div>
+  <section class="lg lg--work empty">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18v13H3zM3 7l3-4h12l3 4"/></svg></div>
+    <h4>No saved pro-formas yet</h4>
+    <p>Run the numbers on any listing and save it here to compare deals side by side.</p>
+    <button class="btn btn-primary btn-sm" style="margin-top:14px">Browse inventory</button>
+  </section>
+
+  <div class="tierlbl"><b>Overlays</b> · modal · toast</div>
+  <div class="scrim-demo">
+    <div class="lg modal">
+      <h3>Submit offer</h3>
+      <p>Your offer on 3415 Overland Dr will be sent to the seller. They typically respond within 24 hours.</p>
+      <div class="mf"><button class="btn btn-ghost btn-sm">Cancel</button><button class="btn btn-primary btn-sm">Submit offer</button></div>
+    </div>
+  </div>
+  <div class="lg lg--work toast">
+    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>
+    Pro-forma saved to your dashboard.
+  </div>
+
+  <footer class="lg lg--work foot">
+    <span class="brand row"><span class="mark" style="width:24px;height:24px;border-radius:7px"><svg viewBox="0 0 24 24" fill="none" style="width:12px;height:12px"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z" stroke="#20150A" stroke-width="2.2"/><circle cx="12" cy="9" r="2.4" fill="#20150A"/></svg></span><b>DIRECT OFF MARKET</b></span>
+    <div class="legal">© 2026 Direct Off Market · Equal Housing Opportunity · Florida real estate</div>
+  </footer>
+
+  <p class="cap">Treasure gold = the lead metal · emerald = secondary accent (info / highlights) · royal blue = action · green = gains only. Showcase glass is more translucent; the map-view rail uses a frosted fill so scrolling over the live map stays smooth.</p>
+
+</div>
+
+<script>
+  var t=document.documentElement, b=document.getElementById('tog'), ic=document.getElementById('togic');
+  var sun='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>';
+  var moon='<path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/>';
+  b.addEventListener('click',function(){
+    var dark=t.getAttribute('data-theme')==='dark';
+    t.setAttribute('data-theme', dark?'light':'dark');
+    ic.innerHTML = dark?sun:moon;
+  });
+  document.querySelectorAll('.faq .q').forEach(function(q){ q.addEventListener('click',function(){ q.classList.toggle('open'); }); });
+  // map pin ↔ rail highlight (demo of the interaction)
+  var pins=document.querySelectorAll('.pin');
+  pins.forEach(function(p){ p.addEventListener('click',function(){ pins.forEach(function(x){x.classList.remove('active')}); p.classList.add('active'); }); });
+</script>
+</body>
+</html>
