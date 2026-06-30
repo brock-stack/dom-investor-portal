@@ -6,32 +6,25 @@
 /* ── CSS Variables ── */
 /* Brand palette: DOM logo navy #2d3560, sky blue var(--accent), white #ffffff */
 :root {
-  --bg: #181c2e;
-  --surface: #1e2340;
-  --surface-2: #252c50;
-  --border: rgba(255,255,255,0.09);
+  --bg: transparent;
+  --surface: rgba(16,32,54,.58);
+  --surface-2: rgba(255,255,255,.06);
+  --border: rgba(255,255,255,.10);
   --text: #f0f4ff;
   --text-muted: #8a9bbf;
-  --accent: var(--accent);       /* sky blue -- DOM logo accent */
-  --accent-hover: #7dd4f8;
   --navy: #2d3560;         /* DOM logo navy */
   --navy-dark: #1a1e38;
   --green: #22c55e;
   --red: #ef4444;
-  --amber: #f59e0b;
-  /* legacy gold alias removed -- use --accent */
-  --gold: var(--accent);
 }
 
 [data-theme="light"] {
-  --bg: #f0f4fa;
-  --surface: #ffffff;
-  --surface-2: #e8edf8;
-  --border: rgba(45,53,96,0.1);
+  --bg: transparent;
+  --surface: rgba(255,255,255,.62);
+  --surface-2: rgba(255,255,255,.42);
+  --border: rgba(16,60,70,.14);
   --text: #1a1e38;
   --text-muted: #4a5a80;
-  --accent: var(--accent);
-  --accent-hover: #7dd4f8;
   --navy: #2d3560;
   --navy-dark: #1a1e38;
 }
@@ -60,17 +53,15 @@ body {
   right: 0;
   height: 70px;
   overflow: visible;
-  background: #1a1e38 !important;
-  border-bottom: 1px solid rgba(61,120,234,0.2) !important;
+  background: var(--glassw);
+  -webkit-backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  border-bottom: 1px solid var(--glassw-bd);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-}
-
-[data-theme="light"] .investor-nav {
-  background: #1a1e38;
 }
 
 .nav-brand {
@@ -239,9 +230,9 @@ body {
 }
 
 .badge-pending {
-  background: rgba(245,158,11,0.15);
-  color: var(--amber);
-  border: 1px solid rgba(245,158,11,0.3);
+  background: var(--grad-gold);
+  color: var(--gold-text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
 }
 
 .badge-sold {
@@ -796,13 +787,11 @@ body {
 [data-theme="light"] .footer-social-link:hover { color: #e8edf5 !important; }
 
 .site-footer {
-  background: #080f1e;
-  border-top: 1px solid var(--border);
+  background: var(--glassw);
+  -webkit-backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  border-top: 1px solid var(--glassw-bd);
   padding: 60px 24px 32px;
-}
-
-[data-theme="light"] .site-footer {
-  background: #1a2744;
 }
 
 .footer-inner {
@@ -1083,7 +1072,7 @@ body {
 }
 
 .legend-dot.orange {
-  background: #f97316;
+  background: var(--gold);
 }
 
 .legend-dot.red {
