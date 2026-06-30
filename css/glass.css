@@ -64,6 +64,16 @@
   --glassw:linear-gradient(157deg, rgba(16,32,54,.60), rgba(11,24,44,.50));
   --glassw-bd:rgba(255,255,255,.10);
   --glassw-blur:18px; --glassw-sat:130%;
+
+  /* frosted tier */
+  --frost:rgba(17,33,56,.82); --frost-bd:rgba(255,255,255,.10);
+
+  /* emerald — info chips, BRRRR tag, lender rates */
+  --em-hi:#8FF0CE; --em:#16B98A; --em-deep:#0A6B4E; --em-text:#04140D;
+  --grad-em:linear-gradient(180deg,var(--em-hi),var(--em) 52%,var(--em-deep));
+
+  /* field inputs */
+  --field:rgba(255,255,255,.06); --field-bd:rgba(255,255,255,.14); --field-focus:rgba(61,120,234,.25);
 }
 
 /* ===================== ☀️ DAY — BRIGHT SHALLOWS ============================= */
@@ -92,6 +102,16 @@
   --glassw:linear-gradient(157deg, rgba(255,255,255,.70), rgba(255,255,255,.60));
   --glassw-bd:rgba(255,255,255,.7);
   --glassw-blur:18px; --glassw-sat:140%;
+
+  /* frosted tier */
+  --frost:rgba(255,255,255,.92); --frost-bd:rgba(16,60,70,.14);
+
+  /* emerald — info chips, BRRRR tag, lender rates */
+  --em-hi:#5FD9A8; --em:#0E9B6E; --em-deep:#0A5C44; --em-text:#04140D;
+  --grad-em:linear-gradient(180deg,var(--em-hi),var(--em) 52%,var(--em-deep));
+
+  /* field inputs */
+  --field:rgba(255,255,255,.55); --field-bd:rgba(16,60,70,.18); --field-focus:rgba(46,106,214,.20);
 }
 
 /* ============================ THE SCENES ==================================== */
@@ -396,3 +416,32 @@ select{appearance:none; background-image:linear-gradient(45deg,transparent 50%,v
 .pf-gauge-svg circle:first-of-type{stroke:var(--track)}
 .pf-gauge-svg circle:nth-of-type(2){stroke:url(#gg); stroke-linecap:round}
 .pf-gauge-card .pf-gauge-label{font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text-faint)}
+
+/* ============================================================================
+ GLASS v3.2.1 — Frosted tier + auto-skin + token confirmations
+ ============================================================================ */
+
+.lg--frost{
+  position:relative; border-radius:var(--r-sm);
+  background:var(--frost); border:1px solid var(--frost-bd);
+  box-shadow:0 6px 18px rgba(3,9,20,.30), inset 0 1px 0 var(--glass-spec);
+  transition:transform .2s var(--ease), box-shadow .2s var(--ease);
+}
+.lg--frost:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(3,9,20,.40), inset 0 1px 0 var(--glass-spec);
+}
+
+.metric-card:not(.lg), .interest-card:not(.lg), .stats-bar:not(.lg), .fav-card:not(.lg),
+.data-table-wrap:not(.lg), .offers-table-wrap:not(.lg), .coming-soon-box:not(.lg),
+.form-section:not(.lg), .contact-form-card:not(.lg), .contact-info-card:not(.lg),
+.glow-card:not(.lg), .faq-item:not(.lg), .faq-cta:not(.lg), .auth-card:not(.lg),
+.lender-dir-card:not(.lg), .lender-card:not(.lg), .why-card:not(.lg),
+.lender-officer-card:not(.lg), .lender-panel:not(.lg), .lender-modal:not(.lg),
+.page-hero:not(.lg), .dashboard-header:not(.lg), .closing-card:not(.lg){
+  background:var(--glassw) !important;
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  border:1px solid var(--glassw-bd) !important;
+  box-shadow:0 14px 36px rgba(3,9,20,.32), inset 0 1px 0 var(--glass-spec);
+}
