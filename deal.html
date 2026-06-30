@@ -26,23 +26,20 @@
     :root {
       --bg: #0f1a2e;
       --navy: #1a2744;
-      --gold: #4fc3f7;
-      --accent: #4fc3f7;
-      --surface: #1a2744;
-      --surface-2: #243257;
+      
+      
       --border: #2d4070;
       --text: #e2e8f0;
       --text-muted: #8a9bbf;
       --green: #22c55e;
       --red: #ef4444;
-      --orange: #f97316;
     }
 
     [data-theme="light"] {
       --bg: #f1f5f9;
       --navy: #1a2744;
-      --surface: #ffffff;
-      --surface-2: #e8eef6;
+      
+      
       --border: #cbd5e1;
       --text: #0f172a;
       --text-muted: #64748b;
@@ -124,11 +121,11 @@
       text-decoration: none;
       display: inline-block;
     }
-    .btn-primary { background: #4fc3f7; color: #ffffff; }
+    .btn-primary { background: var(--c-primary); color: #ffffff; }
     .btn-primary:hover { background: #1a2744; color: #fff; }
     .btn-secondary { background: transparent; color: var(--text); border: 1px solid #1e293b; }
-    [data-theme="dark"] .btn-secondary { border-color: #4fc3f7; }
-    .btn-secondary:hover { background: #4fc3f7; color: #ffffff; border-color: #4fc3f7; }
+    [data-theme="dark"] .btn-secondary { border-color: var(--c-metal); }
+    .btn-secondary:hover { background: var(--c-metal); color: #ffffff; border-color: var(--c-metal); }
     .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
     .btn-ghost:hover { background: var(--surface-2); }
     .btn-outline-heavy {
@@ -260,7 +257,7 @@
       position: absolute; top: 16px; right: 16px;
       width: 40px; height: 40px; border-radius: 50%;
       background: rgba(26,39,68,0.8); border: 1.5px solid rgba(79,195,247,0.4);
-      color: #4fc3f7; font-size: 18px; cursor: pointer;
+      color: var(--c-metal); font-size: 18px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(8px); transition: background .15s;
       z-index: 3; transform: none !important;
@@ -270,7 +267,7 @@
     .gallery-bar-nav {
       width: 44px; height: 44px; border-radius: 50%;
       background: rgba(26,39,68,0.8); border: 1.5px solid rgba(79,195,247,0.4);
-      color: #4fc3f7; font-size: 22px; cursor: pointer;
+      color: var(--c-metal); font-size: 22px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(8px); transition: background .15s;
     }
@@ -324,7 +321,7 @@
       margin-bottom: 4px;
     }
     .stat-value { font-size: 17px; font-weight: 700; }
-    .stat-value.price-accent { color: #4fc3f7; font-size: 19px; }
+    .stat-value.price-accent { color: var(--c-metal); font-size: 19px; }
 
     /* ---- Tab bar ---- */
     .tab-bar {
@@ -348,7 +345,7 @@
       transition: all 0.15s;
     }
     .tab-btn:hover { color: var(--text); }
-    .tab-btn.active { color: #4fc3f7; border-bottom-color: #4fc3f7; font-weight: 600; }
+    .tab-btn.active { color: var(--c-metal); border-bottom-color: var(--c-metal); font-weight: 600; }
 
     /* Deal body */
     .deal-body { padding: 32px; max-width: 1200px; margin: 0 auto; }
@@ -379,7 +376,7 @@
       padding: 12px 16px;
       font-size: 14px;
       font-weight: 500;
-      color: #4fc3f7;
+      color: var(--c-metal);
       margin-bottom: 20px;
     }
 
@@ -444,7 +441,7 @@
     .pro-forma-input {
       width: 100%;
       background: #dbeafe;
-      border: 1px solid #4fc3f7;
+      border: 1px solid var(--c-metal);
       border-radius: 6px;
       padding: 7px 10px;
       color: #0f172a;
@@ -452,7 +449,7 @@
       font-family: 'Inter', sans-serif;
       outline: none;
     }
-    .pro-forma-input:focus { border-color: #4fc3f7; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+    .pro-forma-input:focus { border-color: var(--c-metal); box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
     .pro-forma-row {
       display: flex;
       justify-content: space-between;
@@ -524,7 +521,7 @@
       text-transform: uppercase;
     }
     .badge-available { background: #22c55e; color: #ffffff; border-radius: 20px; padding: 4px 10px; }
-    .badge-pending { background: rgba(249,115,22,0.15); color: #f97316; }
+    .badge-pending { background: rgba(249,115,22,0.15); color: var(--c-metal); }
     .badge-coming-soon { background: rgba(139,92,246,0.15); color: #8b5cf6; }
     .badge-sold { background: rgba(239,68,68,0.15); color: #ef4444; }
 
@@ -594,7 +591,7 @@
     .financial-row:last-child { border-bottom: none; }
     .financial-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
     .financial-value { font-size: 15px; font-weight: 700; color: var(--text); }
-    .financial-value.accent { color: #4fc3f7; font-size: 18px; }
+    .financial-value.accent { color: var(--c-metal); font-size: 18px; }
 
     .key-features {
       display: flex;
@@ -623,7 +620,7 @@
     .feature-pill.accent {
       background: rgba(79,195,247,0.1);
       border-color: rgba(79,195,247,0.4);
-      color: #4fc3f7;
+      color: var(--c-metal);
     }
     [data-theme="light"] .feature-pill.accent {
       background: rgba(79,195,247,0.1);
@@ -662,7 +659,7 @@
       color: var(--text-muted);
       margin-top: 24px;
     }
-    .deal-footer-link { color: #4fc3f7; font-weight: 600; text-decoration: none; }
+    .deal-footer-link { color: var(--c-metal); font-weight: 600; text-decoration: none; }
     .deal-footer-link:hover { text-decoration: underline; }
 
     @media (max-width: 900px) {
@@ -681,7 +678,7 @@
     /* === PRO FORMA V2 === */
     .pf-kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
     .pf-kpi-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; text-align:center; }
-    .pf-kpi-value { font-size:26px; font-weight:800; color:#4fc3f7; margin-bottom:6px; font-family:'Barlow',sans-serif; line-height:1.1; }
+    .pf-kpi-value { font-size:26px; font-weight:800; color:var(--c-metal); margin-bottom:6px; font-family:'Barlow',sans-serif; line-height:1.1; }
     .pf-kpi-label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; justify-content:center; gap:4px; flex-wrap:wrap; }
     .pf-main-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:28px; }
     .pf-label-row { display:flex; align-items:center; gap:4px; margin-bottom:4px; }
@@ -691,10 +688,10 @@
     .pf-tip:hover .pf-tip-text, .pf-tip:focus .pf-tip-text { display:block; }
     .pf-readonly { background:var(--surface-2); border:1px solid var(--border); border-radius:6px; padding:7px 10px; color:var(--text-muted); font-size:14px; width:100%; display:block; }
     .pf-toggle-row { display:flex; align-items:center; gap:8px; padding:8px 0; }
-    .pf-toggle-row input[type="checkbox"] { width:16px; height:16px; accent-color:#4fc3f7; cursor:pointer; }
+    .pf-toggle-row input[type="checkbox"] { width:16px; height:16px; accent-color:var(--c-metal); cursor:pointer; }
     .pf-tab-group { display:flex; background:var(--surface-2); border-radius:8px; padding:3px; gap:3px; }
     .pf-tab-btn { flex:1; padding:7px 0; border:none; background:transparent; color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; border-radius:6px; transition:background 0.15s,color 0.15s; font-family:'Inter',sans-serif; }
-    .pf-tab-btn.active { background:var(--surface); color:#4fc3f7; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+    .pf-tab-btn.active { background:var(--surface); color:var(--c-metal); box-shadow:0 1px 4px rgba(0,0,0,0.2); }
     .pf-result-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
     .pf-result-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:16px; display:flex; align-items:center; gap:5px; }
     .pf-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; gap:8px; }
@@ -707,7 +704,7 @@
     .pf-indent .pf-rl { padding-left:14px; font-size:12px; }
     .positive { color:#22c55e; }
     .negative { color:#ef4444; }
-    .accent-v { color:#4fc3f7; }
+    .accent-v { color:var(--c-metal); }
     .pf-hint { font-size:11px; color:var(--text-muted); margin-top:3px; }
     .pf-proj-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:28px; }
     .pf-proj-title { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); padding:16px 20px; border-bottom:1px solid var(--border); }
@@ -837,7 +834,7 @@
     .proformas-mode-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
     .proformas-mode-pill { padding:10px 36px; border:none; background:var(--surface); color:var(--text-muted); font-size:16px; font-weight:700; letter-spacing:0.02em; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; white-space:nowrap; }
     .proformas-mode-pill:hover { background:var(--surface-2); color:var(--text); }
-    .proformas-mode-pill.active { background:#4fc3f7; color:#0f172a; }
+    .proformas-mode-pill.active { background: var(--c-primary); color:#0f172a; }
     .proformas-subview { display:none; }
     .proformas-subview.active { display:block; padding-top:20px; }
     .pfs-kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px; max-width:100%; overflow:hidden; }
@@ -851,7 +848,7 @@
     .pfs-fin-wrap.collapsed { max-height:0; }
     .pfs-toggle-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
     .pfs-toggle-pill { padding:7px 20px; border:none; background:var(--surface); color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; }
-    .pfs-toggle-pill.active { background:#4fc3f7; color:#0f172a; }
+    .pfs-toggle-pill.active { background: var(--c-primary); color:#0f172a; }
     .pfs-breakdown-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:28px; }
     .pfs-bd-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); font-size:14px; }
     .pfs-bd-row:last-child { border-bottom:none; }
@@ -874,7 +871,7 @@
     .flip-financing-wrap.collapsed { max-height:0; }
     .flip-toggle-pills { display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
     .flip-toggle-pill { padding:7px 20px; border:none; background:var(--surface); color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:background 0.15s,color 0.15s; }
-    .flip-toggle-pill.active { background:#4fc3f7; color:#0f172a; }
+    .flip-toggle-pill.active { background: var(--c-primary); color:#0f172a; }
     .flip-breakdown-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:28px; }
     .flip-bd-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); font-size:14px; }
     .flip-bd-row:last-child { border-bottom:none; }
@@ -899,7 +896,7 @@
     .hero-main-photo-wrap { flex:1; overflow:hidden; cursor:pointer; position:relative; min-height:520px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:13px; }
     .hero-main-photo-wrap img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.2s; position:absolute; inset:0; }
     .hero-main-photo-wrap:hover img { transform:scale(1.02); }
-    .hero-photo-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:15; background:rgba(79,195,247,0.18); border:2px solid #4fc3f7; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; transition:opacity .2s, background .15s; color:#4fc3f7; font-size:18px; font-weight:700; user-select:none; }
+    .hero-photo-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:15; background:rgba(79,195,247,0.18); border:2px solid var(--c-metal); border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; transition:opacity .2s, background .15s; color:var(--c-metal); font-size:18px; font-weight:700; user-select:none; }
     .hero-main-photo-wrap:hover .hero-photo-nav { opacity:1; }
     @media (max-width: 768px) { .hero-photo-nav { opacity:0.7 !important; background:rgba(10,18,40,0.5) !important; } }
     .hero-photo-nav:hover { background:rgba(79,195,247,0.45); }
@@ -910,14 +907,14 @@
     .hero-thumb-wrap:hover .thumb-nav { opacity:1 !important; }
     .thumb-nav:hover { background:rgba(79,195,247,0.35) !important; }
     .hero-thumb { flex-shrink:0; width:139px; height:78px; overflow:hidden; border-radius:6px; cursor:pointer; border:2px solid transparent; transition:border-color 0.15s; }
-    .hero-thumb.active { border-color:#4fc3f7; }
+    .hero-thumb.active { border-color:var(--c-metal); }
     .hero-thumb:hover { border-color:rgba(59,130,246,0.5); }
     .hero-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     .hero-thumb-more { flex-shrink:0; width:139px; height:78px; border-radius:6px; cursor:pointer; background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--text); transition:background 0.15s; }
     .hero-thumb-more:hover { background:var(--border); }
     .hero-info-half { width:50%; flex-shrink:0; padding:28px 32px; overflow-y:auto; background:var(--surface); display:flex; flex-direction:column; gap:14px; border-left:1px solid var(--border); }
     .back-link { color:var(--text-muted); text-decoration:none; font-size:13px; font-weight:500; transition:color 0.15s; display:inline-block; }
-    .back-link:hover { color:#4fc3f7; }
+    .back-link:hover { color:var(--c-metal); }
     .hero-badge-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .hero-address { font-size:24px; font-weight:800; color:var(--text); line-height:1.2; margin:0; }
     .hero-listing-title { font-size:15px; font-weight:600; color:var(--text); }
@@ -932,13 +929,13 @@
     [data-theme="light"] .hero-metric-card { background:#f8fafc; }
     .hero-metric-label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
     .hero-metric-value { font-size:20px; font-weight:800; color:var(--text); }
-    .hero-metric-value.accent { color:#4fc3f7; }
+    .hero-metric-value.accent { color:var(--c-metal); }
     .hero-action-btns { display:flex; gap:10px; margin-top:4px; }
     .hero-action-btns .btn-primary { flex:1; padding:11px 20px; font-size:15px; }
     .btn-outline-secondary { background:transparent; color:#1a2744; border:1.5px solid #1a2744; border-radius:7px; padding:11px 20px; font-size:15px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; flex:1; transition:border-color 0.15s,color 0.15s,background 0.15s; }
     [data-theme="dark"] .btn-outline-secondary { color:#f0f4ff; border-color:rgba(255,255,255,0.25); }
     .btn-outline-secondary:hover { border-color:#1a2744; color:#fff; background:#1a2744; }
-    [data-theme="dark"] .btn-outline-secondary:hover { border-color:#4fc3f7; color:#0f172a; background:#4fc3f7; }
+    [data-theme="dark"] .btn-outline-secondary:hover { border-color:var(--c-metal); color:#0f172a; background:var(--c-metal); }
 
     /* Pill Navigation */
     .pill-nav-wrap { background:var(--surface); border-bottom:1px solid var(--border); padding:0; overflow-x:auto; scrollbar-width:none; position:sticky; top:64px; z-index:50; }
@@ -950,7 +947,7 @@
     [data-theme="dark"] .pill-nav .tab-btn { background:var(--surface-2); color:var(--text-muted); }
     .pill-nav .tab-btn:hover { background:#e2e8f0; color:#1e293b; }
     [data-theme="dark"] .pill-nav .tab-btn:hover { background:#2d4070; color:var(--text); }
-    .pill-nav .tab-btn.active { background:#4fc3f7; color:#0f172a; font-weight:700; }
+    .pill-nav .tab-btn.active { background: var(--c-primary); color:#0f172a; font-weight:700; }
 
     /* Body 2-Column */
     .deal-body-v2 { display:flex; max-width:none; margin:0; padding:24px; gap:24px; }
@@ -959,11 +956,11 @@
     #dealMap { height:700px; }
     .deal-map-controls-left { position:absolute; top:10px; left:10px; z-index:10; display:flex; gap:4px; background:#1a2744; border-radius:8px; padding:4px; border:1px solid rgba(79,195,247,0.2); backdrop-filter:blur(8px); }
     .deal-map-controls-right { position:absolute; top:10px; right:10px; z-index:10; display:flex; gap:4px; background:#1a2744; border-radius:8px; padding:4px; border:1px solid rgba(79,195,247,0.2); backdrop-filter:blur(8px); }
-    .deal-map-btn { padding:5px 12px; border-radius:5px; border:1px solid rgba(79,195,247,0.25); background:rgba(26,39,68,0.9); color:#4fc3f7; font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; white-space:nowrap; }
-    .deal-map-btn:hover { background:rgba(79,195,247,0.18); border-color:#4fc3f7; }
-    .deal-map-btn.active { background:#4fc3f7; color:#1a2744; border-color:#4fc3f7; font-weight:700; }
+    .deal-map-btn { padding:5px 12px; border-radius:5px; border:1px solid rgba(79,195,247,0.25); background:rgba(26,39,68,0.9); color:var(--c-metal); font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; white-space:nowrap; }
+    .deal-map-btn:hover { background:rgba(79,195,247,0.18); border-color:var(--c-metal); }
+    .deal-map-btn.active { background: var(--c-primary); color:#1a2744; border-color:var(--c-metal); font-weight:700; }
     #dealStreetViewFrame { display:none; width:100%; height:100%; border:none; position:absolute; inset:0; z-index:5; }
-    .map-google-link { font-size:12px; color:#4fc3f7; text-decoration:none; display:inline-block; }
+    .map-google-link { font-size:12px; color:var(--c-metal); text-decoration:none; display:inline-block; }
     .map-google-link:hover { text-decoration:underline; }
     .deal-content-col { flex:1; min-width:0; }
     .deal-body-v2.map-hidden .deal-map-sticky { display:none !important; }
@@ -1001,7 +998,7 @@
     }
   .fav-card:hover { border-color: #e8476a !important; }
   @media(min-width:769px) { .deal-sticky-cta { display:none !important; } }
-  .comp-marker-active { box-shadow: 0 0 0 4px rgba(79,195,247,0.5) !important; border-color: #4fc3f7 !important; z-index: 20 !important; }
+  .comp-marker-active { box-shadow: 0 0 0 4px rgba(79,195,247,0.5) !important; border-color: var(--c-metal) !important; z-index: 20 !important; }
   /* Property Details responsive grid */
   #detailsBody > div { display:grid; grid-template-columns:repeat(3,1fr); }
   @media(max-width:1024px) and (min-width:769px) { #detailsBody > div { grid-template-columns:repeat(2,1fr); } }
@@ -1058,9 +1055,9 @@
         No photos available
       </div>
       <div class="hero-thumb-wrap" style="position:relative;">
-        <button class="thumb-nav prev" onclick="thumbScroll(-1)" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;background:rgba(10,18,40,0.65);border:none;color:#4fc3f7;width:28px;height:100%;cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;">&#8249;</button>
+        <button class="thumb-nav prev" onclick="thumbScroll(-1)" style="position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:10;background:rgba(10,18,40,0.65);border:none;color:var(--c-metal);width:28px;height:100%;cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;">&#8249;</button>
         <div id="heroThumbStrip" class="hero-thumb-strip"></div>
-        <button class="thumb-nav next" onclick="thumbScroll(1)" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;background:rgba(10,18,40,0.65);border:none;color:#4fc3f7;width:28px;height:100%;cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;">&#8250;</button>
+        <button class="thumb-nav next" onclick="thumbScroll(1)" style="position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:10;background:rgba(10,18,40,0.65);border:none;color:var(--c-metal);width:28px;height:100%;cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;">&#8250;</button>
       </div>
     </div>
     <!-- RIGHT: Property Info -->
@@ -1076,13 +1073,13 @@
         </div>
       </div>
       <div id="heroEventBadges" style="display:flex;gap:6px;flex-wrap:nowrap;margin-top:4px;align-items:center;">
-        <span id="hero_oh_badge" style="display:none;background:#fff7ed;border:1px solid #f97316;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:#f97316;white-space:nowrap;flex:1;text-align:center;"></span>
-        <span id="hero_od_badge" style="display:none;background:#fff7ed;border:1px solid #f97316;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:#f97316;white-space:nowrap;flex:1;text-align:center;"></span>
+        <span id="hero_oh_badge" style="display:none;background:#fff7ed;border:1px solid var(--c-metal);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:var(--c-metal);white-space:nowrap;flex:1;text-align:center;"></span>
+        <span id="hero_od_badge" style="display:none;background:#fff7ed;border:1px solid var(--c-metal);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:var(--c-metal);white-space:nowrap;flex:1;text-align:center;"></span>
       </div>
       <h1 id="dealAddress" class="hero-address">Loading...</h1>
       <div id="dealTitle" class="hero-listing-title"></div>
       <div id="dealDescription" class="hero-desc"></div>
-      <span id="descToggle" class="desc-toggle" onclick="toggleDesc()" style="display:none;font-size:13px;color:#4fc3f7;cursor:pointer;margin-top:4px;">Read more &#9660;</span>
+      <span id="descToggle" class="desc-toggle" onclick="toggleDesc()" style="display:none;font-size:13px;color:var(--c-metal);cursor:pointer;margin-top:4px;">Read more &#9660;</span>
       <div id="keyFeatures" class="key-features"></div>
       <!-- Compact icon specs row (desktop only) -->
       <div id="compactSpecsRow" style="display:none"></div>
@@ -1255,10 +1252,10 @@
       <!-- What-If Modals -->
       <!-- Loan Scenario Modal -->
       <div id="pfLoanModal" onclick="if(event.target===this)pfCloseLoanModal()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,18,40,0.72);align-items:center;justify-content:center;">
-        <div style="background:var(--surface);border:2px solid #4fc3f7;border-radius:16px;padding:0;width:100%;max-width:420px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
+        <div style="background:var(--surface);border:2px solid var(--c-metal);border-radius:16px;padding:0;width:100%;max-width:420px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
           <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.2);">
             <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:8px;height:8px;border-radius:50%;background:#4fc3f7;"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--c-metal);"></div>
               <span style="font-size:15px;font-weight:700;color:#f0f4ff;">Loan Scenario</span>
             </div>
             <button onclick="pfCloseLoanModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#8a9bbf;line-height:1;padding:0 2px;">&times;</button>
@@ -1266,21 +1263,21 @@
           <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
-                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Down Payment %</label>
+                <label style="font-size:11px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Down Payment %</label>
                 <input type="number" id="wfDownPct" class="pro-forma-input" value="20" min="0" max="100" step="1" style="width:100%;" oninput="pfLoanModalCalc()">
               </div>
               <div>
-                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Closing Costs %</label>
+                <label style="font-size:11px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Closing Costs %</label>
                 <input type="number" id="wfClosingCostPct" class="pro-forma-input" value="0.5" min="0" step="0.05" style="width:100%;" oninput="pfLoanModalCalc()">
               </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
-                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Mortgage Rate %</label>
+                <label style="font-size:11px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Mortgage Rate %</label>
                 <input type="number" id="wfRate" class="pro-forma-input" value="6.5" min="0" step="0.125" style="width:100%;" oninput="pfLoanModalCalc()">
               </div>
               <div>
-                <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Loan Type</label>
+                <label style="font-size:11px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Loan Type</label>
                 <select id="wfLoanType" class="pro-forma-input" style="width:100%;">
                   <option value="30yr_fixed" selected>30yr Fixed</option>
                   <option value="15yr_fixed">15yr Fixed</option>
@@ -1293,48 +1290,48 @@
             <div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.18);border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
               <div style="text-align:center;">
                 <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Down Payment</div>
-                <div style="font-size:16px;font-weight:800;color:#4fc3f7;" id="wfDownAmt">&mdash;</div>
+                <div style="font-size:16px;font-weight:800;color:var(--c-metal);" id="wfDownAmt">&mdash;</div>
               </div>
               <div style="text-align:center;">
                 <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Loan Amount</div>
-                <div style="font-size:16px;font-weight:800;color:#4fc3f7;" id="wfLoanAmt">&mdash;</div>
+                <div style="font-size:16px;font-weight:800;color:var(--c-metal);" id="wfLoanAmt">&mdash;</div>
               </div>
             </div>
           </div>
           <div style="padding:0 24px 20px;display:flex;gap:8px;">
             <button onclick="pfCloseLoanModal()" class="btn-secondary" style="flex:1;">Cancel</button>
-            <button onclick="pfApplyLoanModal()" style="flex:1;background:#4fc3f7;color:#0f172a;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;">Apply to Calculator</button>
+            <button onclick="pfApplyLoanModal()" style="flex:1;background:var(--c-metal);color:#0f172a;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;">Apply to Calculator</button>
           </div>
         </div>
       </div>
 
       <!-- Rent Scenario Modal -->
       <div id="pfRentModal" onclick="if(event.target===this)pfCloseRentModal()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,18,40,0.72);align-items:center;justify-content:center;">
-        <div style="background:var(--surface);border:2px solid #4fc3f7;border-radius:16px;padding:0;width:100%;max-width:400px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
+        <div style="background:var(--surface);border:2px solid var(--c-metal);border-radius:16px;padding:0;width:100%;max-width:400px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
           <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.2);">
             <div style="display:flex;align-items:center;gap:10px;">
-              <div style="width:8px;height:8px;border-radius:50%;background:#4fc3f7;"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--c-metal);"></div>
               <span style="font-size:15px;font-weight:700;color:#f0f4ff;">Rent Scenario</span>
             </div>
             <button onclick="pfCloseRentModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#8a9bbf;line-height:1;padding:0 2px;">&times;</button>
           </div>
           <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
             <div>
-              <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Rent Low ($/mo)</label>
+              <label style="font-size:11px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Rent Low ($/mo)</label>
               <input type="text" inputmode="numeric" id="wfRentLow" class="pro-forma-input" placeholder="$1,500" style="width:100%;" oninput="pfFormatCurrencyInput(this);pfRentModalCalc();">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Rent High ($/mo)</label>
+              <label style="font-size:11px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Rent High ($/mo)</label>
               <input type="text" inputmode="numeric" id="wfRentHigh" class="pro-forma-input" placeholder="$2,000" style="width:100%;" oninput="pfFormatCurrencyInput(this);pfRentModalCalc();">
             </div>
             <div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.18);border-radius:10px;padding:12px 16px;text-align:center;">
               <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Avg Monthly Rent (used in calculator)</div>
-              <div style="font-size:22px;font-weight:800;color:#4fc3f7;" id="wfRentAvg">&mdash;</div>
+              <div style="font-size:22px;font-weight:800;color:var(--c-metal);" id="wfRentAvg">&mdash;</div>
             </div>
           </div>
           <div style="padding:0 24px 20px;display:flex;gap:8px;">
             <button onclick="pfCloseRentModal()" class="btn-secondary" style="flex:1;">Cancel</button>
-            <button onclick="pfApplyRentModal()" style="flex:1;background:#4fc3f7;color:#0f172a;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;">Apply to Calculator</button>
+            <button onclick="pfApplyRentModal()" style="flex:1;background:var(--c-metal);color:#0f172a;border:none;border-radius:8px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer;">Apply to Calculator</button>
           </div>
         </div>
       </div>
@@ -2161,7 +2158,7 @@
           <div class="pfs-bd-row pfs-bd-deduct"><span class="pfs-bd-label">- Debt Service (P&amp;I)</span><span class="pfs-bd-value" id="pfsBrrrrbd_debtService">&mdash;</span></div>
           <div class="pfs-bd-row pfs-bd-sum"><span class="pfs-bd-label">= Monthly CF Post-Refi</span><span class="pfs-bd-value" id="pfsBrrrrbd_monthlyCF">&mdash;</span></div>
           <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;">
-            <strong><span id="pfsBrrrrbd_coc_label">Post-Refi CoC</span>: <span id="pfsBrrrrbd_coc" style="color:#4fc3f7;">&mdash;</span></strong>
+            <strong><span id="pfsBrrrrbd_coc_label">Post-Refi CoC</span>: <span id="pfsBrrrrbd_coc" style="color:var(--c-metal);">&mdash;</span></strong>
           </div>
         </div>
 
@@ -6535,13 +6532,13 @@
     })();
   </script>
 <!-- Signup banner for unauthenticated visitors -->
-<div id="signupBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9995;background:linear-gradient(135deg,#1a2744,#0f172a);border-top:2px solid #4fc3f7;padding:14px 24px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,0.4);">
+<div id="signupBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9995;background:linear-gradient(135deg,#1a2744,#0f172a);border-top:2px solid var(--c-metal);padding:14px 24px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,0.4);">
   <div>
     <div style="font-size:15px;font-weight:700;color:#f0f4ff;margin-bottom:2px;">Create a free account to save this deal, make offers, and run your own numbers.</div>
     <div style="font-size:13px;color:#8a9bbf;">Join 200+ investors already on the platform.</div>
   </div>
   <div style="display:flex;gap:10px;flex-shrink:0;">
-    <a href='/signup' style='background:#4fc3f7;color:#0f172a;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap;'>Get Free Access &rarr;</a>
+    <a href='/signup' style='background:var(--c-metal);color:#0f172a;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:800;text-decoration:none;white-space:nowrap;'>Get Free Access &rarr;</a>
     <a href='/login' style='background:rgba(255,255,255,0.08);color:#f0f4ff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;border:1px solid rgba(255,255,255,0.15);'>Sign In</a>
     <button onclick="document.getElementById('signupBanner').style.display='none'" style="background:none;border:none;color:#8a9bbf;font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>
   </div>
@@ -6565,7 +6562,7 @@
       <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px;">Financing Type</label><select id="oFinancing" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:14px;box-sizing:border-box;"><option value="">Select...</option><option>All Cash</option><option>Conventional Loan</option><option>Hard Money</option><option>Private Money</option><option>DSCR Loan</option><option>Other</option></select></div>
       <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px;">Desired Closing Date</label><input id="oClosingDate" type="date" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:14px;box-sizing:border-box;"></div>
       <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px;">Additional Terms / Notes (optional)</label><textarea id="oNotes" rows="3" placeholder="Any conditions, contingencies, or questions..." style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:14px;box-sizing:border-box;resize:vertical;"></textarea></div>
-      <button onclick="submitOfferModal()" style="width:100%;padding:14px;background:#4fc3f7;color:#0f172a;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;">Submit Offer &rarr;</button>
+      <button onclick="submitOfferModal()" style="width:100%;padding:14px;background:var(--c-metal);color:#0f172a;border:none;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;">Submit Offer &rarr;</button>
     </div>
   </div>
 </div>
@@ -6598,7 +6595,7 @@
     <p id="dupOfferMsg" style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:24px;"></p>
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px;">Would you like to revise your offer? Our team will treat the revised offer as your updated position.</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button onclick="openDealReviseModal()" style="width:100%;padding:13px;background:#4fc3f7;color:#1a2744;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">Revise My Offer</button>
+      <button onclick="openDealReviseModal()" style="width:100%;padding:13px;background:var(--c-metal);color:#1a2744;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">Revise My Offer</button>
       <button onclick="document.getElementById('dupOfferModal').style.display='none'" style="width:100%;padding:13px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">Keep Existing Offer</button>
     </div>
   </div>
@@ -6628,7 +6625,7 @@
         </div>
       </div>
       <div>
-        <div style="font-size:12px;font-weight:700;color:#4fc3f7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Your Revision</div>
+        <div style="font-size:12px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Your Revision</div>
         <div style="display:flex;flex-direction:column;gap:14px;">
           <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px;">New Offer Amount</label><input id="dealRevAmount" type="text" placeholder="$" oninput="var v=this.value.replace(/[^\d]/g,'');this.value=v?'$'+parseInt(v).toLocaleString():'';" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:14px;box-sizing:border-box;"></div>
           <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px;">Financing Type</label><select id="dealRevFinancing" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font-size:14px;box-sizing:border-box;"><option value="">Select...</option><option>All Cash</option><option>Conventional Loan</option><option>Hard Money</option><option>Private Money</option><option>DSCR Loan</option><option>Other</option></select></div>
@@ -6640,7 +6637,7 @@
     </div>
     <div style="padding:16px 28px 24px;display:flex;gap:12px;">
       <button onclick="document.getElementById('dealReviseModal').style.display='none'" style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
-      <button id="dealRevSubmitBtn" onclick="submitDealRevision()" style="flex:2;padding:12px;background:#4fc3f7;color:#1a2744;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Submit Revision</button>
+      <button id="dealRevSubmitBtn" onclick="submitDealRevision()" style="flex:2;padding:12px;background:var(--c-metal);color:#1a2744;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Submit Revision</button>
     </div>
   </div>
 </div>
@@ -6657,7 +6654,7 @@
     <p style="font-size:15px;color:var(--text-muted);line-height:1.65;margin:0 0 8px;">Your offer has been received by the Direct Off Market team.</p>
     <p style="font-size:13px;color:var(--text-muted);margin:0;">We&#39;ll be in touch within 24 hours.</p>
     <div style="margin-top:28px;height:3px;border-radius:2px;background:var(--border);overflow:hidden;">
-      <div style="height:100%;background:linear-gradient(90deg,#4fc3f7,#22c55e);animation:offerSuccessBar 3s linear forwards;border-radius:2px;"></div>
+      <div style="height:100%;background:linear-gradient(90deg,var(--c-metal),#22c55e);animation:offerSuccessBar 3s linear forwards;border-radius:2px;"></div>
     </div>
   </div>
 </div>
@@ -6669,14 +6666,14 @@
 <!-- Revision Success Modal -->
 <div id="revisionSuccessModal" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(15,23,42,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;">
   <div style="background:var(--surface);border-radius:20px;max-width:420px;width:100%;text-align:center;padding:44px 36px;border:1px solid var(--border);box-shadow:0 24px 80px rgba(0,0,0,0.4);">
-    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#4fc3f7,#2563eb);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--c-metal),#2563eb);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
     </div>
     <div style="font-size:26px;font-weight:900;color:var(--text);margin-bottom:10px;letter-spacing:-0.02em;">Offer Revised!</div>
     <p style="font-size:15px;color:var(--text-muted);line-height:1.65;margin:0 0 8px;">Your revised offer has been submitted to the Direct Off Market team.</p>
     <p style="font-size:13px;color:var(--text-muted);margin:0;">We&#39;ll be in touch within 24 hours.</p>
     <div style="margin-top:28px;height:3px;border-radius:2px;background:var(--border);overflow:hidden;">
-      <div style="height:100%;background:linear-gradient(90deg,#4fc3f7,#2563eb);animation:offerSuccessBar 3s linear forwards;border-radius:2px;"></div>
+      <div style="height:100%;background:linear-gradient(90deg,var(--c-metal),#2563eb);animation:offerSuccessBar 3s linear forwards;border-radius:2px;"></div>
     </div>
   </div>
 </div>

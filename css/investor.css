@@ -4,36 +4,29 @@
    ============================================================ */
 
 /* ── CSS Variables ── */
-/* Brand palette: DOM logo navy #2d3560, sky blue #4fc3f7, white #ffffff */
-:root {
-  --bg: #181c2e;
-  --surface: #1e2340;
-  --surface-2: #252c50;
-  --border: rgba(255,255,255,0.09);
-  --text: #f0f4ff;
-  --text-muted: #8a9bbf;
-  --accent: #4fc3f7;       /* sky blue -- DOM logo accent */
-  --accent-hover: #7dd4f8;
-  --navy: #2d3560;         /* DOM logo navy */
-  --navy-dark: #1a1e38;
-  --green: #22c55e;
-  --red: #ef4444;
-  --amber: #f59e0b;
-  /* legacy gold alias removed -- use --accent */
-  --gold: #4fc3f7;
+/* Brand palette: DOM logo navy #2d3560, white #ffffff (sky blue superseded by glass token --c-metal) */
+:root,[data-theme="dark"]{
+  --bg:transparent; /* let .scene show through */
+  --surface:rgba(16,32,54,.58); /* work-glass fill */
+  --surface-2:rgba(255,255,255,.06); /* tile inset */
+  --border:rgba(255,255,255,.10);
+  --text:#EAF2F8;
+  --text-muted:#A9BFD2;
+  --navy:#2d3560;
+  --navy-dark:#1a1e38;
+  --green:#22c55e; /* preserved: traffic-light only */
+  --red:#ef4444; /* preserved: traffic-light only */
 }
 
-[data-theme="light"] {
-  --bg: #f0f4fa;
-  --surface: #ffffff;
-  --surface-2: #e8edf8;
-  --border: rgba(45,53,96,0.1);
-  --text: #1a1e38;
-  --text-muted: #4a5a80;
-  --accent: #4fc3f7;
-  --accent-hover: #7dd4f8;
-  --navy: #2d3560;
-  --navy-dark: #1a1e38;
+[data-theme="light"]{
+  --bg:transparent;
+  --surface:rgba(255,255,255,.62);
+  --surface-2:rgba(255,255,255,.42);
+  --border:rgba(16,60,70,.14);
+  --text:#103A45;
+  --text-muted:#4C6B73;
+  --navy:#2d3560;
+  --navy-dark:#1a1e38;
 }
 
 /* ── Base ── */
@@ -240,7 +233,7 @@ body {
 
 .badge-pending {
   background: rgba(245,158,11,0.15);
-  color: var(--amber);
+  color: var(--c-metal);
   border: 1px solid rgba(245,158,11,0.3);
 }
 
@@ -1083,7 +1076,7 @@ body {
 }
 
 .legend-dot.orange {
-  background: #f97316;
+  background: var(--c-metal);
 }
 
 .legend-dot.red {
@@ -1925,7 +1918,7 @@ body {
 
 .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
 .step-card { background: var(--surface-2); border-radius: 14px; padding: 32px 28px; position: relative; border: 1px solid var(--border); }
-.step-num { position: absolute; top: 24px; right: 24px; font-size: 48px; font-weight: 900; color: #4fc3f7; opacity: 0.7; line-height: 1; }
+.step-num { position: absolute; top: 24px; right: 24px; font-size: 48px; font-weight: 900; color: var(--c-metal); opacity: 0.7; line-height: 1; }
 .step-icon { font-size: 36px; margin-bottom: 16px; }
 .step-card h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
 .step-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
@@ -2199,7 +2192,7 @@ body {
 .pin-menu-dot {
   width: 48px; height: 48px;
   border-radius: 50%;
-  background: #4fc3f7;
+  background: var(--c-metal);
   margin: 0 auto 20px;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 0 0 8px rgba(79,195,247,0.12);
@@ -2217,7 +2210,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   transition: background .15s;
 }
-.pin-menu-close:hover { background: rgba(79,195,247,0.1); color: #4fc3f7; }
+.pin-menu-close:hover { background: rgba(79,195,247,0.1); color: var(--c-metal); }
 
 /* Nav links grid */
 .pin-menu-grid {
@@ -2251,7 +2244,7 @@ body {
 }
 .pin-menu-link:nth-child(even) { border-right: none; }
 /* edge-to-edge tiles -- no per-child radii needed */
-.pin-menu-link.active { background: rgba(79,195,247,0.12); color: #4fc3f7; }
+.pin-menu-link.active { background: rgba(79,195,247,0.12); color: var(--c-primary); }
 .pin-menu-signout { color: #ef4444 !important; }
 .pin-menu-signout:hover { background: rgba(239,68,68,0.1) !important; }
 .pin-menu-link-label { font-size: 12px; font-weight: 700; text-align: center; letter-spacing: .02em; }
@@ -2273,7 +2266,7 @@ body {
 }
 .pin-menu-theme-label { font-size: 13px; font-weight: 600; color: #8a9bbf; }
 .pin-menu-theme-switch {
-  width: 40px; height: 22px; background: #4fc3f7; border-radius: 11px;
+  width: 40px; height: 22px; background: var(--c-primary); border-radius: 11px;
   position: relative; flex-shrink: 0;
 }
 .pin-menu-theme-knob {

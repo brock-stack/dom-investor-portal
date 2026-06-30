@@ -56,7 +56,7 @@
     }
 
     /* 5. Starting Price color in light mode */
-    [data-theme="light"] .mini-card { --accent: #0284c7; }
+    
     [data-theme="light"] .mini-card .mini-price { color: #0284c7; }
 
     /* 6. DOM Difference cards — tighten gap on mobile */
@@ -111,7 +111,7 @@
   <section class="hero" style="background: url('/img/hero-bg.jpg') center center / cover no-repeat;">
     <div class="hero-content">
 
-      <h1 style="margin-bottom:32px;"><span style="white-space:nowrap">Off-Market Investment Deals.</span><br><span style="color:#4fc3f7">Real estate investing made simple.</span></h1>
+      <h1 style="margin-bottom:32px;"><span style="white-space:nowrap">Off-Market Investment Deals.</span><br><span style="color:var(--c-metal)">Real estate investing made simple.</span></h1>
       <div class="hero-buttons">
         <a class='btn-white' href='/marketplace' style='font-size:16px;font-weight:700;padding:14px 28px;display:inline-flex;align-items:center;'>Browse Inventory</a>
         <a class='btn-primary' href='/signup' style='font-size:16px;font-weight:700;padding:14px 28px;display:inline-flex;align-items:center;'>Get Investor Access &rarr;</a>
@@ -179,7 +179,7 @@
 
         <div class="step-card" style="cursor:pointer;position:relative;z-index:1;" onclick="location.href='/signup.html'">
           <div class="step-num">01</div>
-          <div class="step-icon" style="color:#4fc3f7;">
+          <div class="step-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <h3>Create Your Account</h3>
@@ -188,7 +188,7 @@
 
         <div class="step-card" style="cursor:pointer;position:relative;z-index:1;" onclick="location.href='/marketplace.html'">
           <div class="step-num">02</div>
-          <div class="step-icon" style="color:#4fc3f7;">
+          <div class="step-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </div>
           <h3>Browse &amp; Analyze Deals</h3>
@@ -197,7 +197,7 @@
 
         <div class="step-card" style="cursor:pointer;position:relative;z-index:1;" onclick="location.href='/signup.html'">
           <div class="step-num">03</div>
-          <div class="step-icon" style="color:#4fc3f7;">
+          <div class="step-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </div>
           <h3>Submit Your Offer</h3>
@@ -218,48 +218,48 @@
       <p class="section-sub">Our team underwrites every property on this platform. As investors, we can affirm these deals make money.</p>
       <div class="benefit-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
           <h3>Curated Inventory</h3>
           <p>We turn down more deals than we publish. Only properties that meet our underwriting criteria make it to the portal.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           </div>
           <h3>Interactive Pro Forma</h3>
           <p>Every listing includes an investor-grade pro forma calculator. Plug in your own numbers and see your returns in real time.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
           </div>
           <h3>Flood Zone &amp; Comp Maps</h3>
           <p>FEMA flood zone data and sold comps overlaid directly on the property map. Know your risk and your ARV before you commit.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
           <h3>Instant Access</h3>
           <p>No waitlists. No approval queues. Sign up, sign the agreement, and you're browsing live deals within minutes.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <h3>Preferred Partners</h3>
           <p>Get connected with our vetted partners who we trust and rely on.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           </div>
           <h3>Open House Alerts</h3>
@@ -277,9 +277,9 @@
     <h2 class="section-heading">Recently Closed Deals</h2>
 
     <div class="closings-grid" id="recentClosings">
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Cape Coral, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$285,000</div></div></div>
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">North Port, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$219,000</div></div></div>
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Kissimmee, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$310,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="var(--c-metal)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-metal)"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Cape Coral, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$285,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="var(--c-metal)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-metal)"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">North Port, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$219,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="var(--c-metal)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-metal)"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Kissimmee, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$310,000</div></div></div>
     </div>
   </div>
 </section>
@@ -307,7 +307,7 @@
       <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:#0f172a;margin-bottom:12px;">Ready to browse the inventory?</h2>
       <p style="color:#64748b;font-size:16px;margin-bottom:28px;">Get access to Florida's best off-market investment deals.</p>
       <div id="ctaButtons" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <a href='/signup' onmouseout='this.style.background=\'#4fc3f7\'' onmouseover='this.style.background=\'#38b2e8\'' style='background:#4fc3f7;color:#0f172a;padding:14px 36px;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;display:inline-block;transition:background .2s;'>Get Investor Access &rarr;</a>
+        <a href='/signup' onmouseout='this.style.background=\'#4fc3f7\'' onmouseover='this.style.background=\'#38b2e8\'' style='background:var(--c-metal);color:#0f172a;padding:14px 36px;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;display:inline-block;transition:background .2s;'>Get Investor Access &rarr;</a>
         <a class='cta-btn-outline' href='/marketplace'>Browse Deals</a>
       </div>
     </div>

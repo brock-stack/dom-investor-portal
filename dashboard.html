@@ -151,8 +151,8 @@
     }
 
     .tab-btn.active {
-      color: var(--gold);
-      border-bottom-color: var(--gold);
+      color: var(--c-metal);
+      border-bottom-color: var(--c-metal);
     }
 
     /* ── Tab Content ── */
@@ -192,9 +192,9 @@
     /* v2.2.14: Water Source + Sewer pill visual toggle on :checked radio */
     label:has(input[name="water_source"]:checked),
     label:has(input[name="sewer_type"]:checked) {
-      background: #4fc3f7 !important;
+      background: var(--c-metal) !important;
       color: #0f172a !important;
-      border-color: #4fc3f7 !important;
+      border-color: var(--c-metal) !important;
       font-weight: 700 !important;
     }
     /* ── Buy Box Form ── */
@@ -260,7 +260,7 @@
     }
 
     .form-input:focus {
-      border-color: var(--gold);
+      border-color: var(--c-metal);
     }
 
     textarea.form-input {
@@ -325,7 +325,7 @@
     }
 
     .radio-option input[type="radio"] {
-      accent-color: var(--gold);
+      accent-color: var(--c-metal);
     }
 
     .radio-option:has(input:checked) {
@@ -359,7 +359,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: var(--gold);
+      background: var(--c-metal);
       color: #0f1a2e;
       border: none;
       border-radius: 8px;
@@ -453,7 +453,7 @@
     }
 
     .offers-table a {
-      color: var(--gold);
+      color: var(--c-metal);
       text-decoration: none;
       font-weight: 600;
     }
@@ -464,7 +464,7 @@
 
     .badge-offer-review {
       background: rgba(245,158,11,0.15);
-      color: var(--amber);
+      color: var(--c-metal);
       border: 1px solid rgba(245,158,11,0.3);
       padding: 3px 10px;
       border-radius: 20px;
@@ -491,7 +491,7 @@
     }
 
     .empty-state-inline a {
-      color: var(--gold);
+      color: var(--c-metal);
       text-decoration: none;
       font-weight: 600;
     }
@@ -667,7 +667,7 @@
     }
     .badge-pending {
       background: rgba(79,195,247,0.12);
-      color: #4fc3f7;
+      color: var(--c-metal);
       border: 1px solid rgba(79,195,247,0.3);
       padding: 3px 10px;
       border-radius: 20px;
@@ -787,17 +787,17 @@
       <div onclick="switchTab('favorites')" style="background:var(--surface-2);border-radius:12px;padding:16px 20px;text-align:center;cursor:pointer;min-width:110px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 0 0 2px #4fc3f7'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.15)'">
         <div style="font-size:32px;font-weight:900;color:var(--text);" id="kpiSavedDeals">—</div>
         <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;">Favorites</div>
-        <div style="font-size:11px;color:#4fc3f7;margin-top:3px;font-weight:600;">View All →</div>
+        <div style="font-size:11px;color:var(--c-metal);margin-top:3px;font-weight:600;">View All →</div>
       </div>
       <div onclick="switchTab('offers')" style="background:var(--surface-2);border-radius:12px;padding:16px 20px;text-align:center;cursor:pointer;min-width:110px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 0 0 2px #4fc3f7'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.15)'">
         <div style="font-size:32px;font-weight:900;color:var(--text);" id="kpiActiveOffers">—</div>
         <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;">Active Offers</div>
-        <div style="font-size:11px;color:#4fc3f7;margin-top:3px;font-weight:600;">View All →</div>
+        <div style="font-size:11px;color:var(--c-metal);margin-top:3px;font-weight:600;">View All →</div>
       </div>
       <div onclick="switchTab('proformas')" style="background:var(--surface-2);border-radius:12px;padding:16px 20px;text-align:center;cursor:pointer;min-width:110px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 1px 4px rgba(0,0,0,0.15);transition:box-shadow .15s;" onmouseover="this.style.boxShadow='0 0 0 2px #4fc3f7'" onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.15)'">
         <div style="font-size:32px;font-weight:900;color:var(--text);" id="kpiProFormas">—</div>
         <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;">Pro Formas</div>
-        <div style="font-size:11px;color:#4fc3f7;margin-top:3px;font-weight:600;">View All →</div>
+        <div style="font-size:11px;color:var(--c-metal);margin-top:3px;font-weight:600;">View All →</div>
       </div>
     </div>
   </div>
@@ -823,7 +823,7 @@
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;"><span style="color:#e8476a;">&#10084;</span> Favorites</div>
-        <a href="#" onclick="switchTab('favorites');return false;" style="font-size:12px;color:#4fc3f7;font-weight:600;text-decoration:none;">View All &#8594;</a>
+        <a href="#" onclick="switchTab('favorites');return false;" style="font-size:12px;color:var(--c-metal);font-weight:600;text-decoration:none;">View All &#8594;</a>
       </div>
       <div id="homeSavedDeals" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;"><div style="font-size:13px;color:var(--text-muted);padding:16px 0;">Loading...</div></div>
     </div>
@@ -842,7 +842,7 @@
         <div style="font-size:28px;">&#128200;</div>
         <div style="font-size:13px;font-weight:700;color:var(--text);">Custom Pro Forma</div>
         <div style="font-size:12px;color:var(--text-muted);line-height:1.4;">Build your own investment numbers</div>
-        <div style="font-size:12px;color:#4fc3f7;font-weight:600;margin-top:auto;">Create Pro Forma &#8594;</div>
+        <div style="font-size:12px;color:var(--c-metal);font-weight:600;margin-top:auto;">Create Pro Forma &#8594;</div>
       </a>
       <!-- Document Vault: coming soon -->
       <div style="background:var(--surface-2);border-radius:12px;border:1px solid var(--border);padding:12px 14px;opacity:0.55;display:flex;flex-direction:column;gap:8px;">
@@ -912,7 +912,7 @@
         <div style="font-size:12px;color:var(--text-muted);margin-top:4px;" id="ipc_markets"></div>
         <div style="font-size:11px;color:var(--text-muted);margin-top:2px;" id="ipc_since"></div>
       </div>
-      <a href="#" id="editProfileBtn" style="font-size:13px;font-weight:600;color:#4fc3f7;text-decoration:none;white-space:nowrap;flex-shrink:0;">Edit Profile ✏️</a>
+      <a href="#" id="editProfileBtn" style="font-size:13px;font-weight:600;color:var(--c-metal);text-decoration:none;white-space:nowrap;flex-shrink:0;">Edit Profile ✏️</a>
     </div>
 
     <h2 class="section-heading">Your Buy Box</h2>
@@ -999,13 +999,13 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div style="background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:14px;">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text);">
-              <input type="checkbox" id="excludeFloodZone" style="width:16px;height:16px;accent-color:#4fc3f7;">
+              <input type="checkbox" id="excludeFloodZone" style="width:16px;height:16px;accent-color:var(--c-metal);">
               <div><div style="font-weight:700;">No Flood Zone</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Exclude flood zone properties</div></div>
             </label>
           </div>
           <div style="background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:14px;">
             <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text);">
-              <input type="checkbox" id="excludeHoa" style="width:16px;height:16px;accent-color:#4fc3f7;">
+              <input type="checkbox" id="excludeHoa" style="width:16px;height:16px;accent-color:var(--c-metal);">
               <div><div style="font-weight:700;">No HOA</div><div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Exclude properties with HOA</div></div>
             </label>
           </div>
@@ -1071,7 +1071,7 @@
 
       <!-- Photo circle -->
       <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">
-        <div id="st_avatarCircle" style="width:80px;height:80px;border-radius:50%;background:#1a2744;border:2px dashed rgba(255,255,255,0.2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#4fc3f7;cursor:pointer;">?</div>
+        <div id="st_avatarCircle" style="width:80px;height:80px;border-radius:50%;background:#1a2744;border:2px dashed rgba(255,255,255,0.2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--c-metal);cursor:pointer;">?</div>
         <div>
           <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Profile Photo</div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">JPG, PNG or WebP · max 5MB</div>
@@ -3189,7 +3189,7 @@
     <!-- Footer -->
     <div style="padding:16px 28px 24px;display:flex;gap:12px;">
       <button onclick="closeReviseModal()" style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-muted);border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
-      <button id="revSubmitBtn" onclick="submitReviseOffer()" style="flex:2;padding:12px;background:#4fc3f7;color:#1a2744;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Submit Revision</button>
+      <button id="revSubmitBtn" onclick="submitReviseOffer()" style="flex:2;padding:12px;background:var(--c-metal);color:#1a2744;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Submit Revision</button>
     </div>
   </div>
 </div>
@@ -3198,14 +3198,14 @@
 <!-- Revision Success Modal -->
 <div id="revisionSuccessModal" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(15,23,42,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;">
   <div style="background:var(--surface);border-radius:20px;max-width:420px;width:100%;text-align:center;padding:44px 36px;border:1px solid var(--border);box-shadow:0 24px 80px rgba(0,0,0,0.4);">
-    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#4fc3f7,#2563eb);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--c-metal),#2563eb);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;">
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
     </div>
     <div style="font-size:26px;font-weight:900;color:var(--text);margin-bottom:10px;letter-spacing:-0.02em;">Offer Revised!</div>
     <p style="font-size:15px;color:var(--text-muted);line-height:1.65;margin:0 0 8px;">Your revised offer has been submitted to the Direct Off Market team.</p>
     <p style="font-size:13px;color:var(--text-muted);margin:0;">We&#39;ll be in touch within 24 hours.</p>
     <div style="margin-top:28px;height:3px;border-radius:2px;background:var(--border);overflow:hidden;">
-      <div style="height:100%;background:linear-gradient(90deg,#4fc3f7,#2563eb);animation:offerSuccessBar 3s linear forwards;border-radius:2px;"></div>
+      <div style="height:100%;background:linear-gradient(90deg,var(--c-metal),#2563eb);animation:offerSuccessBar 3s linear forwards;border-radius:2px;"></div>
     </div>
   </div>
 </div>

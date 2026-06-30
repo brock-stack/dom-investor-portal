@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gulf Liquid Glass — scene sign-off (production values)</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
+<style>
+/* ===== EXACT production values lifted from css/glass.css ===== */
+:root,[data-theme="dark"]{ --canvas:#030C17; --text:#EAF2F8; --text-muted:#A9BFD2;
+  --glassw:linear-gradient(157deg,rgba(16,32,54,.58),rgba(11,24,44,.48)); --glassw-bd:rgba(255,255,255,.10);
+  --glass-spec:rgba(255,255,255,.45); }
+[data-theme="light"]{ --canvas:#E9F5F1; --text:#103A45; --text-muted:#4C6B73;
+  --glassw:linear-gradient(157deg,rgba(255,255,255,.70),rgba(255,255,255,.60)); --glassw-bd:rgba(255,255,255,.7); }
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{ background:transparent; }                 /* BG fix — lets body canvas propagate below the scenes */
+body{ background:var(--canvas); font-family:'Barlow',system-ui,sans-serif; color:var(--text);
+  min-height:100vh; overflow:hidden; transition:color .5s cubic-bezier(.32,.72,0,1); }
+
+/* scenes — identical to glass.css */
+.scene{ position:fixed; inset:0; z-index:-3; transition:opacity .5s cubic-bezier(.32,.72,0,1); }
+[data-theme="light"] .s-dark{ opacity:0 } [data-theme="dark"] .s-light{ opacity:0 }
+.s-dark{ background:
+  radial-gradient(40% 13% at 24% 0%, rgba(208,234,252,.14), transparent 60%),
+  radial-gradient(46% 15% at 62% -2%, rgba(208,234,252,.11), transparent 58%),
+  radial-gradient(55% 34% at 50% -8%, rgba(150,205,235,.34) 0%, rgba(70,140,182,.12) 30%, transparent 60%),
+  linear-gradient(180deg, #0C3046 0%, #082439 16%, #061A2C 36%, #04111E 56%, #020A13 78%, #01060B 100%); }
+.s-light{ background:
+  radial-gradient(60% 40% at 50% -4%, rgba(255,255,255,.42) 0%, transparent 50%),
+  linear-gradient(180deg, #2E6E88 0%, #4D97AD 24%, #79BCC8 48%, #B4DEDF 74%, #E9F5F1 100%); }
+.depth{ position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:radial-gradient(120% 82% at 50% 18%, transparent 38%, rgba(1,5,12,.6) 100%); }
+[data-theme="light"] .depth{ background:radial-gradient(120% 82% at 50% 22%, transparent 52%, rgba(20,70,90,.12) 100%); }
+
+/* minimal centerpiece so you can judge glass + text legibility ON the scene */
+.center{ position:fixed; inset:0; display:grid; place-items:center; z-index:1; }
+.stack{ text-align:center; }
+.eyebrow{ font-size:11px; font-weight:800; letter-spacing:.26em; text-transform:uppercase; color:var(--text-muted); }
+.scene-name{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:clamp(38px,8vw,76px); line-height:1; margin-top:10px; }
+.sub{ font-size:14px; color:var(--text-muted); margin-top:10px; }
+.chip{ margin:26px auto 0; max-width:340px; padding:16px 18px; border-radius:16px; position:relative; overflow:hidden;
+  background:var(--glassw); -webkit-backdrop-filter:blur(20px) saturate(160%); backdrop-filter:blur(20px) saturate(160%);
+  border:1px solid var(--glassw-bd); box-shadow:0 20px 50px rgba(2,8,18,.4), inset 0 1px 1px var(--glass-spec); }
+.chip b{ font-weight:700 } .chip .m{ color:var(--text-muted); font-size:12.5px; margin-top:3px }
+
+/* toggle */
+.tog{ position:fixed; bottom:26px; left:50%; transform:translateX(-50%); z-index:5;
+  display:inline-flex; align-items:center; gap:9px; padding:11px 18px; border-radius:999px; cursor:pointer;
+  font-weight:700; font-size:13.5px; color:var(--text);
+  background:var(--glassw); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+  border:1px solid var(--glassw-bd); box-shadow:0 12px 30px rgba(2,8,18,.35); }
+.tog svg{ width:17px; height:17px }
+.note{ position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:5; font-size:11px; color:var(--text-muted);
+  letter-spacing:.04em; text-align:center; width:90%; }
+</style>
+</head>
+<body>
+<div class="scene s-dark"></div>
+<div class="scene s-light"></div>
+<div class="depth"></div>
+
+<div class="note">Exact production gradients from <b>css/glass.css</b> — what you approve here is what ships.</div>
+
+<div class="center"><div class="stack">
+  <div class="eyebrow" id="eyebrow">Night · primary</div>
+  <div class="scene-name" id="name">Deep sea</div>
+  <div class="sub" id="sub">Near-black water · a shaft of light at the surface</div>
+  <div class="chip">
+    <b id="chiptitle">White ink reads clean on the deep water.</b>
+    <div class="m">Glass card floating on the scene — the work-tier surface, both themes.</div>
+  </div>
+</div></div>
+
+<button class="tog" id="tog" aria-label="Toggle theme">
+  <svg id="togic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/></svg>
+  <span id="toglabel">Switch to bright shallows</span>
+</button>
+
+<script>
+var t=document.documentElement, b=document.getElementById('tog'), ic=document.getElementById('togic');
+var sun='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>';
+var moon='<path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/>';
+b.onclick=function(){
+  var dark=t.getAttribute('data-theme')==='dark';
+  t.setAttribute('data-theme', dark?'light':'dark');
+  ic.innerHTML = dark?sun:moon;
+  document.getElementById('toglabel').textContent = dark?'Switch to deep sea':'Switch to bright shallows';
+  document.getElementById('eyebrow').textContent = dark?'Day · shallows':'Night · primary';
+  document.getElementById('name').textContent = dark?'Bright shallows':'Deep sea';
+  document.getElementById('sub').textContent = dark?'Calm sand-and-water · airy' : 'Near-black water · a shaft of light at the surface';
+  document.getElementById('chiptitle').textContent = dark?'Dark ink reads clean on the shallows.':'White ink reads clean on the deep water.';
+};
+</script>
+</body>
+</html

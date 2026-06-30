@@ -23,22 +23,20 @@
     :root {
       --bg: #0f1a2e;
       --navy: #1a2744;
-      --gold: #c9a84c;
-      --surface: #1a2744;
-      --surface-2: #243257;
+      
+      
       --border: #2d4070;
       --text: #e2e8f0;
       --text-muted: #8a9bbf;
       --green: #22c55e;
       --red: #ef4444;
-      --orange: #f97316;
     }
 
     [data-theme="light"] {
       --bg: #f1f5f9;
       --navy: #1a2744;
-      --surface: #ffffff;
-      --surface-2: #e8eef6;
+      
+      
       --border: #cbd5e1;
       --text: #0f172a;
       --text-muted: #64748b;
@@ -118,8 +116,8 @@
       transition: all 0.15s;
     }
 
-    .filter-pill:hover { border-color: #4fc3f7; color: var(--text); }
-    .filter-pill.active { background: #4fc3f7; border-color: #4fc3f7; color: #1a2744; font-weight: 700; }
+    .filter-pill:hover { border-color: var(--c-metal); color: var(--text); }
+    .filter-pill.active { background: var(--c-primary); border-color: var(--c-metal); color: #1a2744; font-weight: 700; }
 
     .panel-title-row {
       display: flex;
@@ -145,8 +143,8 @@
       display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .view-btn:hover { border-color: #4fc3f7; color: #4fc3f7; }
-    .view-btn.active { background: var(--surface-2); border-color: #4fc3f7; color: #4fc3f7; }
+    .view-btn:hover { border-color: var(--c-metal); color: var(--c-metal); }
+    .view-btn.active { background: var(--surface-2); border-color: var(--c-metal); color: var(--c-metal); }
 
     .listings-panel {
       flex: 1;
@@ -217,7 +215,7 @@
       z-index: 1;
     }
     .card-wrapper:hover::after {
-      border-color: #4fc3f7;
+      border-color: var(--c-metal);
       box-shadow: 0 4px 20px rgba(79,195,247,0.18);
     }
 
@@ -238,8 +236,8 @@
       text-transform: uppercase;
     }
     .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
-    .badge-pending { background: #f97316; color: #fff; font-weight: 700; }
-    .badge-coming-soon { background: #4fc3f7; color: #1a2744; font-weight: 700; }
+    .badge-pending { background: var(--c-metal); color: #fff; font-weight: 700; }
+    .badge-coming-soon { background: var(--c-primary); color: #1a2744; font-weight: 700; }
     .badge-sold { background: #64748b; color: #fff; font-weight: 700; }
 
     /* Map controls */
@@ -262,15 +260,15 @@
       border-radius: 5px;
       border: 1px solid rgba(79,195,247,0.25);
       background: rgba(26,39,68,0.9);
-      color: #4fc3f7;
+      color: var(--c-metal);
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       transition: all 0.15s;
     }
-.map-style-btn:hover { background: rgba(79,195,247,0.12) !important; border-color: #4fc3f7 !important; color: #4fc3f7 !important; }
-    .map-style-btn.active { background: #4fc3f7; color: #1a2744; border-color: #4fc3f7; font-weight: 700; }
+.map-style-btn:hover { background: rgba(79,195,247,0.12) !important; border-color: var(--c-metal) !important; color: var(--c-metal) !important; }
+    .map-style-btn.active { background: var(--c-primary); color: #1a2744; border-color: var(--c-metal); font-weight: 700; }
 
     .map-legend {
       position: absolute;
@@ -286,7 +284,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      color: #4fc3f7;
+      color: var(--c-metal);
       font-weight: 600;
       box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
@@ -297,7 +295,7 @@
       border: 2px solid white;
       flex-shrink: 0;
     }
-    .legend-dot.orange { background: #4fc3f7; }
+    .legend-dot.orange { background: var(--c-metal); }
     .legend-dot.red { background: #ef4444; }
     .legend-dot.purple { background: #8b5cf6; }
 
@@ -306,7 +304,7 @@
       z-index: 10;
       border: 1px solid rgba(79,195,247,0.25);
       background: #1a2744;
-      color: #4fc3f7;
+      color: var(--c-metal);
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 12px;
@@ -316,7 +314,7 @@
       backdrop-filter: blur(8px);
       transition: all 0.15s;
     }
-    .map-reset-btn:hover, .map-flood-btn:hover { background: rgba(79,195,247,0.15); border-color: #4fc3f7; }
+    .map-reset-btn:hover, .map-flood-btn:hover { background: rgba(79,195,247,0.15); border-color: var(--c-metal); }
     .map-reset-btn { }
     .map-flood-btn { }
 
@@ -361,12 +359,12 @@
     .map-popup .popup-price-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; }
 .map-popup .popup-arv { font-size: 17px; font-weight: 800; color: #2d6a8f; }
     .map-popup .popup-arv-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; white-space: nowrap; }
-.map-popup .popup-link { display: block; background: #1a2744; color: #4fc3f7; font-size: 13px; font-weight: 700; text-align: center; padding: 10px; text-decoration: none; transition: background 0.15s; }
+.map-popup .popup-link { display: block; background: #1a2744; color: var(--c-metal); font-size: 13px; font-weight: 700; text-align: center; padding: 10px; text-decoration: none; transition: background 0.15s; }
 .map-popup .popup-link:hover { background: #243560; }
     .popup-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; }
     .popup-status-published { background: #22c55e; color: #fff; }
-    .popup-status-pending { background: #f97316; color: #fff; }
-    .popup-status-coming_soon { background: #4fc3f7; color: #1a2744; }
+    .popup-status-pending { background: var(--c-metal); color: #fff; }
+    .popup-status-coming_soon { background: var(--c-primary); color: #1a2744; }
     .popup-status-sold { background: #64748b; color: #fff; }
 
     /* Empty state */
@@ -581,8 +579,8 @@
         transform: translateX(-50%);
         z-index: 300;
         background: #1a2744;
-        color: #4fc3f7;
-        border: 1.5px solid #4fc3f7;
+        color: var(--c-metal);
+        border: 1.5px solid var(--c-metal);
         border-radius: 24px;
         padding: 10px 22px;
         font-size: 14px;
@@ -595,7 +593,7 @@
       }
 
       .map-price-pin {
-        background: #f97316;
+        background: var(--c-metal);
         color: white;
         font-size: 11px;
         font-weight: 800;
@@ -612,7 +610,7 @@
       }
 
       .map-price-pin.active {
-        background: #4fc3f7;
+        background: var(--c-metal);
         color: #0f172a;
         transform: scale(1.15);
       }
