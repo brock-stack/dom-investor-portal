@@ -74,9 +74,9 @@
     .faq-q { color: var(--text) !important; }
 
     /* 12. FAQ — Light mode visual break */
-    [data-theme="light"] .faq-section { background: #f8fafc; }
+    [data-theme="light"] .faq-section { background: transparent; }
     @media (max-width: 768px) {
-      [data-theme="light"] .faq-section { background: #f8fafc !important; border-top: 1px solid #e2e8f0 !important; }
+      [data-theme="light"] .faq-section { background: transparent !important; border-top: 1px solid var(--hair) !important; }
     }
 
     /* 13. Social icons — larger on mobile */
@@ -91,6 +91,18 @@
 
     /* 15. v2.2.24 — blur transition for closing photo zones */
     .hp-closing-photo { transition: filter 0.2s; }
+
+    /* v3.2.1 — hero photo-behind-glass */
+    .lg.hero {
+      background:
+        linear-gradient(157deg, rgba(20,42,72,.42), rgba(12,26,48,.30) 60%, rgba(12,26,48,.22)),
+        url('/img/hero-bg.jpg') center center / cover no-repeat;
+    }
+    [data-theme="light"] .lg.hero {
+      background:
+        linear-gradient(157deg, rgba(255,255,255,.55), rgba(255,255,255,.30) 60%, rgba(255,255,255,.22)),
+        url('/img/hero-bg.jpg') center center / cover no-repeat;
+    }
   </style>
 <link rel="stylesheet" href="css/glass.css">
 </head>
@@ -125,7 +137,7 @@
   </nav>
 
   <!-- Hero Section -->
-  <section class="lg hero" style="background: url('/img/hero-bg.jpg') center center / cover no-repeat;">
+  <section class="lg hero">
     <div class="hero-content">
       <span class="eyebrow">By invitation · curated off-market</span>
       <h1 style="margin-bottom:0">
@@ -142,7 +154,7 @@
   </section>
 
   <!-- Video + Featured Deals (combined) -->
-  <section id="introSection" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+  <section id="introSection" class="lg">
     <div style="max-width:1100px;margin:0 auto;padding:72px 24px;">
 
       <!-- TOP HALF: Two columns -->
@@ -240,48 +252,48 @@
       <p class="section-sub">Our team underwrites every property on this platform. As investors, we can affirm these deals make money.</p>
       <div class="benefit-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
 
-        <div class="benefit-card lg lg--interactive" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card lg lg--interactive" style="border-top:3px solid var(--gold);">
+          <div class="benefit-icon" style="color:var(--gold);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
           <h3>Curated Inventory</h3>
           <p>We turn down more deals than we publish. Only properties that meet our underwriting criteria make it to the portal.</p>
         </div>
 
-        <div class="benefit-card lg lg--interactive" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card lg lg--interactive" style="border-top:3px solid var(--gold);">
+          <div class="benefit-icon" style="color:var(--gold);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           </div>
           <h3>Interactive Pro Forma</h3>
           <p>Every listing includes an investor-grade pro forma calculator. Plug in your own numbers and see your returns in real time.</p>
         </div>
 
-        <div class="benefit-card lg lg--interactive" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card lg lg--interactive" style="border-top:3px solid var(--gold);">
+          <div class="benefit-icon" style="color:var(--gold);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
           </div>
           <h3>Flood Zone &amp; Comp Maps</h3>
           <p>FEMA flood zone data and sold comps overlaid directly on the property map. Know your risk and your ARV before you commit.</p>
         </div>
 
-        <div class="benefit-card lg lg--interactive" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card lg lg--interactive" style="border-top:3px solid var(--gold);">
+          <div class="benefit-icon" style="color:var(--gold);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
           <h3>Instant Access</h3>
           <p>No waitlists. No approval queues. Sign up, sign the agreement, and you're browsing live deals within minutes.</p>
         </div>
 
-        <div class="benefit-card lg lg--interactive" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card lg lg--interactive" style="border-top:3px solid var(--gold);">
+          <div class="benefit-icon" style="color:var(--gold);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <h3>Preferred Partners</h3>
           <p>Get connected with our vetted partners who we trust and rely on.</p>
         </div>
 
-        <div class="benefit-card lg lg--interactive" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card lg lg--interactive" style="border-top:3px solid var(--gold);">
+          <div class="benefit-icon" style="color:var(--gold);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           </div>
           <h3>Open House Alerts</h3>
@@ -324,7 +336,7 @@
 </section>
 
   <!-- Investor CTA Strip -->
-  <section class="investor-cta-strip">
+  <section class="investor-cta-strip lg">
     <div class="section-container" style="text-align:center;">
       <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:#0f172a;margin-bottom:12px;">Ready to browse the inventory?</h2>
       <p style="color:#64748b;font-size:16px;margin-bottom:28px;">Get access to Florida's best off-market investment deals.</p>
@@ -517,7 +529,7 @@
           : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:28px;opacity:0.18;"></div>';
         return '<div class="mini-card">' +
           '<div class="mini-photo hp-photo-zone" style="position:relative;">' + photoHtml +
-            '<span style="position:absolute;top:10px;left:10px;background:#f97316;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;">⭐ Featured</span>' +
+            '<span style="position:absolute;top:10px;left:10px;background:var(--grad-gold);color:var(--gold-text);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;">⭐ Featured</span>' +
           '</div>' +
           '<div class="mini-content">' +
             '<div class="mini-location">' + loc + '</div>' +
