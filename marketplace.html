@@ -146,7 +146,7 @@
       transition: all 0.15s;
     }
     .view-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .view-btn.active { background: var(--surface-2); border-color: var(--accent); color: var(--accent); }
+    .view-btn.active { background: var(--tile-bg); border-color: var(--accent); color: var(--accent); }
 
     .listings-panel {
       flex: 1;
@@ -162,17 +162,14 @@
     /* List card hover: use box-shadow accent instead of border-width change (border-width change causes layout shift = flicker) */
 
 
-    .list-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      margin-bottom: 0;
-      position: relative;
-    }
-    .list-card .card-photo-sm img { height: 110px !important; object-fit: cover !important; width: 100% !important; }
+    .list-card { display:flex; gap:10px; padding:8px; align-items:center; }
+    .list-card .card-photo-sm { width:84px; height:64px; border-radius:9px; flex:none; background:linear-gradient(135deg,rgba(120,170,210,.3),rgba(40,70,110,.35)); background-size:cover; background-position:center; }
+    .list-card .lc-body { min-width:0; flex:1; display:flex; flex-direction:column; justify-content:center; }
+    .list-card .lc-price { font-family:var(--font-num); font-weight:800; font-size:15px; }
+    .list-card .lc-addr { font-size:12px; color:var(--text-muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .list-card .lc-foot { display:flex; align-items:center; gap:7px; margin-top:5px; }
+    .list-card .lc-foot .status { padding:2px 8px; font-size:10px; letter-spacing:.05em; }
+    .list-card .lc-eq { font-family:var(--font-num); font-size:11.5px; font-weight:700; color:var(--equity); }
 
     .card-photo-sm {
       width: 140px;
@@ -238,7 +235,7 @@
       text-transform: uppercase;
     }
     .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
-    .badge-pending { background: #f97316; color: #fff; font-weight: 700; }
+    .badge-pending { background: var(--grad-gold); color: var(--gold-text); font-weight: 700; box-shadow: inset 0 1px 0 rgba(255,255,255,.45); }
     .badge-coming-soon { background: var(--accent); color: #1a2744; font-weight: 700; }
     .badge-sold { background: #64748b; color: #fff; font-weight: 700; }
 
@@ -351,8 +348,8 @@
       font-family: 'Inter', sans-serif !important;
       min-width: 180px;
     }
-    .mapboxgl-popup-tip { border-top-color: white !important; }
-    .mapboxgl-popup-content { background: #ffffff !important; border-radius: 10px !important; padding: 0 !important; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important; min-width: 240px !important; }
+    .mapboxgl-popup-tip { border-top-color: rgba(16,32,54,.58) !important; }
+    .mapboxgl-popup-content { background: var(--glassw) !important; -webkit-backdrop-filter: blur(var(--glassw-blur)); backdrop-filter: blur(var(--glassw-blur)); color: var(--text) !important; border: 1px solid var(--glassw-bd) !important; border-radius: 10px !important; padding: 0 !important; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important; min-width: 240px !important; }
     .map-popup { padding: 0; color: #1a2744; font-family: 'Inter', sans-serif; }
     .map-popup .popup-address { font-weight: 600; font-size: 14px; color: #1a2744; margin-bottom: 2px; }
     .map-popup .popup-city { font-size: 14px; font-weight: 600; color: #1a2744; margin-bottom: 6px; }
@@ -595,8 +592,8 @@
       }
 
       .map-price-pin {
-        background: #f97316;
-        color: white;
+        background: var(--grad-gold);
+        color: var(--gold-text);
         font-size: 11px;
         font-weight: 800;
         padding: 4px 8px;
@@ -613,7 +610,7 @@
 
       .map-price-pin.active {
         background: var(--accent);
-        color: #0f172a;
+        color: #fff;
         transform: scale(1.15);
       }
 
@@ -623,8 +620,10 @@
         left: 0;
         right: 0;
         z-index: 150;
-        background: var(--surface);
-        border-bottom: 1px solid var(--border);
+        background: var(--glassw);
+        -webkit-backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+        backdrop-filter: blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+        border-bottom: 1px solid var(--glassw-bd);
         padding: 8px 12px;
         display: flex;
         gap: 6px;
@@ -1077,7 +1076,11 @@
         return;
       }
 
-panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;overflow-y:auto;align-content:start;';
+if (currentView === 'map') {
+        panel.style.cssText = 'display:flex;flex-direction:column;gap:8px;padding:8px;overflow-y:auto;align-content:start;';
+      } else {
+        panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;overflow-y:auto;align-content:start;';
+      }
         panel.innerHTML = filtered.map(function(l) {
           var p = (l.listings && l.listings.properties) || l.properties || {};
           var loc = [p.city, p.state].filter(Boolean).join(', ') || 'Florida';
@@ -1094,6 +1097,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           var equity = (arv != null && p.mao_flip != null) ? (arv - p.mao_flip) : null;
           var statusVariant = l.status === 'sold' ? 'status-sold' : l.status === 'pending' ? 'status-pending' : '';
           var statusLabel = l.status === 'sold' ? 'Sold' : l.status === 'pending' ? 'Pending' : 'Available';
+          if (currentView === 'map') { return tileFmtRail(l, p); }
           return '<div class="card-wrapper"><div class="lg card lg--interactive deal-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer;display:flex;flex-direction:column;' + (l.status === 'sold' ? 'opacity:0.75;' : '') + '">' +
             '<div style="height:150px;position:relative;overflow:hidden;border-radius:8px 8px 0 0;">' + photo + '<span class="badge ' + getBadgeClass(l.status) + '" style="position:absolute;top:8px;left:8px;">' + getStatusLabel(l.status, l.closed_at) + '</span>' +
             '<button onclick="event.stopPropagation();toggleMktFavorite(this,\'' + l.id + '\')" data-lid="' + l.id + '" class="mkt-heart-btn" title="Save to Favorites" style="position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:background .15s;z-index:5;"">&#9825;</button>' +
@@ -1109,6 +1113,32 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
             '</div>' +
           '</div></div>';
         }).join('');
+    }
+
+    function tileFmtRail(l, p) {
+      function shortMoney(v) {
+        if (v == null) return '\u2014';
+        if (v >= 1000000) return '$' + (v/1000000).toFixed(1) + 'M';
+        if (v >= 1000) return '$' + Math.round(v/1000) + 'K';
+        return '$' + v;
+      }
+      var photo = l._photo ? 'url(\'' + l._photo + '\')' : '';
+      var status = l.status === 'sold' ? 'Sold' : l.status === 'pending' ? 'Pending' : 'Available';
+      var statusVariant = l.status === 'sold' ? 'status-sold' : l.status === 'pending' ? 'status-pending' : '';
+      var startingPrice = l.asking_price || (l.listings && l.listings.list_price) || (p && p.mao_wholesale);
+      var arv = p.estimated_arv;
+      var equity = (arv != null && p.mao_flip != null) ? (arv - p.mao_flip) : null;
+      return '<div class="lg--frost list-card" onclick="window.location=\'/deal.html?id=' + l.id + '\'" data-id="' + l.id + '" onmouseenter="highlightMarker(\'' + l.id + '\',true)" onmouseleave="highlightMarker(\'' + l.id + '\',false)" style="cursor:pointer">' +
+        '<div class="card-photo-sm" style="background-image:' + photo + '"></div>' +
+        '<div class="lc-body">' +
+        '<div class="lc-price num">' + shortMoney(startingPrice) + '</div>' +
+        '<div class="lc-addr">' + (p.address || '') + (p.address && p.city ? ', ' : '') + (p.city || '') + '</div>' +
+        '<div class="lc-foot">' +
+        '<span class="status ' + statusVariant + '"><span class="d"></span>' + status + '</span>' +
+        (equity != null && equity > 0 ? '<span class="lc-eq num">+' + shortMoney(equity) + '</span>' : '') +
+        '</div>' +
+        '</div>' +
+        '</div>';
     }
 
     var _mktFavIds = new Set();
