@@ -1590,7 +1590,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         var photo = l._photo
           ? '<img src="' + l._photo + '" alt="property" loading="lazy">'
           : '<div style="position:absolute;inset:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg></div>';
-        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? '#f97316' : (l.status === 'sold' ? '#64748b' : '#4fc3f7'));
+        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? 'var(--c-metal)' : (l.status === 'sold' ? '#64748b' : '#4fc3f7'));
         var statusLabel = getStatusLabel(l.status, l.closed_at).toUpperCase();
         var isFav = (JSON.parse(localStorage.getItem('dom_portal_favorites') || '[]')).some(function(f){return f.id === l.id;});
 
@@ -1598,8 +1598,8 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           '<div class="mobile-card-photo-wrap">' +
             photo +
             '<span style="position:absolute;top:10px;left:10px;background:' + statusColor + ';color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;">' + statusLabel + '</span>' +
-            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:#f97316;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
-            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:#f97316;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
+            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:var(--metal-grad);color:var(--metal-ink);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
+            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:var(--metal-grad);color:var(--metal-ink);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
             '<button class="mobile-card-heart" style="' + (isFav ? 'color:#e8476a;' : '') + '" onclick="event.stopPropagation();toggleMobileFav(this,\'' + l.id + '\')">' + (isFav ? '♥' : '♡') + '</button>' +
           '</div>' +
           '<div class="mobile-card-body">' +

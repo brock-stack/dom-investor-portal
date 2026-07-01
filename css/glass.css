@@ -1,5 +1,5 @@
 /* ============================================================================
-   DOM Gulf Liquid Glass — v2.4.0 foundation  (Phase 0)
+   DOM Gulf Liquid Glass — v2.4.1 (Phase 0 + polish addendum)
    Tokens · scenes · glass tiers · liquid buttons · component utilities ·
    system polish.  Source of truth: dom-liquid-component-library-v5.html.
 
@@ -9,7 +9,16 @@
      A3  .investor-nav background forced with !important (beats inline <style>)
      BG  html{background:transparent} + body canvas fallbacks so the fixed
          scenes ALWAYS paint and never flash white (background propagation).
-   This file is paste-as-is. Do not re-edit the token values.
+
+   POLISH ADDENDUM v2.4.1 (Andrew's preview review + Claude's rev-2):
+     — role reshuffle: dark primary → Lagoon Teal, light primary → Aqua, Coral purged
+     — dark scene oceanic depth: +2 near-horizon caustics, +3-layer animated ::after
+     — dark canvas floor #020B13 (was #030C17)
+     — dark gain calmed: #62F0A8 → #79DDB3 (and family)
+     — dark Available calmed: #7BE6B3 → #84DEB6 (and family)
+     — light .investor-nav gets banded blue background (beats inline .investor-nav{background:var(--navy)})
+     — focus ring repointed to primary (was royal)
+     — .toast.info .ic uses --c-info (was --c-primary)
    ============================================================================ */
 
 :root{
@@ -32,23 +41,25 @@
   --hair:rgba(255,255,255,.12);
 
   /* Roles (dark) */
-  --c-primary:#22D3EE;     /* Aqua Glow */
-  --c-secondary:#8B5CF6;   /* Amethyst */
-  --c-info:#3D78EA;        /* Royal Sapphire */
-  --c-accent:#14B8A6;      /* Lagoon Teal */
+  --c-primary:#14B8A6;     /* Lagoon Teal — primary (rev-2 dark) */
+  --c-secondary:#22D3EE;   /* Aqua Glow — secondary */
+  --c-info:#22D3EE;        /* Aqua Glow — info rides with secondary in dark */
+  --c-accent:#8B5CF6;      /* Amethyst — accent */
   --c-metal:#7A8B9D;       /* Steel platinum */
   --metal-ink:#fff;
   --metal-grad:linear-gradient(180deg,#9DB0BE,#7A8B9D 52%,#5E6E7E);
 
-  --royal:#3D78EA; --royal-hi:#5A8BEE;
+  --royal:#14B8A6; --royal-hi:#3FD6C4; /* stray royal refs point to teal (kill leftover royal) */
   --accent:var(--c-primary);
 
   /* Semantic — success/gain */
-  --em-hi:#8FF0CE; --em:#16B98A;
-  --gain:#62F0A8; --equity:#62F0A8;
-  --equity-bg:rgba(70,224,150,.13); --equity-bd:rgba(70,224,150,.30);
-  --avail:#7BE6B3; --avail-bg:rgba(70,214,149,.13);
-  --avail-bd:rgba(70,214,149,.30); --avail-dot:#46D695;
+  --em-hi:#95E8C6; --em:#16B98A; /* was #8FF0CE — calmed gain family */
+  --gain:#79DDB3; --equity:#79DDB3; /* was #62F0A8 — calmed gain */
+  --equity-bg:rgba(95,210,165,.13); --equity-bd:rgba(95,210,165,.30);
+  --avail:#84DEB6; /* was #7BE6B3 — calmed Available (Q2) */
+  --avail-bg:rgba(100,206,166,.13);
+  --avail-bd:rgba(100,206,166,.30);
+  --avail-dot:#55CFA1; /* was #46D695 */
 
   /* Semantic — danger */
   --rose:#F0685E; --rose-bg:rgba(240,104,94,.14);
@@ -84,7 +95,7 @@
   /* Input field */
   --field:rgba(255,255,255,.05);
   --field-bd:rgba(255,255,255,.14);
-  --field-focus:rgba(61,120,234,.5);
+  --field-focus:rgba(20,184,166,.45); /* focus ring → Lagoon Teal (was royal) */
 
   /* Modal scrim */
   --scrim:rgba(3,9,20,.6);
@@ -95,7 +106,7 @@
   --skel-hi:rgba(255,255,255,.14);
 
   /* Canvas fallback (propagates from body — see BG fix) */
-  --canvas:#030C17;
+  --canvas:#020B13; /* was #030C17 — matches new scene floor */
 }
 
 /* ---- LIGHT ---- */
@@ -105,15 +116,15 @@
   --hair:rgba(16,60,70,.12);
 
   /* Roles (light) */
-  --c-primary:#FF8A6B;     /* Coral */
-  --c-secondary:#60B7F0;   /* Sky Blue */
-  --c-info:#F4889E;        /* Rose */
-  --c-accent:#5BC9D4;      /* Aqua */
+  --c-primary:#5BC9D4;     /* Aqua — primary (rev-2 light) */
+  --c-secondary:#F6E77D;   /* Sunshine — secondary (DARK ink where used, never white) */
+  --c-info:#60B7F0;        /* Sky Blue — info */
+  --c-accent:#F4889E;      /* Rose — accent */
   --c-metal:#7E94A6;       /* GAP-FIX A1: was the invalid word "bright" */
   --metal-ink:#16202B;
   --metal-grad:linear-gradient(180deg,#FBFDFF,#D7E2EA 40%,#AEC0CD 70%,#CBD8E2);
 
-  --royal:#2E6AD6; --royal-hi:#3D78EA;
+  --royal:#5BC9D4; --royal-hi:#3FB8C6; /* stray royal refs → aqua */
   --accent:var(--c-primary);
 
   /* Semantic — success/gain (lightness flips by design — do NOT correct) */
@@ -152,7 +163,7 @@
 
   --field:rgba(255,255,255,.55);
   --field-bd:rgba(16,60,70,.16);
-  --field-focus:rgba(46,106,214,.45);
+  --field-focus:rgba(91,201,212,.45); /* focus ring → Aqua (was royal) */
 
   --scrim:rgba(20,50,70,.4);
   --scrim-blur:6px;
@@ -206,11 +217,25 @@ body{ background:var(--canvas); }
 
 .s-dark{
   background:
-    radial-gradient(40% 13% at 24% 0%, rgba(208,234,252,.14), transparent 60%),
-    radial-gradient(46% 15% at 62% -2%, rgba(208,234,252,.11), transparent 58%),
-    radial-gradient(55% 34% at 50% -8%, rgba(150,205,235,.34) 0%, rgba(70,140,182,.12) 30%, transparent 60%),
-    linear-gradient(180deg, #0C3046 0%, #082439 16%, #061A2C 36%, #04111E 56%, #020A13 78%, #01060B 100%);
+    radial-gradient(72% 26% at 50% -8%, rgba(168,214,244,.30) 0%, rgba(86,158,198,.13) 34%, transparent 64%),
+    radial-gradient(38% 13% at 22% -2%, rgba(200,230,250,.12), transparent 60%),
+    radial-gradient(40% 13% at 76% -2%, rgba(200,230,250,.10), transparent 60%),
+    linear-gradient(180deg, #0E3A55 0%, #0A2D45 14%, #072338 30%, #051B2D 46%, #041521 62%, #03101A 80%, #020B13 100%);
 }
+.s-dark::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(58% 30% at 28% 42%, rgba(86,184,212,.11), transparent 60%),
+    radial-gradient(52% 26% at 74% 54%, rgba(58,150,190,.09), transparent 62%),
+    radial-gradient(44% 22% at 52% 32%, rgba(120,200,225,.08), transparent 60%);
+  background-size:165% 165%, 150% 150%, 140% 140%;
+  animation:caustic 28s ease-in-out infinite alternate;
+}
+@keyframes caustic{
+  from{ background-position:0% 0%, 100% 0%, 50% 0% }
+  to  { background-position:18% 12%, 80% 16%, 58% 12% }
+}
+@media (prefers-reduced-motion:reduce){ .s-dark::after{ animation:none } }
 
 .s-light{
   background:
@@ -648,9 +673,9 @@ body{ background:var(--canvas); }
 .toast.success .ic{ background:var(--equity-bg); color:var(--gain); border:1px solid var(--equity-bd) }
 .toast.error .ic{ background:var(--rose-bg); color:var(--rose); border:1px solid var(--rose-bd) }
 .toast.info .ic{
-  background:color-mix(in srgb, var(--c-primary) 15%, transparent);
-  color:var(--c-primary);
-  border:1px solid color-mix(in srgb, var(--c-primary) 30%, transparent);
+  background:color-mix(in srgb, var(--c-info) 15%, transparent);
+  color:var(--c-info);
+  border:1px solid color-mix(in srgb, var(--c-info) 30%, transparent);
 }
 .toast.warning .ic{
   background:color-mix(in srgb, var(--warn) 30%, transparent);
@@ -712,4 +737,16 @@ body{ background:var(--canvas); }
   -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
   backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
   border-bottom:1px solid var(--glassw-bd);
+}
+/* Light-mode top-nav: banded blue so the nav reads against the white-bloom top of .s-light.
+   !important preserves the same "beats per-page inline .investor-nav { background: var(--navy) }"
+   justification as the base rule (verified: deal.html:53, marketplace.html:50). */
+[data-theme="light"] .investor-nav{
+  background:linear-gradient(180deg, rgba(38,98,128,.86), rgba(64,140,166,.76)) !important;
+  border-bottom:1px solid rgba(255,255,255,.18);
+  color:#fff;
+}
+[data-theme="light"] .investor-nav a,
+[data-theme="light"] .investor-nav .nav-link{
+  color:rgba(255,255,255,.92);
 }
