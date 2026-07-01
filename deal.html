@@ -37,7 +37,7 @@
     }
 
     [data-theme="light"] {
-      --bg: #f1f5f9;
+      --bg: transparent;
       --navy: #1a2744;
       
       
@@ -257,22 +257,22 @@
     .gallery-close-top-right {
       position: absolute; top: 16px; right: 16px;
       width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(26,39,68,0.8); border: 1.5px solid rgba(79,195,247,0.4);
+      background: rgba(26,39,68,0.8); border: 1.5px solid color-mix(in srgb, var(--c-primary) 40%, transparent);
       color: var(--c-metal); font-size: 18px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(8px); transition: background .15s;
       z-index: 3; transform: none !important;
     }
-    .gallery-close-top-right:hover { background: rgba(79,195,247,0.2); }
+    .gallery-close-top-right:hover { background: color-mix(in srgb, var(--c-primary) 20%, transparent); }
     /* Bottom branded nav arrows */
     .gallery-bar-nav {
       width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(26,39,68,0.8); border: 1.5px solid rgba(79,195,247,0.4);
+      background: rgba(26,39,68,0.8); border: 1.5px solid color-mix(in srgb, var(--c-primary) 40%, transparent);
       color: var(--c-metal); font-size: 22px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(8px); transition: background .15s;
     }
-    .gallery-bar-nav:hover { background: rgba(79,195,247,0.25); }
+    .gallery-bar-nav:hover { background: color-mix(in srgb, var(--c-primary) 25%, transparent); }
     /* Old counter hidden — replaced with styled bar */
     .gallery-modal-counter { display: none !important; }
     .gallery-modal-bar {
@@ -289,7 +289,7 @@
     .gallery-modal-bar > * { pointer-events: auto; }
     .gallery-bar-count {
       font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
-      background: rgba(26,39,68,0.75); border: 1px solid rgba(79,195,247,0.35);
+      background: rgba(26,39,68,0.75); border: 1px solid color-mix(in srgb, var(--c-primary) 35%, transparent);
       border-radius: 20px; padding: 5px 16px; backdrop-filter: blur(8px);
     }
 
@@ -615,17 +615,17 @@
       gap: 5px;
     }
     [data-theme="light"] .feature-pill {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
+      background: var(--glassw);
+      border-color: var(--glassw-bd);
     }
     .feature-pill.accent {
-      background: rgba(79,195,247,0.1);
-      border-color: rgba(79,195,247,0.4);
+      background: color-mix(in srgb, var(--c-primary) 10%, transparent);
+      border-color: color-mix(in srgb, var(--c-primary) 40%, transparent);
       color: var(--c-metal);
     }
     [data-theme="light"] .feature-pill.accent {
-      background: rgba(79,195,247,0.1);
-      border-color: rgba(79,195,247,0.4);
+      background: color-mix(in srgb, var(--c-primary) 10%, transparent);
+      border-color: color-mix(in srgb, var(--c-primary) 40%, transparent);
       color: #0e7490;
     }
 
@@ -701,7 +701,7 @@
     .pf-rv { font-weight:600; flex-shrink:0; }
     .pf-row.bold .pf-rl { font-weight:700; color:var(--text); }
     .pf-row.bold .pf-rv { font-size:15px; font-weight:800; }
-    .pf-row.hl { background:rgba(79,195,247,0.07); margin:0 -20px; padding:10px 20px; }
+    .pf-row.hl { background:color-mix(in srgb, var(--c-primary) 7%, transparent); margin:0 -20px; padding:10px 20px; }
     .pf-indent .pf-rl { padding-left:14px; font-size:12px; }
     .positive { color:#22c55e; }
     .negative { color:#ef4444; }
@@ -889,7 +889,7 @@
       .flip-section-grid { grid-template-columns:1fr; }
     }
     /* === V2 LAYOUT === */
-    [data-theme="light"] { --bg: #f8fafc; }
+    [data-theme="light"] { --bg: transparent; }
 
     /* Hero Split */
     .hero-split { display:flex; margin-top:0; min-height:500px; overflow:hidden; }
@@ -897,16 +897,16 @@
     .hero-main-photo-wrap { flex:1; overflow:hidden; cursor:pointer; position:relative; min-height:520px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:13px; }
     .hero-main-photo-wrap img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.2s; position:absolute; inset:0; }
     .hero-main-photo-wrap:hover img { transform:scale(1.02); }
-    .hero-photo-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:15; background:rgba(79,195,247,0.18); border:2px solid var(--c-metal); border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; transition:opacity .2s, background .15s; color:var(--c-metal); font-size:18px; font-weight:700; user-select:none; }
+    .hero-photo-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:15; background:color-mix(in srgb, var(--c-primary) 18%, transparent); border:2px solid var(--c-metal); border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; transition:opacity .2s, background .15s; color:var(--c-metal); font-size:18px; font-weight:700; user-select:none; }
     .hero-main-photo-wrap:hover .hero-photo-nav { opacity:1; }
     @media (max-width: 768px) { .hero-photo-nav { opacity:0.7 !important; background:rgba(10,18,40,0.5) !important; } }
-    .hero-photo-nav:hover { background:rgba(79,195,247,0.45); }
+    .hero-photo-nav:hover { background:color-mix(in srgb, var(--c-primary) 45%, transparent); }
     .hero-photo-nav.prev { left:12px; }
     .hero-photo-nav.next { right:12px; }
     .hero-thumb-strip { height:90px; display:flex; gap:4px; overflow-x:auto; overflow-y:hidden; touch-action:pan-x; padding:6px 36px; background:var(--surface); border-top:1px solid var(--border); flex-shrink:0; scroll-behavior:smooth; scrollbar-width:none; }
     .hero-thumb-strip::-webkit-scrollbar { display:none; }
     .hero-thumb-wrap:hover .thumb-nav { opacity:1 !important; }
-    .thumb-nav:hover { background:rgba(79,195,247,0.35) !important; }
+    .thumb-nav:hover { background:color-mix(in srgb, var(--c-primary) 35%, transparent) !important; }
     .hero-thumb { flex-shrink:0; width:139px; height:78px; overflow:hidden; border-radius:6px; cursor:pointer; border:2px solid transparent; transition:border-color 0.15s; }
     .hero-thumb.active { border-color:var(--c-metal); }
     .hero-thumb:hover { border-color:rgba(59,130,246,0.5); }
@@ -927,7 +927,7 @@
 
     .hero-metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .hero-metric-card { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:13px 16px; }
-    [data-theme="light"] .hero-metric-card { background:#f8fafc; }
+    [data-theme="light"] .hero-metric-card { background:var(--glassw); }
     .hero-metric-label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
     .hero-metric-value { font-size:20px; font-weight:800; color:var(--text); }
     .hero-metric-value.accent { color:var(--c-metal); }
@@ -944,9 +944,9 @@
     .pill-nav-inner { max-width:none; margin:0; padding:0 24px; display:flex; gap:24px; }
     .pill-nav-spacer { width:calc(50% - 12px); flex-shrink:0; } /* exact map col width */
     .pill-nav { display:flex; gap:8px; flex:1; flex-wrap:wrap; padding:10px 0; align-items:center; justify-content:center; }
-    .pill-nav .tab-btn { padding:7px 20px; border:none; border-radius:24px; font-size:14px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; background:#f1f5f9; color:#475569; border-bottom:none; white-space:nowrap; transition:all 0.15s; }
+    .pill-nav .tab-btn { padding:7px 20px; border:none; border-radius:24px; font-size:14px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; background:var(--glassw); color:var(--text-muted); border-bottom:none; white-space:nowrap; transition:all 0.15s; }
     [data-theme="dark"] .pill-nav .tab-btn { background:var(--surface-2); color:var(--text-muted); }
-    .pill-nav .tab-btn:hover { background:#e2e8f0; color:#1e293b; }
+    .pill-nav .tab-btn:hover { background:var(--glassw-bd); color:var(--text); }
     [data-theme="dark"] .pill-nav .tab-btn:hover { background:#2d4070; color:var(--text); }
     .pill-nav .tab-btn.active { background: var(--c-primary); color:#0f172a; font-weight:700; }
 
@@ -955,10 +955,10 @@
     .deal-map-sticky { width:calc(50% - 12px); flex-shrink:0; position:sticky; top:80px; display:flex; flex-direction:column; gap:10px; align-self:flex-start; min-height:200px; }
     .deal-map-wrap { position:relative; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
     #dealMap { height:700px; }
-    .deal-map-controls-left { position:absolute; top:10px; left:10px; z-index:10; display:flex; gap:4px; background:#1a2744; border-radius:8px; padding:4px; border:1px solid rgba(79,195,247,0.2); backdrop-filter:blur(8px); }
-    .deal-map-controls-right { position:absolute; top:10px; right:10px; z-index:10; display:flex; gap:4px; background:#1a2744; border-radius:8px; padding:4px; border:1px solid rgba(79,195,247,0.2); backdrop-filter:blur(8px); }
-    .deal-map-btn { padding:5px 12px; border-radius:5px; border:1px solid rgba(79,195,247,0.25); background:rgba(26,39,68,0.9); color:var(--c-metal); font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; white-space:nowrap; }
-    .deal-map-btn:hover { background:rgba(79,195,247,0.18); border-color:var(--c-metal); }
+    .deal-map-controls-left { position:absolute; top:10px; left:10px; z-index:10; display:flex; gap:4px; background:#1a2744; border-radius:8px; padding:4px; border:1px solid color-mix(in srgb, var(--c-primary) 20%, transparent); backdrop-filter:blur(8px); }
+    .deal-map-controls-right { position:absolute; top:10px; right:10px; z-index:10; display:flex; gap:4px; background:#1a2744; border-radius:8px; padding:4px; border:1px solid color-mix(in srgb, var(--c-primary) 20%, transparent); backdrop-filter:blur(8px); }
+    .deal-map-btn { padding:5px 12px; border-radius:5px; border:1px solid color-mix(in srgb, var(--c-primary) 25%, transparent); background:rgba(26,39,68,0.9); color:var(--c-metal); font-size:11px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.15s; white-space:nowrap; }
+    .deal-map-btn:hover { background:color-mix(in srgb, var(--c-primary) 18%, transparent); border-color:var(--c-metal); }
     .deal-map-btn.active { background: var(--c-primary); color:#1a2744; border-color:var(--c-metal); font-weight:700; }
     #dealStreetViewFrame { display:none; width:100%; height:100%; border:none; position:absolute; inset:0; z-index:5; }
     .map-google-link { font-size:12px; color:var(--c-metal); text-decoration:none; display:inline-block; }
@@ -967,7 +967,7 @@
     .deal-body-v2.map-hidden .deal-map-sticky { display:none !important; }
     .deal-body-v2.map-hidden .deal-content-col { flex:1; max-width:100% !important; }
     .content-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
-    [data-theme="light"] .content-card { background:#ffffff; }
+    [data-theme="light"] .content-card { background:var(--glassw); }
 
     /* Mobile sticky CTA + hide-on-scroll nav */
     @media (max-width:768px) {
@@ -999,7 +999,7 @@
     }
   .fav-card:hover { border-color: #e8476a !important; }
   @media(min-width:769px) { .deal-sticky-cta { display:none !important; } }
-  .comp-marker-active { box-shadow: 0 0 0 4px rgba(79,195,247,0.5) !important; border-color: var(--c-metal) !important; z-index: 20 !important; }
+  .comp-marker-active { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-primary) 50%, transparent) !important; border-color: var(--c-metal) !important; z-index: 20 !important; }
   /* Property Details responsive grid */
   #detailsBody > div { display:grid; grid-template-columns:repeat(3,1fr); }
   @media(max-width:1024px) and (min-width:769px) { #detailsBody > div { grid-template-columns:repeat(2,1fr); } }
@@ -1256,8 +1256,8 @@
       <!-- What-If Modals -->
       <!-- Loan Scenario Modal -->
       <div id="pfLoanModal" onclick="if(event.target===this)pfCloseLoanModal()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,18,40,0.72);align-items:center;justify-content:center;">
-        <div style="background:var(--surface);border:2px solid var(--c-metal);border-radius:16px;padding:0;width:100%;max-width:420px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
-          <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.2);">
+        <div style="background:var(--surface);border:2px solid var(--c-metal);border-radius:16px;padding:0;width:100%;max-width:420px;margin:0 16px;box-shadow:0 8px 40px color-mix(in srgb, var(--c-primary) 15%, transparent);overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid color-mix(in srgb, var(--c-primary) 20%, transparent);">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="width:8px;height:8px;border-radius:50%;background:var(--c-metal);"></div>
               <span style="font-size:15px;font-weight:700;color:#f0f4ff;">Loan Scenario</span>
@@ -1291,7 +1291,7 @@
                 </select>
               </div>
             </div>
-            <div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.18);border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:color-mix(in srgb, var(--c-primary) 7%, transparent);border:1px solid color-mix(in srgb, var(--c-primary) 18%, transparent);border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
               <div style="text-align:center;">
                 <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Down Payment</div>
                 <div style="font-size:16px;font-weight:800;color:var(--c-metal);" id="wfDownAmt">&mdash;</div>
@@ -1311,8 +1311,8 @@
 
       <!-- Rent Scenario Modal -->
       <div id="pfRentModal" onclick="if(event.target===this)pfCloseRentModal()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,18,40,0.72);align-items:center;justify-content:center;">
-        <div style="background:var(--surface);border:2px solid var(--c-metal);border-radius:16px;padding:0;width:100%;max-width:400px;margin:0 16px;box-shadow:0 8px 40px rgba(79,195,247,0.15);overflow:hidden;">
-          <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.2);">
+        <div style="background:var(--surface);border:2px solid var(--c-metal);border-radius:16px;padding:0;width:100%;max-width:400px;margin:0 16px;box-shadow:0 8px 40px color-mix(in srgb, var(--c-primary) 15%, transparent);overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#1a2744 0%,#1e2a50 100%);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid color-mix(in srgb, var(--c-primary) 20%, transparent);">
             <div style="display:flex;align-items:center;gap:10px;">
               <div style="width:8px;height:8px;border-radius:50%;background:var(--c-metal);"></div>
               <span style="font-size:15px;font-weight:700;color:#f0f4ff;">Rent Scenario</span>
@@ -1328,7 +1328,7 @@
               <label style="font-size:11px;font-weight:700;color:var(--c-metal);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:5px;">Rent High ($/mo)</label>
               <input type="text" inputmode="numeric" id="wfRentHigh" class="pro-forma-input" placeholder="$2,000" style="width:100%;" oninput="pfFormatCurrencyInput(this);pfRentModalCalc();">
             </div>
-            <div style="background:rgba(79,195,247,0.07);border:1px solid rgba(79,195,247,0.18);border-radius:10px;padding:12px 16px;text-align:center;">
+            <div style="background:color-mix(in srgb, var(--c-primary) 7%, transparent);border:1px solid color-mix(in srgb, var(--c-primary) 18%, transparent);border-radius:10px;padding:12px 16px;text-align:center;">
               <div style="font-size:11px;font-weight:600;color:#8a9bbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Avg Monthly Rent (used in calculator)</div>
               <div style="font-size:22px;font-weight:800;color:var(--c-metal);" id="wfRentAvg">&mdash;</div>
             </div>
@@ -3080,7 +3080,7 @@
               +'<div style="font-size:40px;margin-bottom:12px;">&#10084;</div>'
               +'<div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Added to Favorites!</div>'
               +'<p style="font-size:13px;color:var(--text-muted);margin:0;line-height:1.5;">Find this deal anytime in your <strong>Favorites</strong> tab.</p>'
-              +'<div style="margin-top:18px;height:3px;border-radius:2px;background:var(--border);overflow:hidden;"><div style="height:100%;background:linear-gradient(90deg,#e8476a,#4fc3f7);animation:offerSuccessBar 2.5s linear forwards;border-radius:2px;"></div></div>'
+              +'<div style="margin-top:18px;height:3px;border-radius:2px;background:var(--border);overflow:hidden;"><div style="height:100%;background:linear-gradient(90deg,#e8476a,var(--c-primary));animation:offerSuccessBar 2.5s linear forwards;border-radius:2px;"></div></div>'
               +'</div>';
             document.body.appendChild(m);
             setTimeout(function(){m.style.opacity='0';m.style.transition='opacity 0.4s';setTimeout(function(){if(m.parentNode)m.parentNode.removeChild(m);},400);},2500);
@@ -5579,7 +5579,7 @@
           '</div>';
       }
       function sectionHeader(title) {
-        return '<div style="grid-column:1/-1;padding:14px 16px 6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#4fc3f7;border-bottom:1px solid var(--border);background:var(--surface-2);">' + title + '</div>';
+        return '<div style="grid-column:1/-1;padding:14px 16px 6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--c-primary);border-bottom:1px solid var(--border);background:var(--surface-2);">' + title + '</div>';
       }
       function grid(cells) {
         return '<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;">' + cells + '</div>';
@@ -5693,7 +5693,7 @@
 
       // Property marker — gold star
       var el = document.createElement('div');
-      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 36 36"><filter id="ds2"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.5"/></filter><polygon points="18,3 22,13 33,13 24,20 27,31 18,24 9,31 12,20 3,13 14,13" fill="#1a2744" stroke="#4fc3f7" stroke-width="1.5" filter="url(#ds2)"/></svg>';
+      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 36 36"><filter id="ds2"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.5"/></filter><polygon points="18,3 22,13 33,13 24,20 27,31 18,24 9,31 12,20 3,13 14,13" fill="#1a2744" style="stroke:var(--c-primary)" stroke-width="1.5" filter="url(#ds2)"/></svg>';
       el.style.cssText = 'cursor:pointer;width:38px;height:38px;';
       new mapboxgl.Marker(el).setLngLat([property.lng, property.lat]).addTo(dealMap);
 
@@ -5777,12 +5777,12 @@
             if (!lat || !lng) return;
             var rel = document.createElement('div');
             rel.className = 'comp-marker-rental'; rel.dataset.rentIdx = i;
-            rel.style.cssText = 'width:22px;height:22px;border-radius:50%;background:#4fc3f7;border:2px solid white;color:#0f172a;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.4);';
+            rel.style.cssText = 'width:22px;height:22px;border-radius:50%;background:var(--c-primary);border:2px solid white;color:#0f172a;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.4);';
             rel.textContent = 'R' + (i + 1);
             var rm = new mapboxgl.Marker(rel).setLngLat([lng, lat])
               .setPopup(new mapboxgl.Popup({offset:15}).setHTML(
                 formatPopupAddr(comp.address||'Rental') +
-                '<br><span style="color:#4fc3f7;font-weight:700;">Rent: ' + Portal.fc(comp.rent||comp.monthly_rent) + '/mo</span>' +
+                '<br><span style="color:var(--c-primary);font-weight:700;">Rent: ' + Portal.fc(comp.rent||comp.monthly_rent) + '/mo</span>' +
                 '<br>' + (comp.beds||comp.bedrooms||'?') + ' bd / ' + (comp.baths||comp.bathrooms||'?') + ' ba' +
                 (comp.sqft ? ' &bull; ' + comp.sqft.toLocaleString() + ' sqft' : '') +
                 (comp.listed ? '<br><span style="color:#6b7280;font-size:12px;">Listed: ' + formatCompDate(comp.listed) + (comp.distance ? ' &bull; ' + comp.distance + ' mi' : '') + '</span>' : '')
@@ -5957,12 +5957,12 @@
             '<thead><tr><th>#</th><th>Address</th><th>Beds</th><th>Baths</th><th>Sqft</th><th>Monthly Rent</th><th>Listed</th><th>Dist</th></tr></thead>' +
             '<tbody>' + (comps.rental_comps || []).map(function(c, i) {
               return '<tr data-rent-idx="' + i + '">' +
-                '<td><span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#4fc3f7;color:#0f172a;font-size:11px;font-weight:800;">R' + (i+1) + '</span></td>' +
+                '<td><span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--c-primary);color:#0f172a;font-size:11px;font-weight:800;">R' + (i+1) + '</span></td>' +
                 '<td>' + (c.address || '—') + '</td>' +
                 '<td>' + (c.beds || c.bedrooms || '—') + '</td>' +
                 '<td>' + (c.baths || c.bathrooms || '—') + '</td>' +
                 '<td>' + (c.sqft ? c.sqft.toLocaleString() : '—') + '</td>' +
-                '<td style="color:#4fc3f7;font-weight:700;">' + Portal.fc(c.rent || c.monthly_rent) + '/mo</td>' +
+                '<td style="color:var(--c-primary);font-weight:700;">' + Portal.fc(c.rent || c.monthly_rent) + '/mo</td>' +
                 '<td>' + formatCompDate(c.listed) + '</td>' +
                 '<td>' + (c.distance != null ? c.distance + ' mi' : '\u2014') + '</td>' +
               '</tr>';
@@ -5992,7 +5992,7 @@
         var idx = parseInt(row.dataset.rentIdx);
         var rm = rentalMarkers.find(function(m){return m.idx===idx;});
         row.addEventListener('mouseenter', function() {
-          row.style.background = 'rgba(79,195,247,0.1)';
+          row.style.background = 'color-mix(in srgb, var(--c-primary) 10%, transparent)';
           if (rm && rm.el) { rm.el.classList.add('comp-marker-active'); }
         });
         row.addEventListener('mouseleave', function() {
@@ -6000,7 +6000,7 @@
           if (rm && rm.el) { rm.el.classList.remove('comp-marker-active'); }
         });
         if (rm) {
-          rm.el.addEventListener('mouseenter', function() { row.style.background = 'rgba(79,195,247,0.1)'; });
+          rm.el.addEventListener('mouseenter', function() { row.style.background = 'color-mix(in srgb, var(--c-primary) 10%, transparent)'; });
           rm.el.addEventListener('mouseleave', function() { row.style.background = ''; });
         }
       });
@@ -6304,7 +6304,7 @@
                 {
                   label: 'Property Value',
                   data: data.equityGrowthData.values,
-                  borderColor: '#4fc3f7',
+                  borderColor: '#5BC9D4',
                   backgroundColor: 'transparent',
                   borderWidth: 2,
                   pointRadius: 3,
@@ -6369,7 +6369,7 @@
                 {
                   label: 'Property Value',
                   data: data.projMiniData.values,
-                  borderColor: '#4fc3f7',
+                  borderColor: '#5BC9D4',
                   backgroundColor: 'transparent',
                   borderWidth: 2,
                   pointRadius: 4,

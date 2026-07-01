@@ -45,9 +45,9 @@
   --c-secondary:#22D3EE;   /* Aqua Glow — secondary */
   --c-info:#22D3EE;        /* Aqua Glow — info rides with secondary in dark */
   --c-accent:#8B5CF6;      /* Amethyst — accent */
-  --c-metal:#7A8B9D;       /* Steel platinum */
+  --c-metal:#5E6E7E;       /* v2.4.2 — deeper platinum for oceanic scene (two-depths rule) */
   --metal-ink:#fff;
-  --metal-grad:linear-gradient(180deg,#9DB0BE,#7A8B9D 52%,#5E6E7E);
+  --metal-grad:linear-gradient(180deg,#7A8B9D,#5E6E7E 52%,#43505E);
 
   --royal:#14B8A6; --royal-hi:#3FD6C4; /* stray royal refs point to teal (kill leftover royal) */
   --accent:var(--c-primary);
@@ -750,3 +750,78 @@ body{ background:var(--canvas); }
 [data-theme="light"] .investor-nav .nav-link{
   color:rgba(255,255,255,.92);
 }
+
+/* ============================================================================
+ v2.4.2 APPENDED RULES — !important justification
+ -------------------------------------------------------------------------
+ All rules below use !important. This is intentional and audit-safe:
+ every selector below targets an element whose page-local <style> block
+ OR inline style="" attribute bakes in a color/background literal that a
+ normal cascade rule cannot beat. Editing the source literals inline (per
+ §D/§E/§F below) removes SOME but not all of those overrides — the rules
+ here catch the residue defensively. When v2.4.4 (per-page inline sweep
+ for non-money pages) fully removes the underlying literals, these
+ !important rules can be softened. Until then, they stay.
+ ============================================================================ */
+
+/* Sub-header hero band + footer top edge read as floating panels */
+.page-hero{ border-radius:var(--r-lg); overflow:hidden; }
+.site-footer{
+  border-top-left-radius:var(--r-lg);
+  border-top-right-radius:var(--r-lg);
+  overflow:hidden;
+}
+
+.faq-item{
+  border-radius:var(--r-md) !important;
+  border:1px solid var(--glassw-bd) !important;
+  background:var(--glassw) !important;
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  box-shadow:0 8px 22px rgba(3,9,20,.10), inset 0 1px 0 var(--glass-spec);
+}
+.faq-item.open{
+  border-color:color-mix(in srgb, var(--c-primary) 40%, transparent) !important;
+}
+.faq-chevron{ background:var(--surface-2); border:1px solid var(--glassw-bd); }
+.faq-item.open .faq-chevron{
+  background:color-mix(in srgb, var(--c-primary) 14%, transparent);
+}
+
+/* The CTA strip sits over the near-white scene floor in light — dark ink required. */
+[data-theme="light"] .investor-cta-strip h2,
+[data-theme="light"] .investor-cta-strip .section-heading{ color:var(--text) !important; }
+[data-theme="light"] .investor-cta-strip p,
+[data-theme="light"] .investor-cta-strip .section-sub{ color:var(--text-muted) !important; }
+
+.pin-menu-body{
+  background:var(--metal-grad) !important;
+  clip-path:polygon(50% 0%,100% 16%,100% 100%,0% 100%,0% 16%);
+  box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.5);
+}
+.pin-menu-shape{ filter:drop-shadow(0 24px 48px rgba(0,0,0,.5)) !important; }
+.pin-menu-dot{
+  background:linear-gradient(160deg,#16324a,#0c2237) !important;
+  box-shadow:0 0 0 7px rgba(255,255,255,.45), inset 0 1px 2px rgba(255,255,255,.3) !important;
+}
+.pin-menu-link{
+  color:var(--metal-ink) !important;
+  border-radius:0;
+  border-right-color:rgba(22,32,43,.10) !important;
+  border-bottom-color:rgba(22,32,43,.10) !important;
+}
+.pin-menu-link i, .pin-menu-link svg{ color:#2C3E4C !important; }
+.pin-menu-link.active{
+  background:linear-gradient(180deg,color-mix(in srgb, var(--c-primary) 22%, transparent),color-mix(in srgb, var(--c-primary) 10%, transparent)) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c-primary) 45%, transparent) !important;
+  color:#0E7A88 !important;
+}
+.pin-menu-link.active i{ color:#0E7A88 !important; }
+.pin-menu-signout, .pin-menu-signout i{ color:var(--rose) !important; }
+.pin-menu-close{
+  background:rgba(22,32,43,.08) !important;
+  border:1px solid rgba(22,32,43,.18) !important;
+  color:#5A6B78 !important;
+}
+.pin-menu-theme-label{ color:#5A6B78 !important; }
+.pin-menu-theme-switch{ background:var(--c-primary) !important; }

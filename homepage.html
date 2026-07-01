@@ -75,9 +75,9 @@
     .faq-q { color: var(--text) !important; }
 
     /* 12. FAQ — Light mode visual break */
-    [data-theme="light"] .faq-section { background: #f8fafc; }
+    [data-theme="light"] .faq-section { background: transparent; }
     @media (max-width: 768px) {
-      [data-theme="light"] .faq-section { background: #f8fafc !important; border-top: 1px solid #e2e8f0 !important; }
+      [data-theme="light"] .faq-section { background: transparent !important; border-top: 1px solid var(--hair) !important; }
     }
 
     /* 13. Social icons — larger on mobile */
@@ -124,7 +124,7 @@
   </section>
 
   <!-- Video + Featured Deals (combined) -->
-  <section id="introSection" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+  <section id="introSection" style="background:transparent;border-top:1px solid var(--hair);">
     <div style="max-width:1100px;margin:0 auto;padding:72px 24px;">
 
       <!-- TOP HALF: Two columns -->
@@ -154,7 +154,7 @@
       </div>
 
       <!-- Divider -->
-      <hr style="margin:48px 0 40px;border:none;border-top:1px solid #e2e8f0;">
+      <hr style="margin:48px 0 40px;border:none;border-top:1px solid var(--hair);">
 
       <!-- BOTTOM HALF: Featured Deals -->
       <div>
@@ -476,7 +476,7 @@
 
       console.log('[loadFeatured] data:', data ? data.length : 'null', 'error:', error ? error.message : 'none');
       if ((!data || data.length === 0)) {
-        section.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p>Check back soon for featured deals.</p></div>';
+        section.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" style="fill:var(--c-primary);fill-opacity:0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" style="fill:var(--c-primary)"/></svg><p>Check back soon for featured deals.</p></div>';
         return;
       }
 
