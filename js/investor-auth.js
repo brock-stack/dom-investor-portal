@@ -78,6 +78,9 @@ window.Portal = {
     // Update pin menu theme button label if open
     const pinBtn = document.getElementById('pinThemeBtn');
     if (pinBtn) pinBtn.textContent = isDark ? '\u2600\uFE0F Switch to Light Mode' : '\uD83C\uDF19 Switch to Dark Mode';
+    // v2.4.3: Update pin-menu overlay theme label if open
+    const pinLbl = document.getElementById('pinThemeLabel');
+    if (pinLbl) pinLbl.textContent = isDark ? 'Light Mode' : 'Dark Mode';
   },
 
   async renderNav(opts) {
@@ -95,7 +98,7 @@ window.Portal = {
       const fullName = [fname, lname].filter(Boolean).join(' ') || email.split('@')[0];
       const initials = ((fname[0] || '') + (lname[0] || '')).toUpperCase() || email[0].toUpperCase();
       const avatarUrl = profile ? profile.avatar_url : null;
-      window._portalMenuUser = { name: fullName, email: email };
+      window._portalMenuUser = { name: fullName, email: email, avatar_url: avatarUrl };
       if (navRight) {
         var inner = avatarUrl
           ? '<img src="' + avatarUrl + '" style="width:34px;height:34px;border-radius:50%;object-fit:cover;" alt="Profile">'
@@ -142,7 +145,7 @@ window.Portal = {
     var themeLabel = isDark ? 'Light Mode' : 'Dark Mode';
     var themeHTML = '<button onclick="event.stopPropagation();Portal.toggleTheme();" class="pin-menu-link">' +
       '<span class="pin-menu-link-icon">' + themeIcon + '</span>' +
-      '<span class="pin-menu-link-label">' + themeLabel + '</span>' +
+      '<span class="pin-menu-link-label" id="pinThemeLabel">' + themeLabel + '</span>' +
     '</button>';
     var signOutHTML = '<button onclick="Portal.logout()" class="pin-menu-link pin-menu-signout">' +
       '<span class="pin-menu-link-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>' +
@@ -154,10 +157,10 @@ window.Portal = {
         '<div class="pin-menu-body">' +
           '<button class="pin-menu-close" onclick="Portal.closePinMenu()">&times;</button>' +
           '<div class="pin-menu-dot">' +
-            '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2C7 2 3 6 3 11c0 7 9 13 9 13s9-6 9-13c0-5-4-9-9-9zm0 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="#1a2744"/></svg>' +
+            (u.avatar_url ? '<img src="' + u.avatar_url + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="Profile">' : '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2C7 2 3 6 3 11c0 7 9 13 9 13s9-6 9-13c0-5-4-9-9-9zm0 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="#1a2744"/></svg>') +
           '</div>' +
           '<div style="text-align:center;padding:10px 16px 14px;">' +
-            '<div style="font-size:13px;font-weight:700;color:#f0f4ff;">' + u.name + '</div>' +
+            '<div style="font-size:13px;font-weight:700;color:var(--metal-ink);">' + u.name + '</div>' +
             (u.email ? '<div style="font-size:11px;color:#8a9bbf;margin-top:2px;">' + u.email + '</div>' : '') +
           '</div>' +
           '<div class="pin-menu-grid">' + gridHTML + '</div>' +
