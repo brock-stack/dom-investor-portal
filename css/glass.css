@@ -846,3 +846,65 @@ body{ background:var(--canvas); }
  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
 }
+
+/* ============================================================
+   v2.4.4 — Gulf Liquid Glass polish
+   ============================================================ */
+
+/* v2.4.4 §A — Light-mode footer text readable on white glass footer.
+   Dark mode inherits the base rules (which already read on the dark scene). */
+[data-theme="light"] .site-footer .footer-col h4{ color:var(--text-muted) !important; }
+[data-theme="light"] .site-footer .footer-col a{ color:var(--text) !important; }
+[data-theme="light"] .site-footer .footer-tagline{ color:var(--text-muted) !important; }
+[data-theme="light"] .site-footer .footer-social-link{ color:var(--text-muted) !important; }
+[data-theme="light"] .portal-footer p{ color:var(--text-muted) !important; }
+[data-theme="light"] .portal-footer .footer-links a{ color:var(--text-muted) !important; }
+
+/* v2.4.4 §C — FAQ heading shares the centered 800px column with .faq-list */
+.faq-section > h2,
+.faq-section > .section-heading{
+  max-width:800px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* v2.4.4 §D — Dark-mode pin menu: navy body + aqua-glow active squares.
+   Supersedes v2.4.3 dark-divider values. Light menu unchanged. */
+[data-theme="dark"] .pin-menu-body{
+  background:linear-gradient(180deg,#243456,#1a2744) !important;
+}
+[data-theme="dark"] .pin-menu-link{
+  border-right-color:rgba(255,255,255,.12) !important;
+  border-bottom-color:rgba(255,255,255,.12) !important;
+}
+[data-theme="dark"] .pin-menu-bottom-row{
+  border-top-color:rgba(255,255,255,.12) !important;
+}
+[data-theme="dark"] .pin-menu-link.active{
+  background:rgba(34,211,238,.18) !important;
+  box-shadow:inset 0 0 0 1px rgba(34,211,238,.55) !important;
+  color:#7FE9F5 !important;
+}
+[data-theme="dark"] .pin-menu-link.active i{ color:#7FE9F5 !important; }
+
+/* v2.4.4 §E — CTA strip: shorter, rounded floating card, theme-aware bg */
+.investor-cta-strip{
+  padding:56px 24px !important; /* was 96px */
+  max-width:1100px;
+  margin:32px auto !important;
+  border-radius:var(--r-lg);
+  overflow:hidden;
+}
+/* Dark-mode: replace the hardcoded near-white bg from investor.css:1911 with dark glass
+   so the floating card still reads in dark (transparent would kill the rounded/inset visual). */
+[data-theme="dark"] .investor-cta-strip{
+  background:var(--glassw) !important;
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
+  border:1px solid var(--glassw-bd) !important;
+  border-top:none !important; /* neutralize the base #e2e8f0 top border from investor.css:1911 */
+}
+/* Light-mode: keep the near-white gradient (matches shallows) but soften edge */
+[data-theme="light"] .investor-cta-strip{
+  border-top:none !important; /* the base #e2e8f0 border reads as a hairline in the floating card — remove */
+}
