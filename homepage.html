@@ -134,8 +134,47 @@
         <div class="intro-video-col" style="flex:0 0 40%;">
           <div data-youtube-url="" style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10);">
             <div style="position:absolute;inset:0;background:var(--metal-grad);display:flex;flex-direction:column;align-items:center;justify-content:center;">
-              <div style="width:64px;height:64px;background:var(--c-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0.9;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="#0f172a"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <div class="play-diamond-wrap" style="width:88px;height:88px;cursor:pointer;">
+               <svg viewBox="0 0 128 128" width="88" height="88" xmlns="http://www.w3.org/2000/svg" aria-label="Play video" class="play-diamond">
+               <defs>
+               <radialGradient id="pbChrome" cx="40%" cy="33%" r="72%">
+               <stop offset="0%" stop-color="#FFFFFF"/><stop offset="24%" stop-color="#EAF1F6"/>
+               <stop offset="52%" stop-color="#C2D0DB"/><stop offset="76%" stop-color="#97A9B7"/>
+               <stop offset="100%" stop-color="#75899B"/>
+               </radialGradient>
+               <linearGradient id="pbCrys" x1="0" y1="0" x2="1" y2="1">
+               <stop offset="0%" stop-color="#FFFFFF"/><stop offset="55%" stop-color="#E4EDF3"/>
+               <stop offset="100%" stop-color="#B9C8D4"/>
+               </linearGradient>
+               <clipPath id="pbClip"><circle cx="64" cy="64" r="60"/></clipPath>
+               </defs>
+               <circle cx="64" cy="64" r="60" fill="url(#pbChrome)"/>
+               <g clip-path="url(#pbClip)" opacity="0.9">
+               <polygon points="64,64 94,12 34,12" fill="#EDF3F7"/>
+               <polygon points="64,64 34,12 4,64" fill="#E0EAF1"/>
+               <polygon points="64,64 124,64 94,12" fill="#CBD8E2"/>
+               <polygon points="64,64 4,64 34,116" fill="#B7C6D2"/>
+               <polygon points="64,64 94,116 124,64" fill="#C2D0DB"/>
+               <polygon points="64,64 34,116 94,116" fill="#9DAFBC"/>
+               <g stroke="#8CA0AF" stroke-width="0.6" opacity="0.5">
+               <line x1="64" y1="64" x2="124" y2="64"/><line x1="64" y1="64" x2="94" y2="12"/>
+               <line x1="64" y1="64" x2="34" y2="12"/><line x1="64" y1="64" x2="4" y2="64"/>
+               <line x1="64" y1="64" x2="34" y2="116"/><line x1="64" y1="64" x2="94" y2="116"/>
+               </g>
+               </g>
+               <circle cx="64" cy="64" r="60" fill="none" stroke="#7E94A6" stroke-width="1.3"/>
+               <circle cx="64" cy="64" r="57" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.45"/>
+               <ellipse cx="42" cy="40" rx="13" ry="8" fill="#FFFFFF" opacity="0.6"/>
+               <polygon points="48,40 48,88 96,64" fill="url(#pbCrys)" stroke="#6E8091" stroke-width="1.1" stroke-linejoin="round"/>
+               <line x1="48" y1="40" x2="73" y2="64" stroke="#FFFFFF" stroke-width="0.8" opacity="0.7"/>
+               <line x1="48" y1="88" x2="73" y2="64" stroke="#9DAFBC" stroke-width="0.8" opacity="0.6"/>
+               <!-- Sparkles: three 4-point stars, positioned in the SVG's outer/corner negative space (NOT on the chrome facets themselves). Staggered @keyframes twinkle. -->
+               <g class="play-diamond-sparkles">
+               <path class="pd-spark pd-spark-1" d="M 108 18 L 110 24 L 116 26 L 110 28 L 108 34 L 106 28 L 100 26 L 106 24 Z" fill="#FFFFFF"/>
+               <path class="pd-spark pd-spark-2" d="M 18 100 L 19.5 104 L 23.5 105.5 L 19.5 107 L 18 111 L 16.5 107 L 12.5 105.5 L 16.5 104 Z" fill="#FFFFFF"/>
+               <path class="pd-spark pd-spark-3" d="M 116 108 L 117 111 L 120 112 L 117 113 L 116 116 L 115 113 L 112 112 L 115 111 Z" fill="#FFFFFF"/>
+               </g>
+               </svg>
               </div>
               <div style="font-size:12px;color:var(--metal-ink);margin-top:14px;font-weight:500;">Watch me</div>
             </div>
@@ -145,9 +184,9 @@
         <!-- Right: Text content -->
         <div class="intro-text-col" style="flex:1;">
           <div style="font-size:11px;font-weight:700;color:#3b82f6;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">FROM THE FOUNDER</div>
-          <h2 style="font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--text);line-height:1.2;margin-bottom:16px;">Real deals from a real investor.</h2>
-          <p style="font-size:15px;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">I'm Brock Holliman — licensed Florida broker, builder of 600+ homes, and full-time real estate investor. Every property on this portal is a deal I'd put my own money into. This isn't a listing aggregator. This is a curated investment marketplace built by someone who actually does the work.</p>
-          <p style="font-size:15px;color:var(--text-muted);line-height:1.7;">I personally own and manage over 100 rental properties through my own property management company. When I say I know what makes a good investment, it's because I'm living it every day — not just selling it.</p>
+          <h2 style="font-size:clamp(26px,3.2vw,40px);font-weight:800;color:var(--text);line-height:1.2;margin-bottom:16px;">Real deals from a real investor.</h2>
+          <p style="font-size:17px;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">I'm Brock Holliman — licensed Florida broker, builder of 600+ homes, and full-time real estate investor. Every property on this portal is a deal I'd put my own money into. This isn't a listing aggregator. This is a curated investment marketplace built by someone who actually does the work.</p>
+          <p style="font-size:17px;color:var(--text-muted);line-height:1.7;">I personally own and manage over 100 rental properties through my own property management company. When I say I know what makes a good investment, it's because I'm living it every day — not just selling it.</p>
         </div>
 
       </div>
@@ -307,8 +346,8 @@
   <!-- Investor CTA Strip -->
   <section class="investor-cta-strip">
     <div class="section-container" style="text-align:center;">
-      <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:#0f172a;margin-bottom:12px;">Ready to browse the inventory?</h2>
-      <p style="color:#64748b;font-size:16px;margin-bottom:28px;">Get access to Florida's best off-market investment deals.</p>
+      <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:var(--text);margin-bottom:12px;">Ready to browse the inventory?</h2>
+      <p style="color:var(--text-muted);font-size:16px;margin-bottom:28px;">Get access to Florida's best off-market investment deals.</p>
       <div id="ctaButtons" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         <a href='/signup' onmouseout='this.style.background=\'#4fc3f7\'' onmouseover='this.style.background=\'#38b2e8\'' style='background:var(--c-metal);color:#0f172a;padding:14px 36px;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;display:inline-block;transition:background .2s;'>Get Investor Access &rarr;</a>
         <a class='cta-btn-outline' href='/marketplace'>Browse Deals</a>

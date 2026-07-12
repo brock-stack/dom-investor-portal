@@ -811,7 +811,7 @@ body{ background:var(--canvas); }
   border-right-color:rgba(22,32,43,.10) !important;
   border-bottom-color:rgba(22,32,43,.10) !important;
 }
-.pin-menu-link i, .pin-menu-link svg{ color:#2C3E4C !important; }
+.pin-menu-link i, .pin-menu-link svg{ color:var(--text) !important; }
 .pin-menu-link.active{
   background:linear-gradient(180deg,color-mix(in srgb, var(--c-primary) 22%, transparent),color-mix(in srgb, var(--c-primary) 10%, transparent)) !important;
   box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c-primary) 45%, transparent) !important;
@@ -907,4 +907,41 @@ body{ background:var(--canvas); }
 /* Light-mode: keep the near-white gradient (matches shallows) but soften edge */
 [data-theme="light"] .investor-cta-strip{
   border-top:none !important; /* the base #e2e8f0 border reads as a hairline in the floating card — remove */
+}
+
+/* v2.4.5 §B3: hover state on menu tiles — mirrors .active look. Sign Out keeps rose. */
+.pin-menu-link{ transition: background .15s ease, color .15s ease, box-shadow .15s ease; }
+.pin-menu-link:not(.pin-menu-signout):hover{
+ background: color-mix(in srgb, var(--c-primary) 12%, transparent) !important;
+ color: #0E7A88 !important;
+}
+.pin-menu-link:not(.pin-menu-signout):hover i,
+.pin-menu-link:not(.pin-menu-signout):hover svg{ color: #0E7A88 !important; }
+[data-theme="dark"] .pin-menu-link:not(.pin-menu-signout):hover{
+ background: rgba(34,211,238,.18) !important;
+ box-shadow: inset 0 0 0 1px rgba(34,211,238,.55) !important;
+ color: #7FE9F5 !important;
+}
+[data-theme="dark"] .pin-menu-link:not(.pin-menu-signout):hover i,
+[data-theme="dark"] .pin-menu-link:not(.pin-menu-signout):hover svg{ color: #7FE9F5 !important; }
+
+/* v2.4.5 §D: platinum diamond sparkle twinkle */
+.play-diamond-sparkles .pd-spark{
+ transform-box: fill-box;
+ transform-origin: center;
+ opacity: 0;
+ animation: pdTwinkle 3.2s ease-in-out infinite;
+}
+.play-diamond-sparkles .pd-spark-1{ animation-delay: 0s; }
+.play-diamond-sparkles .pd-spark-2{ animation-delay: 1.1s; }
+.play-diamond-sparkles .pd-spark-3{ animation-delay: 2.0s; }
+@keyframes pdTwinkle{
+ 0% { opacity: 0; transform: scale(0.4); }
+ 15% { opacity: 0.95; transform: scale(1.15); }
+ 30% { opacity: 0.4; transform: scale(0.9); }
+ 45% { opacity: 0; transform: scale(0.4); }
+ 100% { opacity: 0; transform: scale(0.4); }
+}
+@media (prefers-reduced-motion: reduce){
+ .play-diamond-sparkles .pd-spark{ animation: none; opacity: 0.85; }
 }
