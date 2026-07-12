@@ -36,62 +36,7 @@
       width: 100%;
     }
 
-    .faq-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin-bottom: 10px;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    .faq-item.open { border-color: rgba(79,195,247,0.35); }
 
-    .faq-question {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 18px 22px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .faq-question-text {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.4;
-    }
-    .faq-chevron {
-      flex-shrink: 0;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: var(--accent);
-      transition: transform 0.2s, background 0.2s;
-    }
-    .faq-item.open .faq-chevron {
-      transform: rotate(180deg);
-      background: rgba(79,195,247,0.12);
-    }
-
-    .faq-answer {
-      display: none;
-      padding: 0 22px 20px;
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.75;
-      border-top: 1px solid var(--border);
-      padding-top: 16px;
-    }
-    .faq-item.open .faq-answer { display: block; }
-    .faq-answer a { color: var(--accent); text-decoration: none; }
-    .faq-answer a:hover { text-decoration: underline; }
 
     .faq-cta {
       margin-top: 40px;
@@ -158,115 +103,27 @@
 
     <div class="faq-body">
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">How do I get access to the portal? Is it really free?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          Yes — investor access is completely free. Simply <a href='/signup'>create an account</a> with your name, email, and phone, then review and sign our investor terms agreement. Once complete, you have immediate access to all listed deals, the marketplace, and your investor dashboard. There is no approval queue, no fee, and no credit check.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I get access to the portal? Is it really free? <span class="faq-icon">+</span></button><div class="faq-a">Yes — investor access is completely free. Simply <a href='/signup'>create an account</a> with your name, email, and phone, then review and sign our investor terms agreement. Once complete, you have immediate access to all listed deals, the marketplace, and your investor dashboard. There is no approval queue, no fee, and no credit check.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">What does "off-market" mean, and how is it different from MLS?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          Off-market properties are deals that are never listed on the Multiple Listing Service (MLS) or publicly marketed through retail real estate channels. DOM sources these properties directly from motivated sellers through a multi-channel acquisition engine — including large-scale direct mail campaigns, digital advertising, outbound calling, and a growing referral network. We invest heavily in lead generation across Florida, which means our deal flow is consistent, sourced at volume, and curated before it ever reaches our investors. By the time a listing hits the portal, we've already done the sourcing work — giving you access to inventory the public never sees, with less competition, faster closings, and the opportunity to acquire below retail market value.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What does "off-market" mean, and how is it different from MLS? <span class="faq-icon">+</span></button><div class="faq-a">Off-market properties are deals that are never listed on the Multiple Listing Service (MLS) or publicly marketed through retail real estate channels. DOM sources these properties directly from motivated sellers through a multi-channel acquisition engine — including large-scale direct mail campaigns, digital advertising, outbound calling, and a growing referral network. We invest heavily in lead generation across Florida, which means our deal flow is consistent, sourced at volume, and curated before it ever reaches our investors. By the time a listing hits the portal, we've already done the sourcing work — giving you access to inventory the public never sees, with less competition, faster closings, and the opportunity to acquire below retail market value.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">Who is Direct Off Market and what is their track record?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          Direct Off Market (DOM) was launched in January 2026 by Brock Holliman — a Florida-based real estate broker, licensed general contractor, and developer with a track record that includes 300+ residential flips, 250+ new home builds across multiple markets, and over 100 rental properties currently under management. Brock also operates My New Rental, a Florida property management company. DOM is built on deep operator experience, not just theory. Every deal on the portal has passed our internal review — if we wouldn't be comfortable investing in it ourselves, it doesn't make it onto the platform. Our investor portal exists to give serious buyers access to the same deal flow that experienced operators use, sourced at scale, vetted rigorously, and brought to market with full transparency on pricing and investment metrics.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Who is Direct Off Market and what is their track record? <span class="faq-icon">+</span></button><div class="faq-a">Direct Off Market (DOM) was launched in January 2026 by Brock Holliman — a Florida-based real estate broker, licensed general contractor, and developer with a track record that includes 300+ residential flips, 250+ new home builds across multiple markets, and over 100 rental properties currently under management. Brock also operates My New Rental, a Florida property management company. DOM is built on deep operator experience, not just theory. Every deal on the portal has passed our internal review — if we wouldn't be comfortable investing in it ourselves, it doesn't make it onto the platform. Our investor portal exists to give serious buyers access to the same deal flow that experienced operators use, sourced at scale, vetted rigorously, and brought to market with full transparency on pricing and investment metrics.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">What types of deals are on the portal and how does DOM get paid?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          The DOM portal features several deal types depending on where a property is in our pipeline: wholesale assignments, turnkey renovated properties, and occasionally new construction opportunities. Across all deal types, DOM earns a service fee that is incorporated into the asking price — there is no separate buyer's agent commission or hidden costs. The fee structure is disclosed at or before offer acceptance. Every deal on the portal has been evaluated by our team against the same standard we hold our own investments to — if we wouldn't feel comfortable owning it, we don't bring it to market.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What types of deals are on the portal and how does DOM get paid? <span class="faq-icon">+</span></button><div class="faq-a">The DOM portal features several deal types depending on where a property is in our pipeline: wholesale assignments, turnkey renovated properties, and occasionally new construction opportunities. Across all deal types, DOM earns a service fee that is incorporated into the asking price — there is no separate buyer's agent commission or hidden costs. The fee structure is disclosed at or before offer acceptance. Every deal on the portal has been evaluated by our team against the same standard we hold our own investments to — if we wouldn't feel comfortable owning it, we don't bring it to market.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">How do I submit an offer on a property?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          Navigate to any deal on the <a href='/marketplace'>Marketplace</a>, open the deal detail page, and click the "Make an Offer" button. You'll walk through a simple 3-step process: review the property summary and disclaimer, submit your offer price and financing details, and confirm. Offers go directly to the DOM acquisitions team and you'll receive a response within one business day.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I submit an offer on a property? <span class="faq-icon">+</span></button><div class="faq-a">Navigate to any deal on the <a href='/marketplace'>Marketplace</a>, open the deal detail page, and click the "Make an Offer" button. You'll walk through a simple 3-step process: review the property summary and disclaimer, submit your offer price and financing details, and confirm. Offers go directly to the DOM acquisitions team and you'll receive a response within one business day.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">What happens after I submit an offer?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          After submitting, the DOM acquisitions team reviews your offer and will contact you — typically within one business day — to discuss next steps. If your offer is accepted, you'll receive the contract documents for your review and signature. From there, we coordinate the closing process and guide you through to funding. Your submitted offers and their current status are tracked in the Offers tab of your dashboard.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What happens after I submit an offer? <span class="faq-icon">+</span></button><div class="faq-a">After submitting, the DOM acquisitions team reviews your offer and will contact you — typically within one business day — to discuss next steps. If your offer is accepted, you'll receive the contract documents for your review and signature. From there, we coordinate the closing process and guide you through to funding. Your submitted offers and their current status are tracked in the Offers tab of your dashboard.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">What Florida markets does DOM work in?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          DOM operates statewide across Florida. Our primary deal flow tends to concentrate in Southwest and Central Florida — markets like Tampa, Sarasota, Charlotte County, Lee County, and the Orlando metro — but we source and close deals throughout the state. Any given week could bring inventory from Miami, Fort Lauderdale, Tallahassee, Pensacola, or anywhere in between. Set your Buy Box preferences in your dashboard and we'll notify you the moment something hits your target area.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What Florida markets does DOM work in? <span class="faq-icon">+</span></button><div class="faq-a">DOM operates statewide across Florida. Our primary deal flow tends to concentrate in Southwest and Central Florida — markets like Tampa, Sarasota, Charlotte County, Lee County, and the Orlando metro — but we source and close deals throughout the state. Any given week could bring inventory from Miami, Fort Lauderdale, Tallahassee, Pensacola, or anywhere in between. Set your Buy Box preferences in your dashboard and we'll notify you the moment something hits your target area.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">Do I need to pay cash, or can I use financing?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          Both cash buyers and financed buyers are welcome on DOM deals. However, many wholesale deals have short close timelines (14–21 days), which makes cash or hard money lending the most common approach. If you plan to use conventional or portfolio financing, be sure to communicate that upfront when submitting your offer so we can ensure the timeline works with the seller. You can indicate your financing situation in your offer form and in your Buy Box preferences.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do I need to pay cash, or can I use financing? <span class="faq-icon">+</span></button><div class="faq-a">Both cash buyers and financed buyers are welcome on DOM deals. However, many wholesale deals have short close timelines (14–21 days), which makes cash or hard money lending the most common approach. If you plan to use conventional or portfolio financing, be sure to communicate that upfront when submitting your offer so we can ensure the timeline works with the seller. You can indicate your financing situation in your offer form and in your Buy Box preferences.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">What is the Pro Forma calculator and how do I save analyses?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          Each deal page includes a built-in Pro Forma calculator in the "Pro Forma" tab. You can also build a standalone custom analysis at <a href='/proforma'>deals.directoffmarket.com/proforma</a> — useful when running numbers on deals you're sourcing outside the portal. Enter your purchase price, rehab costs, rental income, vacancy, expenses, and financing assumptions, and the calculator instantly shows Cap Rate, Cash-on-Cash Return, NOI, monthly cash flow, and flip profit projections. Save any analysis to your dashboard for reference across sessions.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What is the Pro Forma calculator and how do I save analyses? <span class="faq-icon">+</span></button><div class="faq-a">Each deal page includes a built-in Pro Forma calculator in the "Pro Forma" tab. You can also build a standalone custom analysis at <a href='/proforma'>deals.directoffmarket.com/proforma</a> — useful when running numbers on deals you're sourcing outside the portal. Enter your purchase price, rehab costs, rental income, vacancy, expenses, and financing assumptions, and the calculator instantly shows Cap Rate, Cash-on-Cash Return, NOI, monthly cash flow, and flip profit projections. Save any analysis to your dashboard for reference across sessions.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">Are the ARV and repair cost estimates accurate?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          The ARV (After Repair Value) and estimated repair costs provided on deal pages are based on DOM's internal analysis and local comparable sales at the time of listing. These estimates are provided for informational purposes to help you quickly evaluate a deal's potential — they are not appraisals or guarantees. We strongly encourage every investor to independently verify ARV with a licensed appraiser or agent.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are the ARV and repair cost estimates accurate? <span class="faq-icon">+</span></button><div class="faq-a">The ARV (After Repair Value) and estimated repair costs provided on deal pages are based on DOM's internal analysis and local comparable sales at the time of listing. These estimates are provided for informational purposes to help you quickly evaluate a deal's potential — they are not appraisals or guarantees. We strongly encourage every investor to independently verify ARV with a licensed appraiser or agent.</div></div>
 
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-question">
-          <div class="faq-question-text">How do I contact support if I need help?</div>
-          <div class="faq-chevron">▼</div>
-        </div>
-        <div class="faq-answer">
-          The fastest way to reach us is through our <a href='/contact'>Contact page</a> or by emailing <a href="mailto:support@directoffmarket.com">support@directoffmarket.com</a>. You can also call <a href="tel:+14077947947">(407) 794-7947</a> Monday through Friday, 8am–6pm ET. We typically respond to emails within one business day. For urgent deal questions on an active transaction, calling is recommended.
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I contact support if I need help? <span class="faq-icon">+</span></button><div class="faq-a">The fastest way to reach us is through our <a href='/contact'>Contact page</a> or by emailing <a href="mailto:support@directoffmarket.com">support@directoffmarket.com</a>. You can also call <a href="tel:+14077947947">(407) 794-7947</a> Monday through Friday, 8am–6pm ET. We typically respond to emails within one business day. For urgent deal questions on an active transaction, calling is recommended.</div></div>
 
       <!-- CTA -->
       <div class="faq-cta">
@@ -297,12 +154,21 @@
   <script>
   document.getElementById('footerYear').textContent = new Date().getFullYear();
 
-  function toggleFaq(item) {
-    var wasOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item.open').forEach(function(el) {
-      el.classList.remove('open');
-    });
-    if (!wasOpen) item.classList.add('open');
+  function toggleFaq(btn) {
+    var item = btn.closest('.faq-item') || btn.parentElement;
+    var answer = btn.nextElementSibling;
+    var icon = btn.querySelector('.faq-icon');
+    var isOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+    document.querySelectorAll('.faq-a').forEach(function(a) { a.style.display = 'none'; });
+    document.querySelectorAll('.faq-icon').forEach(function(ic) { if(ic) ic.textContent = '+'; });
+    // Open this one if it was closed
+    if (!isOpen) {
+      item.classList.add('open');
+      answer.style.display = 'block';
+      if (icon) icon.textContent = '×';
+    }
   }
 
   (async function() {

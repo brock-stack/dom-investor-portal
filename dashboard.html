@@ -1385,6 +1385,13 @@
     try {
       const { data: pu } = await Portal.supabase.from('portal_users').select('id,contact_id,first_name,last_name,email,phone,investor_type,entity_type,company,birthdate,mailing_street,mailing_city,mailing_state,mailing_zip,business_phone,business_email,business_street,business_city,business_state,business_zip,working_with_realtor,realtor_name,realtor_company,realtor_phone,realtor_email,avatar_url,created_at,onboarding_complete,notif_email,notif_sms').eq('user_id', session.user.id).maybeSingle();
       portalUser = pu; window._portalUser = pu;
+      // v2.4.6 §J1: settings deep-link race fix — if the settings tab is already open, hydrate now.
+      try {
+        var _stTab = document.getElementById('tabSettings');
+        if (_stTab && _stTab.style.display === 'block' && window.SettingsTab && pu) {
+          window.SettingsTab.load(pu);
+        }
+      } catch (e) { console.warn('[Settings] post-fetch hydrate skipped:', e); }
     } catch(e) {}
     const profile = portalUser || (await Portal.getProfile(session.user.id));
     if (profile) {
@@ -1468,7 +1475,17 @@
         }
         if (this.dataset.tab === 'settings') {
           document.getElementById('tabSettings').style.display = 'block';
-          if (window._portalUser && window.SettingsTab) SettingsTab.load(window._portalUser);
+          if (window.SettingsTab) {
+            if (window._portalUser) {
+              SettingsTab.load(window._portalUser);
+            } else {
+              // v2.4.6 §J2: race fix — wait up to ~8s for _portalUser fetch to resolve.
+              var _t = 0, _w = setInterval(function () {
+                if (window._portalUser) { clearInterval(_w); SettingsTab.load(window._portalUser); }
+                else if (++_t > 40) { clearInterval(_w); }
+              }, 200);
+            }
+          }
         } else {
           document.getElementById('tabSettings').style.display = '';
           var ssb = document.getElementById('stFloatSave'); if (ssb) ssb.style.display = 'none';
@@ -2722,6 +2739,7 @@
     function load(pu) {
       if (!pu) return;
       _loaded = true;
+      SettingsTab._loaded = true; // v2.4.6 §J3: expose for save() guard
       _set('st_firstName', pu.first_name);
       _set('st_lastName', pu.last_name);
       _set('st_email', pu.email);
@@ -2795,6 +2813,13 @@
       if (btn) { btn.disabled=true; btn.textContent='Saving...'; }
       var pu = window._portalUser;
       if (!pu) { Portal.toast('Session expired. Refresh and try again.', 'error'); return; }
+      // v2.4.6 §J4: DATA-LOSS guard — refuse to save if the form hasn't hydrated.
+      // Prevents wiping name/phone/address/company when the user deep-links to ?tab=settings
+      // and clicks Save before the portal_users fetch resolves.
+      if (!SettingsTab._loaded) {
+        Portal.toast('Still loading your profile — give it a second and try again.', 'error');
+        return;
+      }
       try {
         var update = {
           first_name: (document.getElementById('st_firstName').value||'').trim()||null,

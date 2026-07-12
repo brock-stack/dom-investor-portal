@@ -420,6 +420,26 @@
     }
     .btn-interest-submitted:disabled { opacity: 1; }
     .hero-action-btns .btn-interest-submitted { min-height: 54px; padding: 11px 20px; font-size: 16px; }
+    [data-theme="light"] .interest-noted{
+     background: rgba(246,231,125,.22);
+     border-color: rgba(246,231,125,.55);
+     color: #9A7A12;
+    }
+    [data-theme="dark"] .interest-noted{
+     background: rgba(139,92,246,.18);
+     border-color: rgba(139,92,246,.50);
+     color: #B79BFF;
+    }
+    [data-theme="light"] .btn-interest-submitted{
+     background: rgba(246,231,125,.22);
+     border-color: rgba(246,231,125,.55);
+     color: #9A7A12;
+    }
+    [data-theme="dark"] .btn-interest-submitted{
+     background: rgba(139,92,246,.18);
+     border-color: rgba(139,92,246,.50);
+     color: #B79BFF;
+    }
 
     /* Pro forma */
     .pro-forma-section {
@@ -522,6 +542,8 @@
       text-transform: uppercase;
     }
     .badge-available { background: #22c55e; color: #ffffff; border-radius: 20px; padding: 4px 10px; }
+    [data-theme="light"] .badge-available { background: #F6E77D; color: #08131f; }
+    [data-theme="dark"] .badge-available { background: rgba(139,92,246,.18); color: #B79BFF; border: 1px solid rgba(139,92,246,.50); }
     .badge-pending { background: rgba(249,115,22,0.15); color: var(--c-metal); }
     .badge-coming-soon { background: rgba(139,92,246,0.15); color: #8b5cf6; }
     .badge-sold { background: rgba(239,68,68,0.15); color: #ef4444; }
@@ -786,6 +808,16 @@
     .deal-bottom-left { width:auto; flex:1 1 0; }
     .deal-bottom-right { flex:1 1 0; }
     .deal-bottom-bar .interest-card { margin-bottom:0; height:100%; }
+    /* v2.4.6 §J-plus: equal-cards finish. min-width:0 releases the default flex min-content override,
+     so flex-basis:0 actually holds when the right card's copy is wider than the left's.
+     > * width:100% forces the JS-injected inner cards (#dealCTALeft, #dealCTARight, and whatever
+     markup they render into) to fill their now-truly-equal wrappers. Structure-agnostic on purpose. */
+    .deal-bottom-left, .deal-bottom-right { min-width: 0; }
+    .deal-bottom-left > *, .deal-bottom-right > * {
+     width: 100%;
+     box-sizing: border-box;
+     height: 100%;
+    }
     @media (max-width:900px) {
       .deal-bottom-bar { flex-direction:column; }
       .deal-bottom-left { width:100%; }

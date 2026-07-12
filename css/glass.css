@@ -57,10 +57,10 @@
   --em-hi:#95E8C6; --em:#16B98A; /* was #8FF0CE — calmed gain family */
   --gain:#79DDB3; --equity:#79DDB3; /* was #62F0A8 — calmed gain */
   --equity-bg:rgba(95,210,165,.13); --equity-bd:rgba(95,210,165,.30);
-  --avail:#84DEB6; /* was #7BE6B3 — calmed Available (Q2) */
-  --avail-bg:rgba(100,206,166,.13);
-  --avail-bd:rgba(100,206,166,.30);
-  --avail-dot:#55CFA1; /* was #46D695 */
+  --avail:#B79BFF;
+  --avail-bg:rgba(139,92,246,.18);
+  --avail-bd:rgba(139,92,246,.50);
+  --avail-dot:#8B5CF6;
 
   /* Semantic — danger */
   --rose:#F0685E; --rose-bg:rgba(240,104,94,.14);
@@ -132,8 +132,8 @@
   --em-hi:#5FD9A8; --em:#0E9B6E;
   --gain:#0E9B5E; --equity:#0E9B5E;
   --equity-bg:rgba(20,170,110,.14); --equity-bd:rgba(20,170,110,.34);
-  --avail:#0E8552; --avail-bg:rgba(36,170,110,.14);
-  --avail-bd:rgba(36,170,110,.34); --avail-dot:#1FB872;
+  --avail:#9A7A12; --avail-bg:rgba(246,231,125,.22);
+  --avail-bd:rgba(246,231,125,.55); --avail-dot:#E4C93A;
 
   /* Semantic — danger */
   --rose:#D6453B; --rose-bg:rgba(214,69,59,.1);
@@ -944,4 +944,36 @@ body{ background:var(--canvas); }
 }
 @media (prefers-reduced-motion: reduce){
  .play-diamond-sparkles .pd-spark{ animation: none; opacity: 0.85; }
+}
+
+/* v2.4.6 §C: day-mode active menu tile = rose (light --c-accent = #F4889E). Dark stays aqua per v2.4.4. */
+[data-theme="light"] .pin-menu-link.active{
+ background: color-mix(in srgb, var(--c-accent) 16%, transparent) !important;
+ box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 55%, transparent) !important;
+ color: #C7476A !important;
+}
+[data-theme="light"] .pin-menu-link.active i,
+[data-theme="light"] .pin-menu-link.active svg{ color: #C7476A !important; }
+
+/* v2.4.6 §I: dark-mode CTA buttons colorful + safe hover pattern (retires the removed onmouseover/onmouseout handlers). */
+
+/* Get Investor Access — light keeps steel; dark = aqua fill */
+.cta-btn-invest:hover{ background: color-mix(in srgb, var(--c-metal) 88%, black) !important; } /* light hover — slightly darker steel */
+[data-theme="dark"] .cta-btn-invest{
+ background: var(--c-primary) !important;
+ color: #08131f !important;
+}
+[data-theme="dark"] .cta-btn-invest:hover{
+ background: color-mix(in srgb, var(--c-primary) 88%, black) !important;
+}
+
+/* Browse Deals (.cta-btn-outline) — dark = aqua outline + fill on hover */
+[data-theme="dark"] .cta-btn-outline{
+ border-color: var(--c-primary) !important;
+ color: var(--c-primary) !important;
+}
+[data-theme="dark"] .cta-btn-outline:hover{
+ background: var(--c-primary) !important;
+ border-color: var(--c-primary) !important;
+ color: #08131f !important;
 }

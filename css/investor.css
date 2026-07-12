@@ -54,7 +54,7 @@ body {
   height: 70px;
   overflow: visible;
   background: #1a1e38 !important;
-  border-bottom: 1px solid color-mix(in srgb, var(--c-primary) 20%, transparent) !important;
+  border-bottom: none !important;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -783,7 +783,7 @@ body {
   padding: 4px 6px;
 }
 [data-theme="light"] .eh-logo-wrap {
-  background: #1a2744;
+  background: var(--c-primary);
 }
 .footer-social-link:hover { color: #fff !important; }
 [data-theme="light"] .footer-social-link:hover { color: #e8edf5 !important; }
@@ -876,7 +876,7 @@ body {
 }
 
 [data-theme="light"] .footer-legal {
-  color: rgba(232,237,245,0.6);
+  color: var(--text-muted);
 }
 
 .equal-housing {
@@ -888,7 +888,7 @@ body {
 }
 
 [data-theme="light"] .equal-housing {
-  color: rgba(232,237,245,0.5);
+  color: var(--text-muted);
 }
 
 .eh-icon {
@@ -2282,4 +2282,27 @@ body {
 [data-theme="light"] .glow-card {
   border: 1px solid var(--border);
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* v2.4.6 §H — Status recolor (Sunshine day / Amethyst night). GAINS green intentionally untouched. */
+[data-theme="light"] .badge-available{
+ background: #F6E77D !important;
+ color: #08131f !important;
+ border: 1px solid rgba(246,231,125,.55) !important;
+}
+[data-theme="dark"] .badge-available{
+ background: rgba(139,92,246,.18) !important;
+ color: #B79BFF !important;
+ border: 1px solid rgba(139,92,246,.50) !important;
+}
+
+[data-theme="light"] .interest-noted{
+ background: rgba(246,231,125,.22) !important;
+ border-color: rgba(246,231,125,.55) !important;
+ color: #9A7A12 !important;
+}
+[data-theme="dark"] .interest-noted{
+ background: rgba(139,92,246,.18) !important;
+ border-color: rgba(139,92,246,.50) !important;
+ color: #B79BFF !important;
 }
