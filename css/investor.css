@@ -927,7 +927,7 @@ body {
 
 .panel-header {
   padding: 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none;
   flex-shrink: 0;
 }
 

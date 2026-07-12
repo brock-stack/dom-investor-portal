@@ -977,3 +977,28 @@ body{ background:var(--canvas); }
  border-color: var(--c-primary) !important;
  color: #08131f !important;
 }
+
+/* v2.4.6 round-2 §D: profile dropdown opaque in dark (#domProfileMenu — distinct from .pin-menu-overlay).
+ Light-mode dropdown stays opaque white; dark inline style resolves to a 58%-opacity navy which
+ reads as translucent. Override the inline style at higher specificity with theme-scoped id selector. */
+[data-theme="dark"] #domProfileMenu{
+ background: #141c30 !important;
+ -webkit-backdrop-filter: none !important;
+ backdrop-filter: none !important;
+ border-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+/* v2.4.6 round-2 §F: map controls container light-blue in light mode.
+ Root cause: containers hardcoded #1a2744 navy with no light override, showing navy through light-mode scene.
+ 88% aqua + 12% white = readable light teal that still keeps the aqua brand identity.
+ Dark mode inherits the base navy — no override needed. */
+[data-theme="light"] .deal-map-controls-left,
+[data-theme="light"] .deal-map-controls-right,
+[data-theme="light"] .map-controls,
+[data-theme="light"] #desktopMapControls{
+ background: color-mix(in srgb, var(--c-primary) 88%, white) !important;
+ border-color: color-mix(in srgb, var(--c-primary) 60%, white) !important;
+}
+[data-theme="light"] .map-style-btn:not(.active){
+ color: #08131f !important;
+}

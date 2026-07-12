@@ -1385,10 +1385,12 @@
     try {
       const { data: pu } = await Portal.supabase.from('portal_users').select('id,contact_id,first_name,last_name,email,phone,investor_type,entity_type,company,birthdate,mailing_street,mailing_city,mailing_state,mailing_zip,business_phone,business_email,business_street,business_city,business_state,business_zip,working_with_realtor,realtor_name,realtor_company,realtor_phone,realtor_email,avatar_url,created_at,onboarding_complete,notif_email,notif_sms').eq('user_id', session.user.id).maybeSingle();
       portalUser = pu; window._portalUser = pu;
-      // v2.4.6 §J1: settings deep-link race fix — if the settings tab is already open, hydrate now.
+      // v2.4.6 §J1 + round-2 §E2: settings deep-link race fix — hydrate if the tab is open by
+      // either legacy inline-style path (display=block) OR the switchTab classList.add('active') path.
       try {
         var _stTab = document.getElementById('tabSettings');
-        if (_stTab && _stTab.style.display === 'block' && window.SettingsTab && pu) {
+        var _stOpen = _stTab && (_stTab.style.display === 'block' || _stTab.classList.contains('active'));
+        if (_stOpen && window.SettingsTab && pu) {
           window.SettingsTab.load(pu);
         }
       } catch (e) { console.warn('[Settings] post-fetch hydrate skipped:', e); }
@@ -1968,6 +1970,20 @@
       if (tabName === 'calculator' && !window._calcInited) { // v2.3.4
         try { calcPf(); } catch(e) { console.warn('Calc init failed:', e); }
         window._calcInited = true;
+      }
+      // v2.4.6 round-2 §E1: settings hydration on URL deep-link path.
+      // switchTab() is called by the ?tab=settings deep-link (dashboard.html:2537) and
+      // uses classList.add('active') — it does NOT trigger the tab-button click handler,
+      // so round-1's Fix A/B never fired on this path. Ports the same load-with-retry pattern.
+      if (tabName === 'settings' && window.SettingsTab) {
+        if (window._portalUser) {
+          SettingsTab.load(window._portalUser);
+        } else {
+          var _st = 0, _sw = setInterval(function () {
+            if (window._portalUser) { clearInterval(_sw); SettingsTab.load(window._portalUser); }
+            else if (++_st > 40) { clearInterval(_sw); }
+          }, 200);
+        }
       }
     }
     window.switchTab = switchTab;
