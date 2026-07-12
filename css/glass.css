@@ -999,6 +999,20 @@ body{ background:var(--canvas); }
  background: color-mix(in srgb, var(--c-primary) 88%, white) !important;
  border-color: color-mix(in srgb, var(--c-primary) 60%, white) !important;
 }
-[data-theme="light"] .map-style-btn:not(.active){
+/* v2.4.6 round-3 §D: light-mode idle bg on BOTH map-button selectors.
+ .map-style-btn = marketplace inline navy at marketplace.html:263.
+ .deal-map-btn = deal inline navy at deal.html:992.
+ Buttons render slightly LIGHTER than their container (container = 88% aqua, buttons = 78% aqua)
+ so they layer visibly. Active state (aqua fill + navy ink) stays unchanged in both. */
+[data-theme="light"] .map-style-btn:not(.active),
+[data-theme="light"] .deal-map-btn:not(.active){
+ background: color-mix(in srgb, var(--c-primary) 78%, white) !important;
+ border-color: color-mix(in srgb, var(--c-primary) 45%, white) !important;
+ color: #08131f !important;
+}
+[data-theme="light"] .map-style-btn:not(.active):hover,
+[data-theme="light"] .deal-map-btn:not(.active):hover{
+ background: color-mix(in srgb, var(--c-primary) 55%, white) !important;
+ border-color: color-mix(in srgb, var(--c-primary) 65%, white) !important;
  color: #08131f !important;
 }
