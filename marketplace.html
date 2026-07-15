@@ -237,9 +237,13 @@
       text-transform: uppercase;
     }
     .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
+    [data-theme="light"] .badge-available { background: #22c55e !important; color: #ffffff !important; }
+    [data-theme="dark"] .badge-available { background: #22c55e !important; color: #ffffff !important; border: none !important; }
     .badge-pending { background: var(--c-metal); color: #fff; font-weight: 700; }
     .badge-coming-soon { background: var(--c-primary); color: #1a2744; font-weight: 700; }
-    .badge-sold { background: #64748b; color: #fff; font-weight: 700; }
+    .badge-sold { background: var(--metal-grad); color: var(--metal-ink); font-weight: 700; border: none; }
+    [data-theme="light"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; }
+    [data-theme="dark"] .badge-sold { background: var(--metal-grad) !important; color: #ffffff !important; }
 
     /* Map controls */
     .map-controls {
@@ -338,7 +342,16 @@
     }
     .mapboxgl-ctrl-group button:last-child { border-bottom: none !important; }
     .mapboxgl-ctrl-group button:hover { background: color-mix(in srgb, var(--c-primary) 15%, transparent) !important; }
-    .mapboxgl-ctrl-icon { filter: brightness(0) saturate(100%) invert(72%) sepia(47%) saturate(450%) hue-rotate(165deg) brightness(105%) contrast(93%) !important; }
+    /* v2.4.8: drop retired sky-blue hue-rotate; let button color drive the icon per theme. */
+    .mapboxgl-ctrl-icon { filter: none !important; }
+    .mapboxgl-ctrl-group button svg,
+    .mapboxgl-ctrl-group button svg path { fill: currentColor !important; }
+    [data-theme="dark"] .mapboxgl-ctrl-group button { color: var(--c-primary) !important; }
+    [data-theme="light"] .mapboxgl-ctrl-group button { color: var(--c-primary) !important; }
+    [data-theme="light"] .mapboxgl-ctrl-group {
+      background: color-mix(in srgb, var(--c-primary) 22%, white) !important;
+      border-color: color-mix(in srgb, var(--c-primary) 55%, white) !important;
+    }
 
     /* Mapbox popup */
     .mapboxgl-popup-content {
@@ -1044,7 +1057,8 @@
         var s = pill.dataset.status;
         var count = counts[s] !== undefined ? counts[s] : 0;
         pill.textContent = labels[s] + ' (' + count + ')';
-        pill.style.opacity = (count === 0 && s !== 'all') ? '0.5' : '';
+        pill.dataset.count = String(count); /* v2.4.8: empty-state CSS hook */
+        pill.style.opacity = ''; /* v2.4.8: CSS now owns the muted state via [data-count="0"] */
       });
     }
 

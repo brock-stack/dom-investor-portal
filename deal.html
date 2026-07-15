@@ -420,25 +420,18 @@
     }
     .btn-interest-submitted:disabled { opacity: 1; }
     .hero-action-btns .btn-interest-submitted { min-height: 54px; padding: 11px 20px; font-size: 16px; }
-    [data-theme="light"] .interest-noted{
-     background: rgba(246,231,125,.22);
-     border-color: rgba(246,231,125,.55);
-     color: #9A7A12;
-    }
-    [data-theme="dark"] .interest-noted{
-     background: rgba(139,92,246,.18);
-     border-color: rgba(139,92,246,.50);
-     color: #B79BFF;
-    }
+    /* v2.4.8: confirmed-Interested state = aqua-glow (dark) / rose (light). Pre-click .btn-outline-secondary is frozen. */
+    [data-theme="light"] .interest-noted,
     [data-theme="light"] .btn-interest-submitted{
-     background: rgba(246,231,125,.22);
-     border-color: rgba(246,231,125,.55);
-     color: #9A7A12;
+     background: rgba(244,136,158,.16) !important;
+     border-color: rgba(244,136,158,.55) !important;
+     color: #C7476A !important;
     }
+    [data-theme="dark"] .interest-noted,
     [data-theme="dark"] .btn-interest-submitted{
-     background: rgba(139,92,246,.18);
-     border-color: rgba(139,92,246,.50);
-     color: #B79BFF;
+     background: rgba(34,211,238,.14) !important;
+     border-color: rgba(34,211,238,.55) !important;
+     color: #22D3EE !important;
     }
 
     /* Pro forma */
@@ -542,11 +535,13 @@
       text-transform: uppercase;
     }
     .badge-available { background: #22c55e; color: #ffffff; border-radius: 20px; padding: 4px 10px; }
-    [data-theme="light"] .badge-available { background: #F6E77D; color: #08131f; }
-    [data-theme="dark"] .badge-available { background: rgba(139,92,246,.18); color: #B79BFF; border: 1px solid rgba(139,92,246,.50); }
+    [data-theme="light"] .badge-available { background: #22c55e !important; color: #ffffff !important; }
+    [data-theme="dark"] .badge-available { background: #22c55e !important; color: #ffffff !important; border: none !important; }
     .badge-pending { background: rgba(249,115,22,0.15); color: var(--c-metal); }
     .badge-coming-soon { background: rgba(139,92,246,0.15); color: #8b5cf6; }
-    .badge-sold { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .badge-sold { background: var(--metal-grad); color: var(--metal-ink); border: none; }
+    [data-theme="light"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; border: none !important; }
+    [data-theme="dark"] .badge-sold { background: var(--metal-grad) !important; color: #ffffff !important; border: none !important; }
 
     /* Mapbox popup */
     .mapboxgl-popup-content {
