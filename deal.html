@@ -534,14 +534,14 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
-    .badge-available { background: #22c55e; color: #ffffff; border-radius: 20px; padding: 4px 10px; }
-    [data-theme="light"] .badge-available { background: #22c55e !important; color: #ffffff !important; }
-    [data-theme="dark"] .badge-available { background: #22c55e !important; color: #ffffff !important; border: none !important; }
+    .badge-available { background: #22c55e; color: var(--text); border-radius: 20px; padding: 4px 10px; }
+    [data-theme="light"] .badge-available { background: #22c55e !important; color: var(--text) !important; }
+    [data-theme="dark"] .badge-available { background: #22c55e !important; color: var(--text) !important; border: none !important; }
     .badge-pending { background: rgba(249,115,22,0.15); color: var(--c-metal); }
     .badge-coming-soon { background: rgba(139,92,246,0.15); color: #8b5cf6; }
     .badge-sold { background: var(--metal-grad); color: var(--metal-ink); border: none; }
     [data-theme="light"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; border: none !important; }
-    [data-theme="dark"] .badge-sold { background: var(--metal-grad) !important; color: #ffffff !important; border: none !important; }
+    [data-theme="dark"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; border: none !important; }
 
     /* Mapbox popup */
     .mapboxgl-popup-content {

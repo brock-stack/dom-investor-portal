@@ -46,9 +46,9 @@
   --c-secondary:#22D3EE;   /* Aqua Glow — secondary */
   --c-info:#22D3EE;        /* Aqua Glow — info rides with secondary in dark */
   --c-accent:#8B5CF6;      /* Amethyst — accent */
-  --c-metal:#5E6E7E;       /* v2.4.2 — deeper platinum for oceanic scene (two-depths rule) */
-  --metal-ink:#fff;
-  --metal-grad:linear-gradient(180deg,#7A8B9D,#5E6E7E 52%,#43505E);
+  --c-metal:#7E94A6;       /* v2.4.9: platinum unified across themes per Andrew */
+  --metal-ink:#16202B;     /* v2.4.9: bright metal takes dark ink — both themes */
+  --metal-grad:linear-gradient(180deg,#FBFDFF,#D7E2EA 40%,#AEC0CD 70%,#CBD8E2);
 
   --royal:#14B8A6; --royal-hi:#3FD6C4; /* stray royal refs point to teal (kill leftover royal) */
   --accent:var(--c-primary);
@@ -218,11 +218,43 @@ body{ background:var(--canvas); }
 
 .s-dark{
   background:
-    radial-gradient(72% 26% at 50% -8%, rgba(168,214,244,.30) 0%, rgba(86,158,198,.13) 34%, transparent 64%),
-    radial-gradient(38% 13% at 22% -2%, rgba(200,230,250,.12), transparent 60%),
-    radial-gradient(40% 13% at 76% -2%, rgba(200,230,250,.10), transparent 60%),
-    linear-gradient(180deg, #0E3A55 0%, #0A2D45 14%, #072338 30%, #051B2D 46%, #041521 62%, #03101A 80%, #020B13 100%);
+    /* v2.4.9: shimmer band + surface glow (approved full intensity at 100/21) */
+    linear-gradient(180deg, rgba(200,235,255,.22) 0%, transparent 10%),
+    radial-gradient(ellipse 48% 74% at 50% -8%,
+      rgba(185,225,250,.34) 0%, rgba(140,195,230,.16) 36%, rgba(90,150,190,.07) 62%, transparent 84%),
+    /* descent: lit surface -> near-black floor */
+    linear-gradient(180deg,
+      #0F4A66 0%, #0A3A52 16%, #06283D 38%, #041C2E 58%, #03131E 80%, #010A12 100%);
 }
+/* v2.4.9: gentle surface light — eleven soft ray slivers fanned from top-center,
+   reaching ~90% down before melting. Approved at Light 100% / Definition 21%
+   (blur 13.3px, opacity .49). NOT hard beams — if any shaft reads hard-edged,
+   the blur/opacity drifted from spec. */
+.s-dark::before{
+  content:""; position:absolute; top:-12%; left:50%; width:140%; height:118%;
+  transform:translateX(-50%); pointer-events:none; mix-blend-mode:screen;
+  opacity:.49; filter:blur(13.3px);
+  background:conic-gradient(from 176deg at 50% 0%,
+    transparent 0deg, rgba(190,228,250,.16) 2deg, transparent 5deg,
+    transparent 8deg, rgba(190,228,250,.22) 11deg, transparent 15deg,
+    transparent 18deg, rgba(190,228,250,.12) 21deg, transparent 24deg,
+    transparent 27deg, rgba(190,228,250,.19) 30deg, transparent 34deg,
+    transparent 37deg, rgba(190,228,250,.10) 40deg, transparent 43deg,
+    transparent 46deg, rgba(190,228,250,.14) 49deg, transparent 52deg,
+    transparent 306deg, rgba(190,228,250,.10) 310deg, transparent 313deg,
+    transparent 317deg, rgba(190,228,250,.15) 321deg, transparent 325deg,
+    transparent 329deg, rgba(190,228,250,.11) 332deg, transparent 335deg,
+    transparent 339deg, rgba(190,228,250,.20) 343deg, transparent 347deg,
+    transparent 350deg, rgba(190,228,250,.16) 354deg, transparent 358deg);
+  -webkit-mask-image:radial-gradient(ellipse 66% 96% at 50% 0%, rgba(0,0,0,1) 26%, rgba(0,0,0,.5) 62%, rgba(0,0,0,.18) 82%, transparent 94%);
+  mask-image:radial-gradient(ellipse 66% 96% at 50% 0%, rgba(0,0,0,1) 26%, rgba(0,0,0,.5) 62%, rgba(0,0,0,.18) 82%, transparent 94%);
+  animation:rayBreathe 30s ease-in-out infinite alternate;
+}
+@keyframes rayBreathe{
+  from{ transform:translateX(calc(-50% - 8px)); }
+  to  { transform:translateX(calc(-50% + 8px)); }
+}
+@media (prefers-reduced-motion:reduce){ .s-dark::before{ animation:none } }
 .s-dark::after{
   content:""; position:absolute; inset:0; pointer-events:none;
   background:
@@ -1035,3 +1067,9 @@ body{ background:var(--canvas); }
  color: var(--text-muted) !important;
  opacity: 0.55 !important;
 }
+
+/* v2.4.9 §G2: pin-menu dark guard — after platinum token unification, --metal-ink flips to #16202B in dark,
+   which is unreadable on the navy pin-menu body. Override tile labels + name to sea-foam. Active-state
+   teal ink at .pin-menu-link.active preserved via :not(.active). Icons already ride var(--text). */
+[data-theme="dark"] .pin-menu-link:not(.active) { color: #EAF2F8 !important; }
+[data-theme="dark"] .pin-menu-body div[style*="--metal-ink"] { color: #EAF2F8 !important; }

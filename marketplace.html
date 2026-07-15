@@ -22,7 +22,7 @@
     body { font-family: 'Inter', sans-serif; background: var(--bg, #0f1a2e); color: var(--text, #e2e8f0); }
 
     :root {
-      --bg: #0f1a2e;
+      --bg: transparent; /* v2.4.9: let .s-dark scene show through, matching light */
       --navy: #1a2744;
       
       
@@ -236,14 +236,14 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
-    .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
-    [data-theme="light"] .badge-available { background: #22c55e !important; color: #ffffff !important; }
-    [data-theme="dark"] .badge-available { background: #22c55e !important; color: #ffffff !important; border: none !important; }
+    .badge-available { background: #22c55e; color: var(--text); font-weight: 700; }
+    [data-theme="light"] .badge-available { background: #22c55e !important; color: var(--text) !important; }
+    [data-theme="dark"] .badge-available { background: #22c55e !important; color: var(--text) !important; border: none !important; }
     .badge-pending { background: var(--c-metal); color: #fff; font-weight: 700; }
     .badge-coming-soon { background: var(--c-primary); color: #1a2744; font-weight: 700; }
     .badge-sold { background: var(--metal-grad); color: var(--metal-ink); font-weight: 700; border: none; }
     [data-theme="light"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; }
-    [data-theme="dark"] .badge-sold { background: var(--metal-grad) !important; color: #ffffff !important; }
+    [data-theme="dark"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; }
 
     /* Map controls */
     .map-controls {
