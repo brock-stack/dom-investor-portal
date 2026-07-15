@@ -331,6 +331,8 @@ window.DOMOnboarding = (function() {
       var pu = {
         onboarding_complete: true,
         company: _data.step1.company || null,
+        entity_type: _data.step1.entityType || null, // v2.4.10 §A: was collected in step1 but never persisted
+        accredited_investor: _data.step2.accredited ? (_data.step2.accredited.toLowerCase() === 'yes') : null, // v2.4.10 §B: was going only to investor_buy_box
         investor_type: (_data.step2.experience ? [_data.step2.experience] : null),
         mailing_street: _data.step1.street || null,
         mailing_city: _data.step1.city || null,
