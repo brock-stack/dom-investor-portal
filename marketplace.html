@@ -342,16 +342,36 @@
     }
     .mapboxgl-ctrl-group button:last-child { border-bottom: none !important; }
     .mapboxgl-ctrl-group button:hover { background: color-mix(in srgb, var(--c-primary) 15%, transparent) !important; }
-    /* v2.4.8: drop retired sky-blue hue-rotate; let button color drive the icon per theme. */
+    /* v2.4.8 r2 §C1-fallback (2026-07-15): Mapbox GL 3.9.0 ships +/- as background-image SVG with fill='%23333' baked into the data URI — inline-svg fill:currentColor has no target because there is no <svg> element, only a <span> with background-image. Round-2 fix is dark-mode-only per Andrew's 15:26 EDT lock: mask-image swap paints the glyph #EAF2F8 (dark --text moonlight) on the navy control. Light mode preserves round-1 render (Mapbox default #333 glyph on aqua-tinted container) — no mask, no color override. Mask paths verified against live mapbox-gl-js/v3.9.0/mapbox-gl.css icon URIs. */
     .mapboxgl-ctrl-icon { filter: none !important; }
-    .mapboxgl-ctrl-group button svg,
-    .mapboxgl-ctrl-group button svg path { fill: currentColor !important; }
-    [data-theme="dark"] .mapboxgl-ctrl-group button { color: var(--c-primary) !important; }
-    [data-theme="light"] .mapboxgl-ctrl-group button { color: var(--c-primary) !important; }
     [data-theme="light"] .mapboxgl-ctrl-group {
       background: color-mix(in srgb, var(--c-primary) 22%, white) !important;
       border-color: color-mix(in srgb, var(--c-primary) 55%, white) !important;
     }
+
+    /* Dark-only mask paint: kill Mapbox's baked-in #333 background-image and paint the glyph in moonlight via mask-image + background-color. */
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon,
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon {
+      background-image: none !important;
+      background-color: #EAF2F8 !important;
+      -webkit-mask-repeat: no-repeat !important;
+      mask-repeat: no-repeat !important;
+      -webkit-mask-position: center !important;
+      mask-position: center !important;
+      -webkit-mask-size: 20px 20px !important;
+      mask-size: 20px 20px !important;
+    }
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon {
+      -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5z'/%3E%3C/svg%3E") !important;
+      mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5z'/%3E%3C/svg%3E") !important;
+    }
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon {
+      -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E") !important;
+      mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E") !important;
+    }
+    /* Dark hover/disabled: dim the mask paint via opacity so state cues still read. */
+    [data-theme="dark"] .mapboxgl-ctrl-group button:not(:disabled):hover .mapboxgl-ctrl-icon { opacity: 0.85 !important; }
+    [data-theme="dark"] .mapboxgl-ctrl-group button:disabled .mapboxgl-ctrl-icon { opacity: 0.35 !important; }
 
     /* Mapbox popup */
     .mapboxgl-popup-content {
