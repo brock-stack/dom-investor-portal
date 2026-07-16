@@ -727,6 +727,7 @@
     #tabCalculator .pf-kpi-grid { grid-template-columns: repeat(2,1fr); }
     #tabCalculator .pf-header { flex-direction: column; }
   }
+  @keyframes _dzSpin { to { transform: rotate(360deg); } }
   </style>
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
@@ -1280,6 +1281,54 @@
           <div class="toggle-switch" id="st_notifSms" onclick="this.classList.toggle('active');SettingsTab._markDirty();"></div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- ── Danger Zone ────────────────────────────────────────────── -->
+    <div class="form-section full-width" id="dzSection" style="padding:24px;margin-top:12px;margin-bottom:32px;border-top:2px solid rgba(239,68,68,0.3);">
+      <div class="form-section-title" style="margin-bottom:10px;color:#ef4444;">Danger Zone</div>
+      <p style="font-size:14px;color:var(--text-muted);margin:0 0 16px;line-height:1.5;">Permanently delete your portal account and all associated data.</p>
+      <button type="button" id="dzOpenBtn"
+        style="padding:10px 20px;background:rgba(239,68,68,0.08);color:#ef4444;border:1.5px solid rgba(239,68,68,0.3);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;"
+        onmouseover="this.style.background='rgba(239,68,68,0.16)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">Delete Account</button>
+    </div>
+
+    <!-- ── Danger Zone: full-height confirmation view ────────────── -->
+    <div id="dzConfirmView" style="display:none;padding:8px 0 40px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+        <button type="button" id="dzCancelBtn" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;padding:0;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Cancel
+        </button>
+      </div>
+      <h2 style="font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin:0 0 20px;">Delete Your Account</h2>
+      <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18);border-radius:12px;padding:20px 24px;margin-bottom:28px;">
+        <p style="font-size:14px;color:var(--text);line-height:1.65;margin:0 0 14px;">This will permanently erase your Direct Off Market portal account and the following data: your profile (name, contact info, business details, mailing address, investor preferences, accreditation, license), your saved deals and favorites, your offers (including accepted offers that have not yet closed), your saved proformas, your notification preferences, your uploaded documents and profile photo, and your login credentials.</p>
+        <p style="font-size:14px;color:var(--text);line-height:1.65;margin:0 0 14px;">For business record-keeping, records of any transactions you have closed with Direct Off Market are retained with your name attached. Your email address is retained for future communications unless you unsubscribe.</p>
+        <p style="font-size:13px;font-weight:700;color:#ef4444;margin:0;">This action cannot be undone.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;max-width:440px;">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;" for="dzTypeInput">Type DELETE to confirm</label>
+          <input type="text" id="dzTypeInput" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="DELETE"
+            style="width:100%;box-sizing:border-box;background:var(--input-bg,rgba(255,255,255,0.06));border:1.5px solid var(--border,rgba(255,255,255,0.12));border-radius:8px;padding:11px 14px;font-size:14px;font-family:inherit;color:var(--text);outline:none;"
+            oninput="DangerZone._validate()"
+            onfocus="this.style.borderColor='rgba(239,68,68,0.5)'" onblur="this.style.borderColor='var(--border,rgba(255,255,255,0.12))'">
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;" for="dzPasswordInput">Enter your current password</label>
+          <input type="password" id="dzPasswordInput" autocomplete="current-password" placeholder="Current password"
+            style="width:100%;box-sizing:border-box;background:var(--input-bg,rgba(255,255,255,0.06));border:1.5px solid var(--border,rgba(255,255,255,0.12));border-radius:8px;padding:11px 14px;font-size:14px;font-family:inherit;color:var(--text);outline:none;"
+            oninput="DangerZone._validate()"
+            onfocus="this.style.borderColor='rgba(239,68,68,0.5)'" onblur="this.style.borderColor='var(--border,rgba(255,255,255,0.12))'">
+        </div>
+        <div id="dzErrorBox" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#ef4444;"></div>
+        <button type="button" id="dzSubmitBtn" disabled
+          style="padding:13px 24px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:not-allowed;font-family:inherit;opacity:0.45;display:flex;align-items:center;justify-content:center;gap:10px;"
+          onclick="DangerZone._submit()">
+          <span id="dzSubmitLabel">Permanently Delete My Account</span>
+          <span id="dzSpinner" style="display:none;width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:_dzSpin 0.7s linear infinite;flex-shrink:0;"></span>
+        </button>
       </div>
     </div>
 
@@ -2937,6 +2986,118 @@
     }
 
     return { load:load, save:save, _markDirty:_markDirty };
+  }());
+
+  // ── Danger Zone (v2.5.0) ──────────────────────────────────────────────────
+  window.DangerZone = (function() {
+    // Elements (resolved lazily to avoid timing issues)
+    function _el(id) { return document.getElementById(id); }
+
+    // Show confirmation view — hides all sibling settings content
+    function _showConfirm() {
+      var tab = _el('tabSettings');
+      if (!tab) return;
+      // Hide all direct children except the confirmation view itself
+      Array.prototype.forEach.call(tab.children, function(child) {
+        if (child.id !== 'dzConfirmView') child.style.display = 'none';
+      });
+      var cv = _el('dzConfirmView');
+      if (cv) cv.style.display = 'block';
+      // Reset inputs
+      var ti = _el('dzTypeInput'); if (ti) ti.value = '';
+      var pi = _el('dzPasswordInput'); if (pi) pi.value = '';
+      _clearError();
+      _validate();
+    }
+
+    // Restore settings view
+    function _showSettings() {
+      var tab = _el('tabSettings');
+      if (!tab) return;
+      var cv = _el('dzConfirmView');
+      if (cv) cv.style.display = 'none';
+      // Restore all siblings (let their original display come back)
+      Array.prototype.forEach.call(tab.children, function(child) {
+        if (child.id !== 'dzConfirmView') child.style.display = '';
+      });
+    }
+
+    function _clearError() {
+      var eb = _el('dzErrorBox');
+      if (eb) { eb.style.display = 'none'; eb.textContent = ''; }
+    }
+
+    function _showError(msg) {
+      var eb = _el('dzErrorBox');
+      if (eb) { eb.textContent = msg; eb.style.display = 'block'; }
+    }
+
+    function _validate() {
+      var typeOk = (_el('dzTypeInput') || {}).value === 'DELETE';
+      var pwOk   = ((_el('dzPasswordInput') || {}).value || '').length > 0;
+      var btn = _el('dzSubmitBtn');
+      if (!btn) return;
+      var ok = typeOk && pwOk;
+      btn.disabled = !ok;
+      btn.style.opacity = ok ? '1' : '0.45';
+      btn.style.cursor  = ok ? 'pointer' : 'not-allowed';
+    }
+
+    async function _submit() {
+      var btn = _el('dzSubmitBtn');
+      var label = _el('dzSubmitLabel');
+      var spinner = _el('dzSpinner');
+      var pw = (_el('dzPasswordInput') || {}).value || '';
+
+      if (!pw || (_el('dzTypeInput') || {}).value !== 'DELETE') return;
+
+      // Lock UI
+      btn.disabled = true;
+      btn.style.cursor = 'not-allowed';
+      if (label) label.textContent = 'Deleting…';
+      if (spinner) spinner.style.display = 'inline-block';
+      _clearError();
+
+      try {
+        var session = await Portal.supabase.auth.getSession();
+        var jwt = session && session.data && session.data.session && session.data.session.access_token;
+        if (!jwt) throw new Error('Session expired. Please reload and try again.');
+
+        var res = await fetch('/.netlify/functions/delete-portal-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwt },
+          body: JSON.stringify({ password: pw }),
+        });
+
+        if (res.ok) {
+          // Auth row is gone — session is now invalid. Navigate to success page.
+          window.location.href = '/account-deleted.html';
+          return;
+        }
+
+        var data = await res.json().catch(function() { return {}; });
+        var msg = data.error || ('Deletion failed (' + res.status + '). Please try again.');
+        _showError(msg);
+      } catch (e) {
+        _showError(e.message || 'Unexpected error. Please try again.');
+      }
+
+      // Re-enable on error (preserve typed DELETE, clear password)
+      if (label) label.textContent = 'Permanently Delete My Account';
+      if (spinner) spinner.style.display = 'none';
+      var pi = _el('dzPasswordInput'); if (pi) pi.value = '';
+      _validate(); // will re-disable since password is now blank
+    }
+
+    // Wire up buttons after DOM ready
+    (function _init() {
+      var openBtn   = _el('dzOpenBtn');
+      var cancelBtn = _el('dzCancelBtn');
+      if (openBtn)   openBtn.addEventListener('click', _showConfirm);
+      if (cancelBtn) cancelBtn.addEventListener('click', _showSettings);
+    })();
+
+    return { _validate: _validate, _submit: _submit, _showConfirm: _showConfirm, _showSettings: _showSettings };
   }());
 
   // Photo input change
