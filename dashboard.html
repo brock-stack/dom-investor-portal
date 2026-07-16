@@ -1284,16 +1284,15 @@
       </div>
     </div>
 
-    <!-- ── Danger Zone ────────────────────────────────────────────── -->
+    <!-- ── Account deletion card ────────────────────────────────────── -->
     <div class="form-section full-width" id="dzSection" style="padding:24px;margin-top:12px;margin-bottom:32px;border-top:2px solid rgba(239,68,68,0.3);">
-      <div class="form-section-title" style="margin-bottom:10px;color:#ef4444;">Danger Zone</div>
       <p style="font-size:14px;color:var(--text-muted);margin:0 0 16px;line-height:1.5;">Permanently delete your portal account and all associated data.</p>
       <button type="button" id="dzOpenBtn"
         style="padding:10px 20px;background:rgba(239,68,68,0.08);color:#ef4444;border:1.5px solid rgba(239,68,68,0.3);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.15s;"
         onmouseover="this.style.background='rgba(239,68,68,0.16)'" onmouseout="this.style.background='rgba(239,68,68,0.08)'">Delete Account</button>
     </div>
 
-    <!-- ── Danger Zone: full-height confirmation view ────────────── -->
+    <!-- ── Account deletion confirmation view ───────────────────── -->
     <div id="dzConfirmView" style="display:none;padding:8px 0 40px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
         <button type="button" id="dzCancelBtn" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text-muted);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;padding:0;">
@@ -2988,7 +2987,7 @@
     return { load:load, save:save, _markDirty:_markDirty };
   }());
 
-  // ── Danger Zone (v2.5.0) ──────────────────────────────────────────────────
+  // ── Account deletion UI (v2.5.0) ───────────────────────────────────────────
   window.DangerZone = (function() {
     // Elements (resolved lazily to avoid timing issues)
     function _el(id) { return document.getElementById(id); }

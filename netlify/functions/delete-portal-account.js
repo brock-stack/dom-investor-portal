@@ -1,5 +1,5 @@
 // netlify/functions/delete-portal-account.js
-// v2.5.0 — Investor portal account self-deletion (server-side, service role)
+// v2.5.1 — NULL contact_id guard (D8) + Rider C resume path (D10)
 //
 // Tombstone-first cascade (D3). Verifies caller can only delete themselves.
 // Re-verifies password server-side. Idempotent on partial failure (re-submit resumes).
@@ -205,10 +205,44 @@ exports.handler = async function(event) {
   }
 
   const portalUser = portalRows[0] || null;
-  if (!portalUser) return resp(404, { error: 'No portal account for this user' });
+  if (!portalUser) {
+    // v2.5.1 (D10 / Rider C): resume from orphaned auth.users when a matching
+    // tombstone already exists from a prior partial run (e.g. Step 4.21 failed).
+    let tombstoneRows = [];
+    try {
+      tombstoneRows = await sbSelect('deleted_portal_users', {
+        'email': `eq.${userEmail}`,
+        'select': 'id,portal_user_id,deleted_at',
+        'order': 'deleted_at.desc',
+        'limit': '1',
+      });
+      // If exact-case match finds nothing, retry case-insensitively
+      if (!tombstoneRows || tombstoneRows.length === 0) {
+        tombstoneRows = await sbSelect('deleted_portal_users', {
+          'email': `ilike.${userEmail}`,
+          'select': 'id,portal_user_id,deleted_at',
+          'order': 'deleted_at.desc',
+          'limit': '1',
+        });
+      }
+    } catch (_) { tombstoneRows = []; }
+    if (tombstoneRows && tombstoneRows.length > 0) {
+      const t = tombstoneRows[0];
+      console.info(`[delete] v2.5.1 resume: tombstone found for ${userEmail}, resuming from Step 4.21`);
+      try {
+        await deleteAuthUser(AUTH_ID);
+      } catch (e) {
+        return resp(500, { error: 'Resume path failed at auth delete', detail: e.message, tombstone_id: t.id });
+      }
+      return resp(200, { ok: true, resumed: true, tombstone_id: t.id, resumed_at: new Date().toISOString() });
+    }
+    return resp(404, { error: 'No portal account for this user' });
+  }
 
   const PID = portalUser.id;           // portal_users.id
   const CID = portalUser.contact_id;   // contacts.id
+  const hasContact = !!CID; // v2.5.1 (D8): 3 live portal_users have contact_id=NULL; cascade must skip contact-keyed steps when hasContact === false.
+  console.info(`[delete] v2.5.1: PID=${PID}, CID=${CID || 'null'}, hasContact=${hasContact}`);
 
   // ── Step 2b (D7): Load at-risk accepted offers with no linked transaction ─
   let atRiskOffers = [];
@@ -286,31 +320,38 @@ exports.handler = async function(event) {
         .join('; ');
       const notifBody = 'Investor deleted portal account with an accepted offer in flight — deal at risk, human follow-up required.';
 
-      // 1. activity_events record (shows in CRM lead activity feed)
+      // 1. activity_events record — D9: use contact or portal_user fallback when CID is null
+      const aeRecordType = hasContact ? 'contacts' : 'portal_user_deletion';
+      const aeRecordId   = hasContact ? CID : PID;
+      const aeEventData  = {
+        portal_user_id: PID,
+        email: portalUser.email,
+        at_risk_offers: atRiskOffers.map(o => ({
+          property_address: o.property_address,
+          offer_amount: o.offer_amount,
+        })),
+        ...(!hasContact && {
+          contact_id_at_deletion: null,
+          note: 'No CRM contact linked at deletion time — flag applied to portal_user_id instead.',
+        }),
+      };
       await sbInsert('activity_events', {
-        record_type: 'contacts',
-        record_id: CID,
+        record_type: aeRecordType,
+        record_id: aeRecordId,
         event_type: 'investor_deleted_mid_deal',
-        event_data: {
-          portal_user_id: PID,
-          email: portalUser.email,
-          at_risk_offers: atRiskOffers.map(o => ({
-            property_address: o.property_address,
-            offer_amount: o.offer_amount,
-          })),
-        },
+        event_data: aeEventData,
         body: notifBody,
         created_by: null,
         mentioned_users: null,
       });
 
-      // 2. tasks row (creates actionable follow-up in CRM task list)
+      // 2. tasks row — same D9 fallback
       const fullName = [portalUser.first_name, portalUser.last_name].filter(Boolean).join(' ') || userEmail;
       await sbInsert('tasks', {
         title: `Deal at risk: ${fullName} deleted portal account with accepted offer in flight`,
         description: offerList,
-        record_type: 'contacts',
-        record_id: CID,
+        record_type: hasContact ? 'contacts' : 'portal_user_deletion',
+        record_id: hasContact ? CID : PID,
         task_type: 'follow_up',
         status: 'open',
         source: 'system',
@@ -340,18 +381,47 @@ exports.handler = async function(event) {
     { name: '4.6 investor_buy_box',       fn: () => sbDelete('investor_buy_box', `user_id=eq.${PID}`) },
     // 4.7
     { name: '4.7 investor_agreements',    fn: () => sbDelete('investor_agreements', `user_id=eq.${PID}`) },
-    // 4.8
-    { name: '4.8 favorites',              fn: () => sbDelete('favorites', `contact_id=eq.${CID}`) },
-    // 4.9
-    { name: '4.9 cart_items',             fn: () => sbDelete('cart_items', `contact_id=eq.${CID}`) },
+    // 4.8 — D8: skip when contact_id is NULL
+    {
+      name: '4.8 favorites',
+      fn: () => {
+        if (!hasContact) { console.info('[delete] v2.5.1 step 4.8 skipped: no contact_id linked, PID=' + PID); return Promise.resolve(); }
+        return sbDelete('favorites', `contact_id=eq.${CID}`);
+      },
+    },
+    // 4.9 — D8: skip when contact_id is NULL
+    {
+      name: '4.9 cart_items',
+      fn: () => {
+        if (!hasContact) { console.info('[delete] v2.5.1 step 4.9 skipped: no contact_id linked, PID=' + PID); return Promise.resolve(); }
+        return sbDelete('cart_items', `contact_id=eq.${CID}`);
+      },
+    },
     // 4.10
     { name: '4.10 deal_views',            fn: () => sbDelete('deal_views', `user_id=eq.${AUTH_ID}`) },
-    // 4.11 (OR condition)
-    { name: '4.11 open_house_rsvps',      fn: () => sbDeleteOr('open_house_rsvps', `portal_user_id.eq.${PID},contact_id.eq.${CID}`) },
-    // 4.12
-    { name: '4.12 portal_activity',       fn: () => sbDelete('portal_activity', `contact_id=eq.${CID}`) },
-    // 4.13
-    { name: '4.13 portal_invites',        fn: () => sbDelete('portal_invites', `contact_id=eq.${CID}`) },
+    // 4.11 — D8: OR-clause collapses to portal_user_id-only when no contact
+    {
+      name: '4.11 open_house_rsvps',
+      fn: () => hasContact
+        ? sbDeleteOr('open_house_rsvps', `portal_user_id.eq.${PID},contact_id.eq.${CID}`)
+        : sbDelete('open_house_rsvps', `portal_user_id=eq.${PID}`),
+    },
+    // 4.12 — D8: skip when contact_id is NULL
+    {
+      name: '4.12 portal_activity',
+      fn: () => {
+        if (!hasContact) { console.info('[delete] v2.5.1 step 4.12 skipped: no contact_id linked, PID=' + PID); return Promise.resolve(); }
+        return sbDelete('portal_activity', `contact_id=eq.${CID}`);
+      },
+    },
+    // 4.13 — D8: skip when contact_id is NULL
+    {
+      name: '4.13 portal_invites',
+      fn: () => {
+        if (!hasContact) { console.info('[delete] v2.5.1 step 4.13 skipped: no contact_id linked, PID=' + PID); return Promise.resolve(); }
+        return sbDelete('portal_invites', `contact_id=eq.${CID}`);
+      },
+    },
     // 4.14
     { name: '4.14 blast_recipients',      fn: () => sbDelete('blast_recipients', `portal_user_id=eq.${PID}`) },
     // 4.15
@@ -368,11 +438,15 @@ exports.handler = async function(event) {
         if (agreementPaths.length > 0) await deleteStorageFiles('agreements', agreementPaths);
       },
     },
-    // 4.19 contacts: retain with flags (D5)
-    // JSONB key removal: fetch current custom_fields, strip portal-specific keys, re-patch.
+    // 4.19 contacts: retain with flags (D5) — D8: skip entirely when no contact
     {
       name: '4.19 contacts_flag',
       fn: async () => {
+        if (!hasContact) {
+          console.info('[delete] v2.5.1 step 4.19 skipped: no contact_id linked, PID=' + PID);
+          return;
+        }
+        // JSONB key removal: fetch current custom_fields, strip portal-specific keys, re-patch.
         let cf = {};
         try {
           const ctRows = await sbSelect('contacts', { 'id': `eq.${CID}`, 'select': 'custom_fields' });
