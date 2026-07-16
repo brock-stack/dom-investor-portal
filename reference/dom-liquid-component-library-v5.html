@@ -1,0 +1,389 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOM · Liquid Glass — Full Component Library v2 (palette-applied)</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+:root{--font-ui:'Barlow',system-ui,sans-serif;--font-display:'Barlow Condensed',var(--font-ui);--font-num:'Inter',var(--font-ui);
+ --r-lg:22px;--r-md:16px;--r-sm:11px;--ease:cubic-bezier(.32,.72,0,1);--dur:.5s}
+/* ===== TOKENS — palette mapped to ROLES (approved picks) ===== */
+:root,[data-theme="dark"]{color-scheme:dark;
+ --text:#EAF2F8;--text-muted:#A9BFD2;--text-faint:#74899E;--hair:rgba(255,255,255,.12);
+ /* approved DARK picks → roles */
+ --c-primary:#22D3EE;   /* Aqua Glow */
+ --c-secondary:#8B5CF6; /* Amethyst */
+ --c-info:#3D78EA;      /* Royal Sapphire */
+ --c-accent:#14B8A6;    /* Lagoon Teal */
+ --c-metal:#7A8B9D;     /* Steel platinum (white ink in dark) */
+ --metal-ink:#fff; --metal-grad:linear-gradient(180deg,#9DB0BE,#7A8B9D 52%,#5E6E7E);
+ --royal:#3D78EA;--royal-hi:#5A8BEE;--accent:var(--c-primary);
+ --em-hi:#8FF0CE;--em:#16B98A;--gain:#62F0A8;--equity:#62F0A8;--equity-bg:rgba(70,224,150,.13);--equity-bd:rgba(70,224,150,.30);
+ --avail:#7BE6B3;--avail-bg:rgba(70,214,149,.13);--avail-bd:rgba(70,214,149,.30);--avail-dot:#46D695;
+ --rose:#F0685E;--rose-bg:rgba(240,104,94,.14);--rose-bd:rgba(240,104,94,.32);
+ --warn:#7FD9E8; --warn-ink:#7FD9E8; /* dark warning chip */
+ --tile-bg:rgba(255,255,255,.06);--tile-bd:rgba(255,255,255,.12);--tile-spec:rgba(255,255,255,.16);
+ --glass:linear-gradient(157deg,rgba(24,48,80,.42),rgba(14,30,54,.24) 60%,rgba(14,30,54,.16));
+ --glass-bd:rgba(255,255,255,.14);--glass-drop:0 26px 60px rgba(2,8,18,.5);--glass-spec:rgba(255,255,255,.45);--glass-shade:rgba(2,8,18,.36);
+ --glass-rim:linear-gradient(155deg,rgba(255,255,255,.85),rgba(170,210,235,.14) 28%,transparent 52%,#F2F7FB 96%);
+ --glass-pool:rgba(180,214,240,.16);--glass-blur:22px;--glass-sat:160%;
+ --glassw:linear-gradient(157deg,rgba(16,32,54,.58),rgba(11,24,44,.48));--glassw-bd:rgba(255,255,255,.10);--glassw-blur:18px;--glassw-sat:130%;
+ --frost:rgba(17,33,56,.82);--frost-bd:rgba(255,255,255,.1);
+ --field:rgba(255,255,255,.05);--field-bd:rgba(255,255,255,.14);--field-focus:rgba(61,120,234,.5);
+ --scrim:rgba(3,9,20,.6);--scrim-blur:6px;--skel:rgba(255,255,255,.06);--skel-hi:rgba(255,255,255,.14)}
+[data-theme="light"]{color-scheme:light;
+ --text:#103A45;--text-muted:#4C6B73;--text-faint:#83A0A7;--hair:rgba(16,60,70,.12);
+ /* approved LIGHT picks → roles */
+ --c-primary:#FF8A6B;   /* Coral */
+ --c-secondary:#60B7F0; /* Sky Blue */
+ --c-info:#F4889E;      /* Rose */
+ --c-accent:#5BC9D4;    /* Aqua */
+ --c-metal:bright;
+ --metal-ink:#16202B; --metal-grad:linear-gradient(180deg,#FBFDFF,#D7E2EA 40%,#AEC0CD 70%,#CBD8E2);
+ --royal:#2E6AD6;--royal-hi:#3D78EA;--accent:var(--c-primary);
+ --em-hi:#5FD9A8;--em:#0E9B6E;--gain:#0E9B5E;--equity:#0E9B5E;--equity-bg:rgba(20,170,110,.14);--equity-bd:rgba(20,170,110,.34);
+ --avail:#0E8552;--avail-bg:rgba(36,170,110,.14);--avail-bd:rgba(36,170,110,.34);--avail-dot:#1FB872;
+ --rose:#D6453B;--rose-bg:rgba(214,69,59,.1);--rose-bd:rgba(214,69,59,.28);
+ --warn:#F6E77D; --warn-ink:#9A7A12; /* Sunshine — bright restored; deeper ink only for tiny icons */
+ --tile-bg:rgba(255,255,255,.42);--tile-bd:rgba(255,255,255,.62);--tile-spec:rgba(255,255,255,.85);
+ --glass:linear-gradient(157deg,rgba(255,255,255,.44),rgba(255,255,255,.18) 60%,rgba(255,255,255,.12));
+ --glass-bd:rgba(255,255,255,.62);--glass-drop:0 22px 50px rgba(26,92,112,.18);--glass-spec:rgba(255,255,255,.95);--glass-shade:rgba(30,90,110,.05);
+ --glass-rim:linear-gradient(155deg,rgba(255,255,255,1),rgba(255,255,255,.35) 30%,transparent 54%,#BAC9D6 96%);
+ --glass-pool:rgba(255,255,255,.55);--glass-blur:22px;--glass-sat:175%;
+ --glassw:linear-gradient(157deg,rgba(255,255,255,.70),rgba(255,255,255,.60));--glassw-bd:rgba(255,255,255,.7);--glassw-blur:18px;--glassw-sat:140%;
+ --frost:rgba(255,255,255,.92);--frost-bd:rgba(16,60,70,.14);
+ --field:rgba(255,255,255,.55);--field-bd:rgba(16,60,70,.16);--field-focus:rgba(46,106,214,.45);
+ --scrim:rgba(20,50,70,.4);--scrim-blur:6px;--skel:rgba(16,60,70,.07);--skel-hi:rgba(255,255,255,.5)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-ui);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;background:#030C17;transition:color var(--dur) var(--ease)}
+::placeholder{color:var(--text-faint);opacity:1}
+::selection{background:var(--c-metal,#BAC9D6);color:#16202B}
+[data-theme="dark"] ::selection{background:#9DB0BE;color:#16202B}
+*{scrollbar-width:thin;scrollbar-color:var(--glassw-bd) transparent}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--glassw-bd);border-radius:5px}::-webkit-scrollbar-thumb:hover{background:var(--c-metal,#9DB0BE)}
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:none;box-shadow:0 0 0 3px var(--field-focus);border-radius:8px}
+/* scenes */
+.scene{position:fixed;inset:0;z-index:-3;transition:opacity var(--dur) var(--ease)}
+[data-theme="light"] .s-dark{opacity:0}[data-theme="dark"] .s-light{opacity:0}
+[data-theme="dark"] .lonly{display:none!important}
+.s-dark{background:radial-gradient(40% 13% at 24% 0%,rgba(208,234,252,.14),transparent 60%),radial-gradient(46% 15% at 62% -2%,rgba(208,234,252,.11),transparent 58%),radial-gradient(55% 34% at 50% -8%,rgba(150,205,235,.34) 0%,rgba(70,140,182,.12) 30%,transparent 60%),linear-gradient(180deg,#0C3046 0%,#082439 16%,#061A2C 36%,#04111E 56%,#020A13 78%,#01060B 100%)}
+.s-light{background:radial-gradient(60% 40% at 50% -4%,rgba(255,255,255,.42) 0%,transparent 50%),linear-gradient(180deg,#2E6E88 0%,#4D97AD 24%,#79BCC8 48%,#B4DEDF 74%,#E9F5F1 100%)}
+.depth{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(120% 82% at 50% 18%,transparent 38%,rgba(1,5,12,.6) 100%)}
+[data-theme="light"] .depth{background:radial-gradient(120% 82% at 50% 22%,transparent 52%,rgba(20,70,90,.12) 100%)}
+/* glass tiers */
+.lg{position:relative;border-radius:var(--r-md);overflow:hidden;background:var(--glass);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));border:1px solid var(--glass-bd);box-shadow:var(--glass-drop),inset 0 1px 1px var(--glass-spec),inset 0 -24px 44px var(--glass-shade)}
+.lg::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1.2px;background:var(--glass-rim);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.lg::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(58% 48% at 16% 4%,var(--glass-pool),transparent 60%)}
+.lg--interactive{cursor:pointer;transition:transform .25s var(--ease)}.lg--interactive:hover{transform:translateY(-3px)}
+.lg--work{background:var(--glassw);-webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));border:1px solid var(--glassw-bd);box-shadow:0 14px 36px rgba(2,8,18,.32),inset 0 1px 0 var(--glass-spec)}
+.lg--work::before{opacity:.5}.lg--work::after{opacity:.5}
+.lg--frost{position:relative;border-radius:var(--r-sm);background:var(--frost);border:1px solid var(--frost-bd);box-shadow:0 6px 18px rgba(2,8,18,.3),inset 0 1px 0 var(--glass-spec)}
+/* liquid button */
+.lqb{position:relative;isolation:isolate;border:none;border-radius:999px;cursor:pointer;padding:13px 20px;font:700 14px var(--font-ui);color:var(--ink,#fff);text-shadow:0 1px 2px rgba(2,12,28,.5);display:inline-flex;align-items:center;justify-content:center;gap:8px;background:radial-gradient(82% 56% at 50% -12%,rgba(255,255,255,.42),transparent 62%),linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,white),var(--c) 52%,color-mix(in srgb,var(--c) 62%,black));-webkit-backdrop-filter:blur(11px) saturate(165%);backdrop-filter:blur(11px) saturate(165%);box-shadow:0 12px 24px rgba(3,9,22,.48),0 0 26px -5px var(--c),inset 0 1.5px 1px rgba(255,255,255,.6),inset 0 -11px 15px color-mix(in srgb,var(--c) 42%,black),inset 0 0 0 1px rgba(255,255,255,.18);transition:transform .18s var(--ease)}
+.lqb svg{width:17px;height:17px}.lqb:hover{transform:translateY(-2px)}
+.lqb::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.4px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.92),color-mix(in srgb,var(--c) 35%,white) 33%,transparent 58%,color-mix(in srgb,var(--c) 45%,white));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.lqb::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:radial-gradient(118% 86% at 50% 46%,transparent 34%,color-mix(in srgb,var(--c) 48%,transparent) 72%,color-mix(in srgb,var(--c) 26%,white) 100%);mix-blend-mode:screen}
+.lqb.sec{background:radial-gradient(82% 56% at 50% -12%,rgba(255,255,255,.3),transparent 62%),color-mix(in srgb,var(--c) 46%,transparent);box-shadow:0 8px 18px rgba(3,9,22,.32),0 0 18px -6px var(--c),inset 0 1px 0 rgba(255,255,255,.42),inset 0 0 0 1px rgba(255,255,255,.22)}
+.lqb.ghost{background:none;box-shadow:inset 0 0 0 1.4px color-mix(in srgb,var(--c) 55%,transparent),0 0 16px -9px var(--c);text-shadow:none}.lqb.ghost::after{display:none}.lqb.ghost::before{opacity:.5}
+[data-theme="light"] .lqb{background:radial-gradient(82% 56% at 50% -12%,rgba(255,255,255,.66),transparent 60%),linear-gradient(180deg,color-mix(in srgb,var(--c) 56%,white),var(--c) 50%,color-mix(in srgb,var(--c) 54%,black));box-shadow:0 9px 20px rgba(40,90,120,.20),0 0 22px -7px var(--c),inset 0 1.5px 1px rgba(255,255,255,.95),inset 0 -9px 13px color-mix(in srgb,var(--c) 26%,black),inset 0 0 0 1px rgba(255,255,255,.55)}
+[data-theme="light"] .lqb.sec{background:radial-gradient(82% 56% at 50% -12%,rgba(255,255,255,.5),transparent 60%),color-mix(in srgb,var(--c) 38%,transparent)}
+.lqb.sm{padding:10px 15px;font-size:13px}.lqb.plat{color:#16202B;text-shadow:none;background:radial-gradient(82% 56% at 50% -12%,rgba(255,255,255,.6),transparent 62%),linear-gradient(180deg,#FBFDFF,#D7E2EA 32%,#AEC0CD 56%,#E6EEF4 78%,#BCCBD6);box-shadow:0 12px 24px rgba(40,90,120,.3),0 0 24px -6px rgba(220,235,245,.7),inset 0 1.5px 1px rgba(255,255,255,1),inset 0 -11px 15px rgba(140,170,190,.34),inset 0 0 0 1px rgba(255,255,255,.6)}
+/* layout */
+.wrap{max-width:820px;margin:0 auto;padding:24px 22px 100px;position:relative;z-index:1}
+.tog{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid var(--glassw-bd);background:var(--glassw);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:grid;place-items:center;cursor:pointer;color:var(--text);z-index:50}.tog svg{width:20px;height:20px}
+.mast{text-align:center;padding:14px 0 4px}.mast .k{font-size:11px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--text-muted)}.mast h1{font-family:var(--font-display);font-size:40px;font-weight:700;line-height:1;margin-top:8px}.mast p{color:var(--text-muted);font-size:13.5px;margin-top:8px}
+.grp{font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--c-metal,#BAC9D6);margin:46px 2px 2px;display:flex;align-items:center;gap:12px}
+[data-theme="dark"] .grp{color:#BAC9D6}
+.grp::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--hair),transparent)}
+.sec-h{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);margin:26px 2px 4px;display:flex;align-items:center;gap:10px}.sec-h::after{content:"";flex:1;height:1px;background:var(--hair)}
+.cl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-faint);margin:16px 0 9px}
+.panel{padding:20px;border-radius:var(--r-md)}.flow{display:flex;flex-wrap:wrap;gap:12px;align-items:center}.col{display:flex;flex-direction:column;gap:12px}
+.note{font-size:11.5px;color:var(--text-faint);margin-top:9px;line-height:1.55}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}@media(max-width:640px){.two{grid-template-columns:1fr}}
+/* palette legend */
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.sw{padding:12px;border-radius:13px;background:var(--tile-bg);border:1px solid var(--tile-bd)}
+.sw .chip{height:30px;border-radius:8px;box-shadow:0 0 16px -3px currentColor,inset 0 1px 0 rgba(255,255,255,.4)}
+.sw .role{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:9px}
+.sw .nm{font-size:12px;color:var(--text-muted);margin-top:2px}.sw .hx{font-family:var(--font-num);font-size:10.5px;color:var(--text-faint)}
+/* typography scale */
+.ty .d{font-family:var(--font-display);font-size:42px;font-weight:700;line-height:1}
+.ty .h2{font-family:var(--font-display);font-size:26px;font-weight:700}
+.ty .h3{font-size:18px;font-weight:800}
+.ty .bl{font-size:16px}.ty .bm{font-size:14px}.ty .bs{font-size:13px;color:var(--text-muted)}
+.ty .cap{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint)}
+.ty .nu{font-family:var(--font-num);font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+/* field */
+.field label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-faint);margin-bottom:6px}
+.field .inp{display:flex;align-items:center;gap:9px;padding:12px 14px;border-radius:12px;background:var(--field);border:1px solid var(--field-bd);-webkit-backdrop-filter:blur(8px) saturate(140%);backdrop-filter:blur(8px) saturate(140%);transition:.2s}
+.field .inp svg{width:17px;height:17px;color:var(--text-faint);flex:none}
+.field .inp input,.field .inp select,.field .inp textarea{flex:1;border:none;background:transparent;color:var(--text);font:500 14px var(--font-num);outline:none;resize:none}
+.field .inp:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--field-focus)}
+.field.err .inp{border-color:var(--rose);box-shadow:0 0 0 3px var(--rose-bg)}
+.field .help{font-size:11.5px;color:var(--text-faint);margin-top:6px}.field .err-msg{font-size:11.5px;color:var(--rose);margin-top:6px;font-weight:600}
+.field .inp.disabled{opacity:.45;pointer-events:none}
+/* badges + pills */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:700}
+.badge .d{width:7px;height:7px;border-radius:50%}
+.badge.available{background:var(--avail-bg);border:1px solid var(--avail-bd);color:var(--avail)}.badge.available .d{background:var(--avail-dot)}
+.badge.pending,.badge.featured{background:var(--metal-grad);color:var(--metal-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+[data-theme="dark"] .badge.pending,[data-theme="dark"] .badge.featured{color:#16202B}
+.badge.coming{background:color-mix(in srgb,var(--c-primary) 18%,transparent);border:1px solid var(--c-primary);color:var(--c-primary)}
+.badge.sold{background:var(--tile-bg);border:1px solid var(--tile-bd);color:var(--text-muted)}
+.badge.closed{background:var(--rose-bg);border:1px solid var(--rose-bd);color:var(--rose)}
+.tag{display:inline-block;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;background:var(--tile-bg);border:1px solid var(--tile-bd);color:var(--text-muted)}
+/* filter / loan / market pills */
+.pill{border:1px solid var(--tile-bd);background:var(--tile-bg);color:var(--text-muted);font:700 12.5px var(--font-ui);padding:8px 15px;border-radius:999px;cursor:pointer;transition:.2s}
+.pill.on{color:#fff;border-color:transparent;background:linear-gradient(180deg,color-mix(in srgb,var(--c-primary) 78%,white),var(--c-primary) 55%,color-mix(in srgb,var(--c-primary) 70%,black));box-shadow:0 6px 14px -3px var(--c-primary),inset 0 1px 0 rgba(255,255,255,.4)}
+.pill.metal.on{color:var(--metal-ink);background:var(--metal-grad);box-shadow:0 6px 14px rgba(2,8,18,.35),inset 0 1px 0 rgba(255,255,255,.7)}
+/* selection controls */
+.swc{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px;font-weight:600}
+.swc .track{width:46px;height:27px;border-radius:999px;background:var(--tile-bg);border:1px solid var(--tile-bd);position:relative;transition:.25s var(--ease);box-shadow:inset 0 1px 3px rgba(2,8,18,.3)}
+.swc .track .knob{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.35);transition:.25s var(--ease)}
+.swc.on .track{background:linear-gradient(180deg,color-mix(in srgb,var(--c-primary) 78%,white),var(--c-primary) 60%);border-color:transparent;box-shadow:0 0 14px -3px var(--c-primary),inset 0 1px 1px rgba(255,255,255,.4)}.swc.on .track .knob{left:21px}
+.cb,.rb{display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px}
+.cb .box{width:21px;height:21px;border-radius:7px;background:var(--field);border:1px solid var(--field-bd);display:grid;place-items:center;transition:.2s}
+.cb .box svg{width:13px;height:13px;color:#fff;opacity:0}.cb.on .box{background:linear-gradient(180deg,color-mix(in srgb,var(--c-primary) 78%,white),var(--c-primary));border-color:transparent;box-shadow:0 0 12px -3px var(--c-primary)}.cb.on .box svg{opacity:1}
+.rb .box{width:21px;height:21px;border-radius:50%;background:var(--field);border:1px solid var(--field-bd);display:grid;place-items:center;transition:.2s}
+.rb .box::after{content:"";width:9px;height:9px;border-radius:50%;background:#fff;transform:scale(0);transition:.2s}.rb.on .box{background:linear-gradient(180deg,color-mix(in srgb,var(--c-primary) 78%,white),var(--c-primary));border-color:transparent;box-shadow:0 0 12px -3px var(--c-primary)}.rb.on .box::after{transform:scale(1)}
+/* tooltip */
+.tip{position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13.5px}
+.tip .q{width:18px;height:18px;border-radius:50%;background:var(--tile-bg);border:1px solid var(--tile-bd);color:var(--text-muted);font-size:11px;font-weight:800;display:grid;place-items:center;cursor:help}
+.tip .bubble{position:absolute;bottom:130%;left:0;width:230px;padding:11px 13px;border-radius:12px;font-size:12px;line-height:1.5;color:var(--text);background:var(--glassw);-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);border:1px solid var(--glassw-bd);box-shadow:0 12px 30px rgba(2,8,18,.5);opacity:0;transform:translateY(4px);pointer-events:none;transition:.2s;z-index:5}.tip:hover .bubble{opacity:1;transform:translateY(0)}
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{padding:14px 10px;text-align:center;border-radius:14px;background:var(--tile-bg);border:1px solid var(--tile-bd);box-shadow:inset 0 1px 0 var(--tile-spec)}
+.tile .l{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint)}.tile .v{font-family:var(--font-num);font-size:18px;font-weight:800;margin-top:5px}
+.tile.equity{background:var(--equity-bg);border-color:var(--equity-bd)}.tile.equity .v{color:var(--equity)}
+/* segmented / tabs / stepper */
+.seg{display:inline-flex;padding:5px;gap:4px;border-radius:999px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:var(--glassw);border:1px solid var(--glassw-bd);box-shadow:inset 0 1px 0 var(--glass-spec)}
+.seg .s{border:none;background:transparent;color:var(--text-muted);font:700 13.5px var(--font-ui);padding:9px 18px;border-radius:999px;cursor:pointer}
+.seg .s.on{position:relative;color:var(--metal-ink);background:var(--metal-grad);box-shadow:0 6px 14px rgba(2,8,18,.4),inset 0 1.5px 1px rgba(255,255,255,.85),inset 0 0 0 1px rgba(255,255,255,.3)}
+[data-theme="dark"] .seg .s.on{color:#fff;text-shadow:0 1px 2px rgba(2,12,28,.5)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--hair)}
+.tabs .t{border:none;background:transparent;color:var(--text-muted);font:700 13.5px var(--font-ui);padding:11px 15px;cursor:pointer;position:relative;border-radius:10px 10px 0 0}
+.tabs .t.on{color:var(--text)}.tabs .t.on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2.5px;border-radius:3px;background:var(--metal-grad)}
+.stepper{display:flex;align-items:center}
+.stepper .st{display:flex;flex-direction:column;align-items:center;gap:7px;flex:none}
+.stepper .circle{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-num);font-weight:800;font-size:14px;background:var(--tile-bg);border:1px solid var(--tile-bd);color:var(--text-faint)}
+.stepper .st.done .circle,.stepper .st.active .circle{background:linear-gradient(180deg,color-mix(in srgb,var(--c-primary) 78%,white),var(--c-primary));border-color:transparent;color:#fff;box-shadow:0 0 16px -3px var(--c-primary)}
+.stepper .lab{font-size:11px;font-weight:700;color:var(--text-faint)}.stepper .st.active .lab{color:var(--text)}
+.stepper .line{flex:1;height:2px;background:var(--hair);margin:0 6px 24px;border-radius:2px}.stepper .line.done{background:linear-gradient(90deg,var(--c-primary),color-mix(in srgb,var(--c-primary) 60%,white))}
+/* rate bar + gauge */
+.ratebar{display:flex;align-items:center;gap:12px}
+.ratebar .bar{flex:1;height:8px;border-radius:999px;background:var(--tile-bg);overflow:hidden;border:1px solid var(--tile-bd)}
+.ratebar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--em),var(--em-hi))}
+.ratebar .n{font-family:var(--font-num);font-weight:800;font-size:17px;color:var(--em)}[data-theme="dark"] .ratebar .n{color:var(--em-hi)}
+.gauge{text-align:center}.gauge svg{width:84px;height:84px;transform:rotate(-90deg)}
+.gauge .tk{fill:none;stroke:var(--tile-bg);stroke-width:8}.gauge .rg{fill:none;stroke:url(#pg);stroke-width:8;stroke-linecap:round}
+.gauge .val{font-family:var(--font-num);font-size:15px;font-weight:800;margin-top:-52px}.gauge .lab{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-faint);margin-top:34px}
+/* cards */
+.dcard{overflow:hidden}.dcard .ph{height:120px;background:linear-gradient(135deg,rgba(120,170,210,.25),rgba(40,70,110,.3));display:grid;place-items:center;position:relative}
+[data-theme="light"] .dcard .ph{background:linear-gradient(135deg,rgba(180,220,235,.6),rgba(120,190,200,.5))}
+.dcard .ph svg{width:32px;height:32px;opacity:.5;color:var(--text-faint)}.dcard .ph .badge{position:absolute;top:9px;left:9px}
+.dcard .bd{padding:13px}.dcard .price{font-family:var(--font-num);font-size:18px;font-weight:800}.dcard .meta{font-size:12px;color:var(--text-muted);margin-top:2px}.dcard .eq{font-family:var(--font-num);font-size:12px;font-weight:700;color:var(--equity);margin-top:7px}
+.lendcard{display:flex;gap:13px;align-items:center;padding:15px}
+.lendcard .logo{width:46px;height:46px;border-radius:12px;background:var(--tile-bg);border:1px solid var(--tile-bd);display:grid;place-items:center;color:var(--c-metal,#BAC9D6);flex:none}[data-theme="dark"] .lendcard .logo{color:#BAC9D6}.lendcard .logo svg{width:22px;height:22px}
+.lendcard .nm{font-weight:700;font-size:15px}.lendcard .sub{font-size:12px;color:var(--text-muted)}
+.lendcard .rate{margin-left:auto;text-align:right}.lendcard .rate .n{font-family:var(--font-num);font-weight:800;font-size:17px;color:var(--em)}[data-theme="dark"] .lendcard .rate .n{color:var(--em-hi)}.lendcard .rate .l{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint)}
+.favcard{display:flex;gap:12px;align-items:center;padding:12px}
+.favcard .thumb{width:64px;height:48px;border-radius:9px;background:linear-gradient(135deg,rgba(120,170,210,.3),rgba(40,70,110,.35));flex:none}
+.favcard .heart{margin-left:auto;width:34px;height:34px;border-radius:50%;background:var(--tile-bg);border:1px solid var(--tile-bd);display:grid;place-items:center;color:var(--c-metal,#BAC9D6);cursor:pointer}[data-theme="dark"] .favcard .heart{color:#BAC9D6}
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;font-family:var(--font-num)}
+.tbl th{text-align:left;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-faint);padding:10px 12px;background:var(--tile-bg);border-bottom:1px solid var(--hair)}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--hair)}.tbl tbody tr{background:var(--frost)}.tbl tbody tr:hover{background:var(--tile-bg)}.tbl .gain{color:var(--gain);font-weight:700}
+/* toast */
+.toast{display:flex;align-items:center;gap:11px;padding:12px 15px;border-radius:13px;font-size:13.5px;font-weight:600;background:var(--glassw);-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);border:1px solid var(--glassw-bd);box-shadow:0 12px 30px rgba(2,8,18,.45)}
+.toast .ic{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex:none}.toast .ic svg{width:14px;height:14px}
+.toast.success .ic{background:var(--equity-bg);color:var(--gain);border:1px solid var(--equity-bd)}
+.toast.error .ic{background:var(--rose-bg);color:var(--rose);border:1px solid var(--rose-bd)}
+.toast.info .ic{background:color-mix(in srgb,var(--c-primary) 15%,transparent);color:var(--c-primary);border:1px solid color-mix(in srgb,var(--c-primary) 30%,transparent)}
+.toast.warning .ic{background:color-mix(in srgb,var(--warn) 30%,transparent);color:var(--warn-ink);border:1px solid color-mix(in srgb,var(--warn) 55%,transparent)}
+/* empty + skeleton */
+.empty{padding:30px 22px;text-align:center;border-radius:var(--r-md)}
+.empty .eic{width:52px;height:52px;border-radius:15px;background:var(--tile-bg);border:1px solid var(--tile-bd);display:grid;place-items:center;margin:0 auto 13px;color:var(--text-faint)}.empty .eic svg{width:25px;height:25px}
+.empty h4{font-family:var(--font-display);font-size:19px;font-weight:700}.empty p{color:var(--text-muted);font-size:13px;margin:6px 0 14px}
+.skel{border-radius:10px;background:linear-gradient(100deg,var(--skel) 30%,var(--skel-hi) 50%,var(--skel) 70%);background-size:200% 100%;animation:shimmer 1.4s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+/* modal */
+.modaldemo{border-radius:var(--r-md);padding:30px 18px;background:var(--scrim);-webkit-backdrop-filter:blur(var(--scrim-blur));backdrop-filter:blur(var(--scrim-blur));display:grid;place-items:center}
+.modal-card{max-width:380px;width:100%;padding:22px;position:relative}.modal-card h3{font-family:var(--font-display);font-size:21px;font-weight:700}.modal-card p{color:var(--text-muted);font-size:13px;margin-top:8px}.modal-card .mf{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:1px solid var(--glassw-bd);background:var(--tile-bg);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:var(--text-muted);font-size:17px;cursor:pointer;display:grid;place-items:center;line-height:1}
+.successbar{height:4px;border-radius:3px;background:var(--equity-bg);overflow:hidden;margin-top:16px}.successbar i{display:block;height:100%;width:64%;background:linear-gradient(90deg,var(--em),var(--em-hi))}
+/* nav + footer chrome */
+.nav{padding:11px 16px;display:flex;align-items:center;gap:12px;border-radius:16px}
+.nav .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:14px;letter-spacing:.03em}
+.nav .brand .mk{width:28px;height:28px;border-radius:8px;background:var(--metal-grad);display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}.nav .brand .mk svg{width:14px;height:14px}
+.nav .brand .off{color:var(--c-metal,#BAC9D6)}[data-theme="dark"] .nav .brand .off{color:#BAC9D6}
+.nav .lk{margin-left:auto;display:flex;gap:3px}.nav .lk a{font-size:12.5px;font-weight:600;color:var(--text-muted);padding:7px 11px;border-radius:9px;text-decoration:none}.nav .lk a.on{color:var(--text);background:var(--tile-bg)}
+.foot{padding:18px 20px;border-radius:16px;text-align:center}.foot .brand{justify-content:center;font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:8px}.foot .legal{font-size:11.5px;color:var(--text-faint)}
+</style></head><body>
+<div class="scene s-dark"></div><div class="scene s-light"></div><div class="depth"></div>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2F7FB"/><stop offset="1" stop-color="#7C8E9C"/></linearGradient></defs></svg>
+<button class="tog" id="tog" aria-label="Toggle theme"><svg id="togic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/></svg></button>
+
+<div class="wrap">
+  <div class="mast"><div class="k">DOM · Liquid Glass</div><h1>Component Library v5 · FINAL palette</h1><p>FINAL roles locked · Aqua-lead dark · Coral-lead light · Sunshine light-only. Critique build — the visual contract before Kong. Toggle top-right.</p></div>
+
+  <!-- ===== FOUNDATIONS ===== -->
+  <div class="grp">Foundations</div>
+  <div class="sec-h">Palette → roles (the approved picks, applied everywhere below)</div>
+  <div class="lg lg--work panel">
+    <div class="cl" style="margin-top:0">Primary actions, accents &amp; the metal — toggle to see the light set</div>
+    <div class="pal">
+      <div class="sw"><div class="chip" style="background:var(--c-primary);color:var(--c-primary)"></div><div class="role">Primary</div><div class="nm" id="r1">Aqua Glow</div><div class="hx" id="h1">#22D3EE</div></div>
+      <div class="sw"><div class="chip" style="background:var(--c-secondary);color:var(--c-secondary)"></div><div class="role">Secondary</div><div class="nm" id="r2">Amethyst</div><div class="hx" id="h2">#8B5CF6</div></div>
+      <div class="sw"><div class="chip" style="background:var(--c-info);color:var(--c-info)"></div><div class="role">Info</div><div class="nm" id="r3">Royal Sapphire</div><div class="hx" id="h3">#3D78EA</div></div>
+      <div class="sw"><div class="chip" style="background:var(--c-accent);color:var(--c-accent)"></div><div class="role">Accent</div><div class="nm" id="r4">Lagoon Teal</div><div class="hx" id="h4">#14B8A6</div></div>
+      <div class="sw lonly"><div class="chip" style="background:#F6E77D;color:#F6E77D"></div><div class="role">Sunshine</div><div class="nm">Highlight (light)</div><div class="hx">#F6E77D</div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(180deg,#FBFDFF,#AEC0CD);color:#9DB0BE"></div><div class="role">Metal</div><div class="nm" id="r5">Platinum (steel/bright)</div><div class="hx">split</div></div>
+      <div class="sw"><div class="chip" style="background:var(--gain);color:var(--gain)"></div><div class="role">Success / gain</div><div class="nm">Spring mint</div><div class="hx">semantic</div></div>
+      <div class="sw"><div class="chip" style="background:var(--rose);color:var(--rose)"></div><div class="role">Danger</div><div class="nm">Rose</div><div class="hx">semantic</div></div>
+    </div>
+    <div class="note">Roles are my suggested mapping — say the word and I'll swap any (e.g. make Lagoon Teal the secondary). Success &amp; danger stay semantic (your color contract); everything decorative/interactive draws from the picks.</div>
+  </div>
+
+  <div class="sec-h">Typography scale</div>
+  <div class="lg lg--work panel ty col" style="gap:8px">
+    <div class="d">Off-market deals.</div><div class="h2">Section heading</div><div class="h3">Card title</div>
+    <div class="bl">Body large — intro copy and lead paragraphs.</div>
+    <div class="bm">Body medium — the default reading size across the portal.</div>
+    <div class="bs">Body small — meta rows, captions under figures.</div>
+    <div class="cap">Eyebrow / label caps</div>
+    <div class="nu">$169,000 · 8.4% · 1.38×</div>
+    <div class="note">Barlow Condensed = display · Barlow = UI/body · Inter = tabular numerics. One scale replaces the 1,234 inline font declarations Einstein flagged.</div>
+  </div>
+
+  <!-- ===== ATOMS ===== -->
+  <div class="grp">Atoms</div>
+  <div class="sec-h">Buttons (approved — full system in its own file)</div>
+  <div class="lg lg--work panel flow">
+    <button class="lqb" style="--c:var(--c-primary)">Primary</button>
+    <button class="lqb sec" style="--c:var(--c-secondary)">Secondary</button>
+    <button class="lqb ghost" style="--c:var(--c-primary)">Ghost</button>
+    <button class="lqb" style="--c:var(--rose)">Destructive</button>
+    <button class="lqb plat">Platinum</button>
+    <button class="lqb lonly" style="--c:#F6E77D;--ink:#16202B">Sunshine</button>
+  </div>
+  <div class="note lonly">Sunshine is the one colour that reads far better with dark ink than white — shown here as it should be used: a highlight, not a white-text action button.</div>
+
+  <div class="sec-h">Input fields · states</div>
+  <div class="lg lg--work panel col">
+    <div class="field"><label>Email</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg><input placeholder="you@firm.com"></div></div>
+    <div class="field"><label>Search · focused (royal ring)</label><div class="inp" style="border-color:var(--accent);box-shadow:0 0 0 3px var(--field-focus)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input value="3415 Overland"></div></div>
+    <div class="field"><label>Purchase price · helper</label><div class="inp"><span style="color:var(--text-faint);font-family:var(--font-num)">$</span><input value="169,000"></div><div class="help">Auto-fills from the listing; override to model your own.</div></div>
+    <div class="field err"><label>Password · error</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><input type="password" value="123"></div><div class="err-msg">Must be at least 8 characters.</div></div>
+    <div class="two"><div class="field"><label>Loan type · select</label><div class="inp"><select><option>Conventional</option><option>DSCR</option></select><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div></div>
+    <div class="field"><label>Disabled</label><div class="inp disabled"><input value="Locked field"></div></div></div>
+    <div class="field"><label>Notes · textarea</label><div class="inp"><textarea rows="2" placeholder="Anything the seller should know…"></textarea></div></div>
+  </div>
+
+  <div class="sec-h">Badges · status</div>
+  <div class="lg lg--work panel"><div class="flow"><span class="badge available"><span class="d"></span>Available</span><span class="badge pending">Pending</span><span class="badge coming">Coming soon</span><span class="badge sold">Sold</span><span class="badge closed">Closed</span><span class="badge featured">★ Featured</span></div></div>
+
+  <div class="sec-h">Pills · filter / loan-type / market-region</div>
+  <div class="lg lg--work panel col">
+    <div><div class="cl" style="margin-top:0">Filter (active = primary)</div><div class="flow"><button class="pill on">All</button><button class="pill">Available</button><button class="pill">Pending</button><button class="pill">Coming soon</button><button class="pill">Closed</button></div></div>
+    <div><div class="cl">Loan type (active = platinum metal)</div><div class="flow"><button class="pill metal on">Hard money</button><button class="pill">DSCR</button><button class="pill">Bridge</button><button class="pill">Fix &amp; flip</button><button class="pill">Construction</button></div></div>
+    <div><div class="cl">Market region (active = platinum metal)</div><div class="flow"><button class="pill metal on">Tampa</button><button class="pill">Pasco</button><button class="pill">Pinellas</button><button class="pill">Sarasota</button></div></div>
+  </div>
+
+  <div class="sec-h">Tags · selection controls · tooltip</div>
+  <div class="two">
+    <div class="lg lg--work panel"><div class="cl" style="margin-top:0">Tags</div><div class="flow"><span class="tag">Single-family</span><span class="tag">Off-market</span><span class="tag">Value-add</span></div>
+      <div class="cl">Tooltip (hover ?)</div><div class="tip"><span>Cap rate</span><span class="q">?</span><span class="bubble">Net operating income ÷ purchase price — the unleveraged yield.</span></div></div>
+    <div class="lg lg--work panel col"><div class="cl" style="margin-top:0">Toggle · checkbox · radio</div>
+      <div class="swc on" id="sw1"><span class="track"><span class="knob"></span></span>Email alerts</div>
+      <div class="cb on" id="cb1"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>Save my filters</div>
+      <div class="flow" style="gap:18px"><div class="rb on" id="rb1"><span class="box"></span>Cash</div><div class="rb" id="rb2"><span class="box"></span>Financed</div></div></div>
+  </div>
+
+  <!-- ===== MOLECULES ===== -->
+  <div class="grp">Molecules</div>
+  <div class="sec-h">Search bar · metric tiles</div>
+  <div class="two">
+    <div class="lg lg--work panel"><div class="flow" style="flex-wrap:nowrap"><div class="field" style="flex:1"><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input placeholder="Search deals…"></div></div><button class="lqb sm" style="--c:var(--c-primary)">Go</button></div></div>
+    <div class="lg panel"><div class="tiles"><div class="tile"><div class="l">Starting</div><div class="v">$169k</div></div><div class="tile"><div class="l">ARV</div><div class="v">$235k</div></div><div class="tile equity"><div class="l">Equity</div><div class="v">$64.3k</div></div></div></div>
+  </div>
+
+  <div class="sec-h">Segmented · tabs · stepper</div>
+  <div class="lg lg--work panel col">
+    <div class="seg" style="align-self:flex-start"><button class="s on">Pipeline</button><button class="s">Dash</button><button class="s">List</button></div>
+    <div class="tabs"><button class="t on">Overview</button><button class="t">Pro Formas</button><button class="t">Details</button><button class="t">Photos</button><button class="t">Map</button></div>
+    <div class="stepper"><div class="st done"><span class="circle">1</span><span class="lab">Property</span></div><div class="line done"></div><div class="st active"><span class="circle">2</span><span class="lab">Offer</span></div><div class="line"></div><div class="st"><span class="circle">3</span><span class="lab">Confirm</span></div></div>
+  </div>
+
+  <div class="sec-h">Rate bar · pro-forma gauges (platinum stroke)</div>
+  <div class="two">
+    <div class="lg lg--work panel col"><div class="cl" style="margin-top:0">Lender APR bar</div>
+      <div class="ratebar"><span style="font-size:13px">From</span><div class="bar"><div class="fill" style="width:42%"></div></div><span class="n">9.5%</span></div>
+      <div class="ratebar"><span style="font-size:13px">From</span><div class="bar"><div class="fill" style="width:30%"></div></div><span class="n">7.8%</span></div></div>
+    <div class="lg lg--work panel"><div class="cl" style="margin-top:0">Gauges</div><div class="flow" style="justify-content:space-around">
+      <div class="gauge"><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="40"/><circle class="rg" cx="50" cy="50" r="40" stroke-dasharray="251" stroke-dashoffset="88"/></svg><div class="val">8.4%</div><div class="lab">Cap rate</div></div>
+      <div class="gauge"><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="40"/><circle class="rg" cx="50" cy="50" r="40" stroke-dasharray="251" stroke-dashoffset="72"/></svg><div class="val">12.1%</div><div class="lab">Cash/cash</div></div>
+      <div class="gauge"><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="40"/><circle class="rg" cx="50" cy="50" r="40" stroke-dasharray="251" stroke-dashoffset="55"/></svg><div class="val">1.38</div><div class="lab">DSCR</div></div>
+    </div></div>
+  </div>
+
+  <!-- ===== ORGANISMS ===== -->
+  <div class="grp">Organisms</div>
+  <div class="sec-h">Navigation + footer chrome</div>
+  <div class="lg lg--work nav"><span class="brand"><span class="mk"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z" stroke="#16202B" stroke-width="2.2"/><circle cx="12" cy="9" r="2.4" fill="#16202B"/></svg></span><b>DIRECT</b> <span class="off">OFF MARKET</span></span><span class="lk"><a class="on">Marketplace</a><a>Lenders</a><a>FAQ</a></span></div>
+  <div class="lg lg--work foot" style="margin-top:12px"><span class="brand"><b>DIRECT OFF MARKET</b></span><div class="legal">© 2026 Direct Off Market · Equal Housing Opportunity · Florida</div></div>
+
+  <div class="sec-h">Cards · deal (showcase) / frost / lender / favorite</div>
+  <div class="two">
+    <article class="lg lg--interactive dcard"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="badge featured">★ Featured</span></div><div class="bd"><div class="price">$169k</div><div class="meta">3415 Overland Dr · Holiday</div><div class="eq">+$64.3k equity</div></div></article>
+    <div class="lg--frost dcard"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="badge available" style="position:absolute;top:9px;left:9px"><span class="d"></span>Available</span></div><div class="bd"><div class="price">$204k</div><div class="meta">812 Mariner Way · Tarpon</div><div class="eq">+$51.0k equity</div></div></div>
+  </div>
+  <div class="col" style="margin-top:12px">
+    <article class="lg lg--interactive lendcard"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 21V9l8-5 8 5v12M9 21v-6h6v6"/></svg></span><div><div class="nm">Gulf Coast Capital</div><div class="sub">Hard money · 12-mo bridge</div></div><div class="rate"><div class="n">9.5%</div><div class="l">from</div></div></article>
+    <div class="lg--frost favcard"><span class="thumb"></span><div><div style="font-weight:700;font-size:14px">3415 Overland Dr</div><div style="font-size:12px;color:var(--text-muted)">Holiday · +$64.3k</div></div><span class="heart"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 21s-7-4.5-9.5-9C1 9 2.5 5.5 6 5.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 16.5 12 21 12 21z"/></svg></span></div>
+  </div>
+
+  <div class="sec-h">Data table · frosted rows</div>
+  <div class="lg lg--work panel" style="padding:6px 6px 0"><table class="tbl"><thead><tr><th>Line item</th><th>Amount</th><th>% of ARV</th></tr></thead><tbody><tr><td>Purchase price</td><td>$169,000</td><td>71.9%</td></tr><tr><td>Rehab budget</td><td>$28,000</td><td>11.9%</td></tr><tr><td>Holding + closing</td><td>$11,400</td><td>4.9%</td></tr><tr><td class="gain">Net profit</td><td class="gain">$42,100</td><td class="gain">17.9%</td></tr></tbody></table></div>
+
+  <div class="sec-h">Accordion (FAQ)</div>
+  <div class="lg lg--work panel" style="padding:0"><div class="acc"><div class="q open" style="padding:15px 16px;display:flex;justify-content:space-between;cursor:pointer;font-weight:600;font-size:14px">How do off-market deals get sourced?<span class="ic" style="color:var(--c-metal,#BAC9D6);font-size:18px">+</span></div><div class="a" style="padding:0 16px 15px;font-size:13px;color:var(--text-muted)">Direct seller relationships and pre-foreclosure data, vetted before they hit the MLS.</div><div class="q" style="padding:15px 16px;display:flex;justify-content:space-between;cursor:pointer;font-weight:600;font-size:14px;border-top:1px solid var(--hair)">Typical close timeline?<span class="ic" style="color:var(--c-metal,#BAC9D6);font-size:18px">+</span></div><div class="a" style="padding:0 16px 15px;font-size:13px;color:var(--text-muted);display:none">Most close in 21–30 days with our preferred title partners.</div></div></div>
+
+  <div class="sec-h">Toasts (info=primary · warning=sunshine/cyan · success/error=semantic)</div>
+  <div class="col" style="max-width:400px">
+    <div class="toast success"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>Pro-forma saved to your dashboard.</div>
+    <div class="toast error"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></span>Couldn't submit offer — try again.</div>
+    <div class="toast info"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 8v.01M11 12h1v4h1"/></svg></span>New deal added in Pasco County.</div>
+    <div class="toast warning"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4M12 17v.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>Offer expires in 24 hours.</div>
+  </div>
+
+  <div class="sec-h">Modals · confirm + success</div>
+  <div class="two">
+    <div class="modaldemo"><div class="lg modal-card"><button class="modal-close">×</button><h3>Submit offer</h3><p>Your offer on 3415 Overland Dr will be sent to the seller.</p><div class="mf"><button class="lqb sec sm" style="--c:var(--c-primary)">Cancel</button><button class="lqb sm" style="--c:var(--c-primary)">Submit</button></div></div></div>
+    <div class="modaldemo"><div class="lg modal-card"><h3>Offer submitted ✓</h3><p>The seller typically responds within 24 hours. Redirecting…</p><div class="successbar"><i></i></div></div></div>
+  </div>
+
+  <div class="sec-h">Empty state · loading skeleton</div>
+  <div class="two">
+    <div class="lg lg--work empty"><div class="eic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18v13H3zM3 7l3-4h12l3 4"/></svg></div><h4>No saved pro-formas</h4><p>Run the numbers on any listing to compare deals.</p><button class="lqb sm" style="--c:var(--c-primary)">Browse</button></div>
+    <div class="lg lg--work panel col"><div class="cl" style="margin-top:0">Skeleton</div><div class="skel" style="height:14px;width:70%"></div><div class="skel" style="height:14px;width:90%"></div><div class="skel" style="height:14px;width:55%"></div><div class="skel" style="height:80px;width:100%;margin-top:6px"></div></div>
+  </div>
+
+  <!-- ===== SYSTEM ===== -->
+  <div class="grp">System polish</div>
+  <div class="sec-h">Scrollbar · placeholder · selection · focus</div>
+  <div class="lg lg--work panel col">
+    <div style="max-height:90px;overflow:auto;padding:10px 12px;border-radius:12px;background:var(--field);border:1px solid var(--field-bd);font-size:12.5px;color:var(--text-muted)">Scroll me — the thumb is glass-themed and picks up platinum on hover. Direct seller relationships and pre-foreclosure data, vetted before they hit the MLS. Most close in 21–30 days. Run the numbers on any listing and save it to compare deals side by side, then submit an offer in a couple of clicks.</div>
+    <div style="font-size:12.5px;color:var(--text-muted)"><b style="color:var(--text)">Selection</b> — select this text; the highlight is platinum, not browser blue. <b style="color:var(--text)">Placeholder</b> uses the faint token (see inputs). <b style="color:var(--text)">Focus ring</b> is the shared royal ring on every control.</div>
+  </div>
+</div>
+
+<script>
+var t=document.documentElement,b=document.getElementById('tog'),ic=document.getElementById('togic');
+var sun='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>';
+var moon='<path d="M20 14.5A7.5 7.5 0 0 1 9.5 4 7.5 7.5 0 1 0 20 14.5z"/>';
+var L={r1:["Aqua Glow","Coral"],h1:["#22D3EE","#FF8A6B"],r2:["Amethyst","Sky Blue"],h2:["#8B5CF6","#60B7F0"],r3:["Royal Sapphire","Rose"],h3:["#3D78EA","#F4889E"],r4:["Lagoon Teal","Aqua"],h4:["#14B8A6","#5BC9D4"]};
+function paint(dark){for(var k in L){var e=document.getElementById(k);if(e)e.textContent=L[k][dark?0:1];}}
+b.onclick=function(){var d=t.getAttribute('data-theme')==='dark';t.setAttribute('data-theme',d?'light':'dark');ic.innerHTML=d?sun:moon;paint(!d);};
+['sw1','cb1'].forEach(function(id){var e=document.getElementById(id);e.onclick=function(){e.classList.toggle('on');};});
+document.getElementById('rb1').onclick=function(){this.classList.add('on');document.getElementById('rb2').classList.remove('on');};
+document.getElementById('rb2').onclick=function(){this.classList.add('on');document.getElementById('rb1').classList.remove('on');};
+document.querySelectorAll('.seg .s,.tabs .t,.pill').forEach(function(s){s.onclick=function(){if(s.classList.contains('pill')&&!s.parentNode.querySelector('.metal'))s.parentNode.querySelectorAll('.pill').forEach(function(x){x.classList.remove('on')});else if(s.classList.contains('pill'))s.parentNode.querySelectorAll('.pill').forEach(function(x){x.classList.remove('on')});else s.parentNode.querySelectorAll(s.classList.contains('s')?'.s':'.t').forEach(function(x){x.classList.remove('on')});s.classList.add('on');};});
+document.querySelectorAll('.acc .q').forEach(function(q){q.onclick=function(){q.classList.toggle('open');var a=q.nextElementSibling;if(a&&a.classList.contains('a'))a.style.display=q.classList.contains('open')?'block':'none';};});
+</script></body></html>

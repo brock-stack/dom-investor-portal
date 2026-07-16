@@ -1,0 +1,1075 @@
+/* ============================================================================
+   DOM Gulf Liquid Glass — v2.4.1 (Phase 0 + polish addendum)
+   v2.4.3 — menu + brand polish
+   Tokens · scenes · glass tiers · liquid buttons · component utilities ·
+   system polish.  Source of truth: dom-liquid-component-library-v5.html.
+
+   GAP-FIXES APPLIED vs the spec's paste (see gap-closing addendum):
+     A1  light --c-metal is a valid hex (#7E94A6), not the word "bright"
+     A2  .lqb has a default --c:var(--c-primary)
+     A3  .investor-nav background forced with !important (beats inline <style>)
+     BG  html{background:transparent} + body canvas fallbacks so the fixed
+         scenes ALWAYS paint and never flash white (background propagation).
+
+   POLISH ADDENDUM v2.4.1 (Andrew's preview review + Claude's rev-2):
+     — role reshuffle: dark primary → Lagoon Teal, light primary → Aqua, Coral purged
+     — dark scene oceanic depth: +2 near-horizon caustics, +3-layer animated ::after
+     — dark canvas floor #020B13 (was #030C17)
+     — dark gain calmed: #62F0A8 → #79DDB3 (and family)
+     — dark Available calmed: #7BE6B3 → #84DEB6 (and family)
+     — light .investor-nav gets banded blue background (beats inline .investor-nav{background:var(--navy)})
+     — focus ring repointed to primary (was royal)
+     — .toast.info .ic uses --c-info (was --c-primary)
+   ============================================================================ */
+
+:root{
+  --font-ui:'Barlow',system-ui,sans-serif;
+  --font-display:'Barlow Condensed',var(--font-ui);
+  --font-num:'Inter',var(--font-ui);
+  --r-lg:22px; --r-md:16px; --r-sm:11px;
+  --ease:cubic-bezier(.32,.72,0,1); --dur:.5s;
+  /* z-index tokens — replace ad-hoc values */
+  --z-toast:9000;
+  --z-modal-backdrop:10000;
+  --z-modal:10010;
+  --z-modal-success:10020;
+}
+
+/* ---- DARK (default) ---- */
+:root, [data-theme="dark"]{
+  color-scheme:dark;
+  --text:#EAF2F8; --text-muted:#A9BFD2; --text-faint:#74899E;
+  --hair:rgba(255,255,255,.12);
+
+  /* Roles (dark) */
+  --c-primary:#14B8A6;     /* Lagoon Teal — primary (rev-2 dark) */
+  --c-secondary:#22D3EE;   /* Aqua Glow — secondary */
+  --c-info:#22D3EE;        /* Aqua Glow — info rides with secondary in dark */
+  --c-accent:#8B5CF6;      /* Amethyst — accent */
+  --c-metal:#7E94A6;       /* v2.4.9: platinum unified across themes per Andrew */
+  --metal-ink:#16202B;     /* v2.4.9: bright metal takes dark ink — both themes */
+  --metal-grad:linear-gradient(180deg,#FBFDFF,#D7E2EA 40%,#AEC0CD 70%,#CBD8E2);
+
+  --royal:#14B8A6; --royal-hi:#3FD6C4; /* stray royal refs point to teal (kill leftover royal) */
+  --accent:var(--c-primary);
+
+  /* Semantic — success/gain */
+  --em-hi:#95E8C6; --em:#16B98A; /* was #8FF0CE — calmed gain family */
+  --gain:#79DDB3; --equity:#79DDB3; /* was #62F0A8 — calmed gain */
+  --equity-bg:rgba(95,210,165,.13); --equity-bd:rgba(95,210,165,.30);
+  --avail:#B79BFF;
+  --avail-bg:rgba(139,92,246,.18);
+  --avail-bd:rgba(139,92,246,.50);
+  --avail-dot:#8B5CF6;
+
+  /* Semantic — danger */
+  --rose:#F0685E; --rose-bg:rgba(240,104,94,.14);
+  --rose-bd:rgba(240,104,94,.32);
+
+  /* Warning (dark chip) */
+  --warn:#7FD9E8; --warn-ink:#7FD9E8;
+
+  /* Tile + surface */
+  --tile-bg:rgba(255,255,255,.06);
+  --tile-bd:rgba(255,255,255,.12);
+  --tile-spec:rgba(255,255,255,.16);
+
+  /* Glass tier — showcase */
+  --glass:linear-gradient(157deg,rgba(24,48,80,.42),rgba(14,30,54,.24) 60%,rgba(14,30,54,.16));
+  --glass-bd:rgba(255,255,255,.14);
+  --glass-drop:0 26px 60px rgba(2,8,18,.5);
+  --glass-spec:rgba(255,255,255,.45);
+  --glass-shade:rgba(2,8,18,.36);
+  --glass-rim:linear-gradient(155deg,rgba(255,255,255,.85),rgba(170,210,235,.14) 28%,transparent 52%,#F2F7FB 96%);
+  --glass-pool:rgba(180,214,240,.16);
+  --glass-blur:22px; --glass-sat:160%;
+
+  /* Glass tier — work */
+  --glassw:linear-gradient(157deg,rgba(16,32,54,.58),rgba(11,24,44,.48));
+  --glassw-bd:rgba(255,255,255,.10);
+  --glassw-blur:18px; --glassw-sat:130%;
+
+  /* Glass tier — frost */
+  --frost:rgba(17,33,56,.82);
+  --frost-bd:rgba(255,255,255,.1);
+
+  /* Input field */
+  --field:rgba(255,255,255,.05);
+  --field-bd:rgba(255,255,255,.14);
+  --field-focus:rgba(20,184,166,.45); /* focus ring → Lagoon Teal (was royal) */
+
+  /* Modal scrim */
+  --scrim:rgba(3,9,20,.6);
+  --scrim-blur:6px;
+
+  /* Skeleton */
+  --skel:rgba(255,255,255,.06);
+  --skel-hi:rgba(255,255,255,.14);
+
+  /* Canvas fallback (propagates from body — see BG fix) */
+  --canvas:#020B13; /* was #030C17 — matches new scene floor */
+}
+
+/* ---- LIGHT ---- */
+[data-theme="light"]{
+  color-scheme:light;
+  --text:#103A45; --text-muted:#4C6B73; --text-faint:#83A0A7;
+  --hair:rgba(16,60,70,.12);
+
+  /* Roles (light) */
+  --c-primary:#5BC9D4;     /* Aqua — primary (rev-2 light) */
+  --c-secondary:#F6E77D;   /* Sunshine — secondary (DARK ink where used, never white) */
+  --c-info:#60B7F0;        /* Sky Blue — info */
+  --c-accent:#F4889E;      /* Rose — accent */
+  --c-metal:#7E94A6;       /* GAP-FIX A1: was the invalid word "bright" */
+  --metal-ink:#16202B;
+  --metal-grad:linear-gradient(180deg,#FBFDFF,#D7E2EA 40%,#AEC0CD 70%,#CBD8E2);
+
+  --royal:#5BC9D4; --royal-hi:#3FB8C6; /* stray royal refs → aqua */
+  --accent:var(--c-primary);
+
+  /* Semantic — success/gain (lightness flips by design — do NOT correct) */
+  --em-hi:#5FD9A8; --em:#0E9B6E;
+  --gain:#0E9B5E; --equity:#0E9B5E;
+  --equity-bg:rgba(20,170,110,.14); --equity-bd:rgba(20,170,110,.34);
+  --avail:#9A7A12; --avail-bg:rgba(246,231,125,.22);
+  --avail-bd:rgba(246,231,125,.55); --avail-dot:#E4C93A;
+
+  /* Semantic — danger */
+  --rose:#D6453B; --rose-bg:rgba(214,69,59,.1);
+  --rose-bd:rgba(214,69,59,.28);
+
+  /* Warning (Sunshine — light-only highlight) */
+  --warn:#F6E77D; --warn-ink:#9A7A12;
+
+  --tile-bg:rgba(255,255,255,.42);
+  --tile-bd:rgba(255,255,255,.62);
+  --tile-spec:rgba(255,255,255,.85);
+
+  --glass:linear-gradient(157deg,rgba(255,255,255,.44),rgba(255,255,255,.18) 60%,rgba(255,255,255,.12));
+  --glass-bd:rgba(255,255,255,.62);
+  --glass-drop:0 22px 50px rgba(26,92,112,.18);
+  --glass-spec:rgba(255,255,255,.95);
+  --glass-shade:rgba(30,90,110,.05);
+  --glass-rim:linear-gradient(155deg,rgba(255,255,255,1),rgba(255,255,255,.35) 30%,transparent 54%,#BAC9D6 96%);
+  --glass-pool:rgba(255,255,255,.55);
+  --glass-blur:22px; --glass-sat:175%;
+
+  --glassw:linear-gradient(157deg,rgba(255,255,255,.70),rgba(255,255,255,.60));
+  --glassw-bd:rgba(255,255,255,.7);
+  --glassw-blur:18px; --glassw-sat:140%;
+
+  --frost:rgba(255,255,255,.92);
+  --frost-bd:rgba(16,60,70,.14);
+
+  --field:rgba(255,255,255,.55);
+  --field-bd:rgba(16,60,70,.16);
+  --field-focus:rgba(91,201,212,.45); /* focus ring → Aqua (was royal) */
+
+  --scrim:rgba(20,50,70,.4);
+  --scrim-blur:6px;
+
+  --skel:rgba(16,60,70,.07);
+  --skel-hi:rgba(255,255,255,.5);
+
+  --canvas:#E9F5F1;
+}
+
+/* ===== BG FIX — guarantee the fixed scenes paint, never flash white ==========
+   The .scene divs are position:fixed; z-index:-3. They only show if the body's
+   background PROPAGATES to the root canvas, which requires html to have no
+   opaque background. We force that here so scene visibility can't depend on
+   investor.css. body's --canvas color sits BELOW the scenes (instant fallback),
+   the scene gradient paints over it, content paints over the scene.            */
+html{ background:transparent !important; }
+body{ background:var(--canvas); }
+/* (Phase-0 spec Ask C5's body fallback becomes redundant with this — harmless if both ship.) */
+
+/* defensive: new component utilities assume border-box (won't touch legacy layout) */
+.lg,.lg--work,.lg--frost,.lqb,.field .inp,.badge,.tag,.pill,.swc .track,
+.cb .box,.rb .box,.tip .bubble,.tip-text,.tile,.seg,.tabs,.stepper .circle,
+.toast,.empty-state,.empty,.modal-card,.modal-close-btn,.modal-close{ box-sizing:border-box; }
+
+/* ===== System polish ===== */
+::placeholder{ color:var(--text-faint); opacity:1 }
+::selection{ background:var(--c-metal,#BAC9D6); color:#16202B }
+[data-theme="dark"] ::selection{ background:#9DB0BE; color:#16202B }
+* { scrollbar-width:thin; scrollbar-color:var(--glassw-bd) transparent }
+::-webkit-scrollbar{ width:9px; height:9px }
+::-webkit-scrollbar-track{ background:transparent }
+::-webkit-scrollbar-thumb{ background:var(--glassw-bd); border-radius:5px }
+::-webkit-scrollbar-thumb:hover{ background:var(--c-metal,#9DB0BE) }
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:none; box-shadow:0 0 0 3px var(--field-focus); border-radius:8px;
+}
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* ===== Scenes ===== */
+.scene{
+  position:fixed; inset:0; z-index:-3;
+  transition:opacity var(--dur) var(--ease);
+}
+[data-theme="light"] .s-dark{ opacity:0 }
+[data-theme="dark"]  .s-light{ opacity:0 }
+[data-theme="dark"]  .lonly{ display:none !important }
+
+.s-dark{
+  background:
+    /* v2.4.9: shimmer band + surface glow (approved full intensity at 100/21) */
+    linear-gradient(180deg, rgba(200,235,255,.22) 0%, transparent 10%),
+    radial-gradient(ellipse 48% 74% at 50% -8%,
+      rgba(185,225,250,.34) 0%, rgba(140,195,230,.16) 36%, rgba(90,150,190,.07) 62%, transparent 84%),
+    /* descent: lit surface -> near-black floor */
+    linear-gradient(180deg,
+      #0F4A66 0%, #0A3A52 16%, #06283D 38%, #041C2E 58%, #03131E 80%, #010A12 100%);
+}
+/* v2.4.9: gentle surface light — eleven soft ray slivers fanned from top-center,
+   reaching ~90% down before melting. Approved at Light 100% / Definition 21%
+   (blur 13.3px, opacity .49). NOT hard beams — if any shaft reads hard-edged,
+   the blur/opacity drifted from spec. */
+.s-dark::before{
+  content:""; position:absolute; top:-12%; left:50%; width:140%; height:118%;
+  transform:translateX(-50%); pointer-events:none; mix-blend-mode:screen;
+  opacity:.49; filter:blur(13.3px);
+  background:conic-gradient(from 176deg at 50% 0%,
+    transparent 0deg, rgba(190,228,250,.16) 2deg, transparent 5deg,
+    transparent 8deg, rgba(190,228,250,.22) 11deg, transparent 15deg,
+    transparent 18deg, rgba(190,228,250,.12) 21deg, transparent 24deg,
+    transparent 27deg, rgba(190,228,250,.19) 30deg, transparent 34deg,
+    transparent 37deg, rgba(190,228,250,.10) 40deg, transparent 43deg,
+    transparent 46deg, rgba(190,228,250,.14) 49deg, transparent 52deg,
+    transparent 306deg, rgba(190,228,250,.10) 310deg, transparent 313deg,
+    transparent 317deg, rgba(190,228,250,.15) 321deg, transparent 325deg,
+    transparent 329deg, rgba(190,228,250,.11) 332deg, transparent 335deg,
+    transparent 339deg, rgba(190,228,250,.20) 343deg, transparent 347deg,
+    transparent 350deg, rgba(190,228,250,.16) 354deg, transparent 358deg);
+  -webkit-mask-image:radial-gradient(ellipse 66% 96% at 50% 0%, rgba(0,0,0,1) 26%, rgba(0,0,0,.5) 62%, rgba(0,0,0,.18) 82%, transparent 94%);
+  mask-image:radial-gradient(ellipse 66% 96% at 50% 0%, rgba(0,0,0,1) 26%, rgba(0,0,0,.5) 62%, rgba(0,0,0,.18) 82%, transparent 94%);
+  animation:rayBreathe 30s ease-in-out infinite alternate;
+}
+@keyframes rayBreathe{
+  from{ transform:translateX(calc(-50% - 8px)); }
+  to  { transform:translateX(calc(-50% + 8px)); }
+}
+@media (prefers-reduced-motion:reduce){ .s-dark::before{ animation:none } }
+.s-dark::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(58% 30% at 28% 42%, rgba(86,184,212,.11), transparent 60%),
+    radial-gradient(52% 26% at 74% 54%, rgba(58,150,190,.09), transparent 62%),
+    radial-gradient(44% 22% at 52% 32%, rgba(120,200,225,.08), transparent 60%);
+  background-size:165% 165%, 150% 150%, 140% 140%;
+  animation:caustic 28s ease-in-out infinite alternate;
+}
+@keyframes caustic{
+  from{ background-position:0% 0%, 100% 0%, 50% 0% }
+  to  { background-position:18% 12%, 80% 16%, 58% 12% }
+}
+@media (prefers-reduced-motion:reduce){ .s-dark::after{ animation:none } }
+
+.s-light{
+  background:
+    radial-gradient(60% 40% at 50% -4%, rgba(255,255,255,.42) 0%, transparent 50%),
+    linear-gradient(180deg, #2E6E88 0%, #4D97AD 24%, #79BCC8 48%, #B4DEDF 74%, #E9F5F1 100%);
+}
+
+.depth{
+  position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:radial-gradient(120% 82% at 50% 18%, transparent 38%, rgba(1,5,12,.6) 100%);
+}
+[data-theme="light"] .depth{
+  background:radial-gradient(120% 82% at 50% 22%, transparent 52%, rgba(20,70,90,.12) 100%);
+}
+
+.scene--dim::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:rgba(4,12,24,.28);
+}
+[data-theme="light"] .scene--dim::before{ background:rgba(255,255,255,.30) }
+
+/* ===== Glass tiers ===== */
+.lg{
+  position:relative; border-radius:var(--r-md); overflow:hidden;
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border:1px solid var(--glass-bd);
+  box-shadow:var(--glass-drop), inset 0 1px 1px var(--glass-spec), inset 0 -24px 44px var(--glass-shade);
+}
+.lg::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  padding:1.2px;
+  background:var(--glass-rim);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+.lg::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(58% 48% at 16% 4%, var(--glass-pool), transparent 60%);
+}
+.lg--interactive{ cursor:pointer; transition:transform .25s var(--ease) }
+.lg--interactive:hover{ transform:translateY(-3px) }
+
+.lg--work{
+  background:var(--glassw);
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  border:1px solid var(--glassw-bd);
+  box-shadow:0 14px 36px rgba(2,8,18,.32), inset 0 1px 0 var(--glass-spec);
+}
+.lg--work::before{ opacity:.5 }
+.lg--work::after{ opacity:.5 }
+
+.lg--frost{
+  position:relative; border-radius:var(--r-sm);
+  background:var(--frost); border:1px solid var(--frost-bd);
+  box-shadow:0 6px 18px rgba(2,8,18,.3), inset 0 1px 0 var(--glass-spec);
+}
+
+/* Auto-skin — with :not(.lg) guard so showcase wins */
+.metric-card:not(.lg), .interest-card:not(.lg), .stats-bar:not(.lg), .fav-card:not(.lg),
+.data-table-wrap:not(.lg), .offers-table-wrap:not(.lg), .coming-soon-box:not(.lg),
+.form-section:not(.lg), .contact-form-card:not(.lg), .contact-info-card:not(.lg),
+.glow-card:not(.lg), .faq-item:not(.lg), .faq-cta:not(.lg), .auth-card:not(.lg),
+.lender-dir-card:not(.lg), .lender-card:not(.lg), .why-card:not(.lg),
+.lender-officer-card:not(.lg), .lender-panel:not(.lg), .lender-modal:not(.lg),
+.page-hero:not(.lg), .dashboard-header:not(.lg), .closing-card:not(.lg){
+  background:var(--glassw) !important;
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  border:1px solid var(--glassw-bd) !important;
+  box-shadow:0 14px 36px rgba(3,9,20,.32), inset 0 1px 0 var(--glass-spec);
+}
+
+/* ===== Liquid button .lqb ===== */
+.lqb{
+  --c:var(--c-primary);            /* GAP-FIX A2: default so a bare .lqb still renders */
+  position:relative; isolation:isolate; border:none; border-radius:999px; cursor:pointer;
+  padding:13px 20px; font:700 14px var(--font-ui);
+  color:var(--ink,#fff); text-shadow:0 1px 2px rgba(2,12,28,.5);
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  background:
+    radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.42), transparent 62%),
+    linear-gradient(180deg, color-mix(in srgb, var(--c) 70%, white), var(--c) 52%, color-mix(in srgb, var(--c) 62%, black));
+  -webkit-backdrop-filter:blur(11px) saturate(165%);
+  backdrop-filter:blur(11px) saturate(165%);
+  box-shadow:
+    0 12px 24px rgba(3,9,22,.48),
+    0 0 26px -5px var(--c),
+    inset 0 1.5px 1px rgba(255,255,255,.6),
+    inset 0 -11px 15px color-mix(in srgb, var(--c) 42%, black),
+    inset 0 0 0 1px rgba(255,255,255,.18);
+  transition:transform .18s var(--ease);
+}
+.lqb svg{ width:17px; height:17px }
+.lqb:hover{ transform:translateY(-2px) }
+.lqb::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; padding:1.4px;
+  pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.92), color-mix(in srgb, var(--c) 35%, white) 33%, transparent 58%, color-mix(in srgb, var(--c) 45%, white));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+.lqb::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:-1;
+  background:radial-gradient(118% 86% at 50% 46%, transparent 34%, color-mix(in srgb, var(--c) 48%, transparent) 72%, color-mix(in srgb, var(--c) 26%, white) 100%);
+  mix-blend-mode:screen;
+}
+.lqb.sec{
+  background:
+    radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.3), transparent 62%),
+    color-mix(in srgb, var(--c) 46%, transparent);
+  box-shadow:
+    0 8px 18px rgba(3,9,22,.32),
+    0 0 18px -6px var(--c),
+    inset 0 1px 0 rgba(255,255,255,.42),
+    inset 0 0 0 1px rgba(255,255,255,.22);
+}
+.lqb.ghost{
+  background:none;
+  box-shadow:
+    inset 0 0 0 1.4px color-mix(in srgb, var(--c) 55%, transparent),
+    0 0 16px -9px var(--c);
+  text-shadow:none;
+}
+.lqb.ghost::after{ display:none }
+.lqb.ghost::before{ opacity:.5 }
+[data-theme="light"] .lqb{
+  background:
+    radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.66), transparent 60%),
+    linear-gradient(180deg, color-mix(in srgb, var(--c) 56%, white), var(--c) 50%, color-mix(in srgb, var(--c) 54%, black));
+  box-shadow:
+    0 9px 20px rgba(40,90,120,.20),
+    0 0 22px -7px var(--c),
+    inset 0 1.5px 1px rgba(255,255,255,.95),
+    inset 0 -9px 13px color-mix(in srgb, var(--c) 26%, black),
+    inset 0 0 0 1px rgba(255,255,255,.55);
+}
+[data-theme="light"] .lqb.sec{
+  background:
+    radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.5), transparent 60%),
+    color-mix(in srgb, var(--c) 38%, transparent);
+}
+.lqb.sm{ padding:10px 15px; font-size:13px }
+.lqb.plat{
+  color:#16202B; text-shadow:none;
+  background:
+    radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.6), transparent 62%),
+    linear-gradient(180deg, #FBFDFF, #D7E2EA 32%, #AEC0CD 56%, #E6EEF4 78%, #BCCBD6);
+  box-shadow:
+    0 12px 24px rgba(40,90,120,.3),
+    0 0 24px -6px rgba(220,235,245,.7),
+    inset 0 1.5px 1px rgba(255,255,255,1),
+    inset 0 -11px 15px rgba(140,170,190,.34),
+    inset 0 0 0 1px rgba(255,255,255,.6);
+}
+
+/* ===== Component utilities ===== */
+
+/* Field (input wrapper) */
+.field label{
+  display:block; font-size:11px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:6px;
+}
+.field .inp{
+  display:flex; align-items:center; gap:9px;
+  padding:12px 14px; border-radius:12px;
+  background:var(--field); border:1px solid var(--field-bd);
+  -webkit-backdrop-filter:blur(8px) saturate(140%);
+  backdrop-filter:blur(8px) saturate(140%);
+  transition:.2s;
+}
+.field .inp svg{ width:17px; height:17px; color:var(--text-faint); flex:none }
+.field .inp input, .field .inp select, .field .inp textarea{
+  flex:1; border:none; background:transparent; color:var(--text);
+  font:500 14px var(--font-num); outline:none; resize:none;
+}
+.field .inp:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--field-focus);
+}
+.field.err .inp{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px var(--rose-bg);
+}
+.field .help{ font-size:11.5px; color:var(--text-faint); margin-top:6px }
+.field .err-msg{ font-size:11.5px; color:var(--rose); margin-top:6px; font-weight:600 }
+.field .inp.disabled{ opacity:.45; pointer-events:none }
+
+/* Badges */
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 11px; border-radius:999px;
+  font-size:11.5px; font-weight:700;
+}
+.badge .d{ width:7px; height:7px; border-radius:50% }
+.badge.available{ background:var(--avail-bg); border:1px solid var(--avail-bd); color:var(--avail) }
+.badge.available .d{ background:var(--avail-dot) }
+.badge.pending, .badge.featured{
+  background:var(--metal-grad); color:var(--metal-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+[data-theme="dark"] .badge.pending,
+[data-theme="dark"] .badge.featured{ color:#16202B }
+.badge.coming{
+  background:color-mix(in srgb, var(--c-primary) 18%, transparent);
+  border:1px solid var(--c-primary); color:var(--c-primary);
+}
+.badge.sold{ background:var(--tile-bg); border:1px solid var(--tile-bd); color:var(--text-muted) }
+.badge.closed{ background:var(--rose-bg); border:1px solid var(--rose-bd); color:var(--rose) }
+
+/* Tag */
+.tag{
+  display:inline-block; padding:4px 10px; border-radius:8px;
+  font-size:11px; font-weight:700;
+  background:var(--tile-bg); border:1px solid var(--tile-bd); color:var(--text-muted);
+}
+
+/* Pills — filter/loan/market */
+.pill{
+  border:1px solid var(--tile-bd); background:var(--tile-bg);
+  color:var(--text-muted); font:700 12.5px var(--font-ui);
+  padding:8px 15px; border-radius:999px; cursor:pointer; transition:.2s;
+}
+.pill.on{
+  color:#fff; border-color:transparent;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--c-primary) 78%, white), var(--c-primary) 55%, color-mix(in srgb, var(--c-primary) 70%, black));
+  box-shadow:0 6px 14px -3px var(--c-primary), inset 0 1px 0 rgba(255,255,255,.4);
+}
+.pill.metal.on{
+  color:var(--metal-ink); background:var(--metal-grad);
+  box-shadow:0 6px 14px rgba(2,8,18,.35), inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+/* Selection controls */
+.swc{
+  display:inline-flex; align-items:center; gap:10px;
+  cursor:pointer; font-size:13.5px; font-weight:600;
+}
+.swc .track{
+  width:46px; height:27px; border-radius:999px;
+  background:var(--tile-bg); border:1px solid var(--tile-bd);
+  position:relative; transition:.25s var(--ease);
+  box-shadow:inset 0 1px 3px rgba(2,8,18,.3);
+}
+.swc .track .knob{
+  position:absolute; top:2px; left:2px;
+  width:21px; height:21px; border-radius:50%;
+  background:#fff; box-shadow:0 2px 5px rgba(0,0,0,.35);
+  transition:.25s var(--ease);
+}
+.swc.on .track{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--c-primary) 78%, white), var(--c-primary) 60%);
+  border-color:transparent;
+  box-shadow:0 0 14px -3px var(--c-primary), inset 0 1px 1px rgba(255,255,255,.4);
+}
+.swc.on .track .knob{ left:21px }
+.cb, .rb{ display:inline-flex; align-items:center; gap:9px; cursor:pointer; font-size:13.5px }
+.cb .box{
+  width:21px; height:21px; border-radius:7px;
+  background:var(--field); border:1px solid var(--field-bd);
+  display:grid; place-items:center; transition:.2s;
+}
+.cb .box svg{ width:13px; height:13px; color:#fff; opacity:0 }
+.cb.on .box{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--c-primary) 78%, white), var(--c-primary));
+  border-color:transparent; box-shadow:0 0 12px -3px var(--c-primary);
+}
+.cb.on .box svg{ opacity:1 }
+.rb .box{
+  width:21px; height:21px; border-radius:50%;
+  background:var(--field); border:1px solid var(--field-bd);
+  display:grid; place-items:center; transition:.2s;
+}
+.rb .box::after{
+  content:""; width:9px; height:9px; border-radius:50%;
+  background:#fff; transform:scale(0); transition:.2s;
+}
+.rb.on .box{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--c-primary) 78%, white), var(--c-primary));
+  border-color:transparent; box-shadow:0 0 12px -3px var(--c-primary);
+}
+.rb.on .box::after{ transform:scale(1) }
+
+/* Tooltip (glass) */
+.tip{ position:relative; display:inline-flex; align-items:center; gap:7px; font-size:13.5px }
+.tip .q{
+  width:18px; height:18px; border-radius:50%;
+  background:var(--tile-bg); border:1px solid var(--tile-bd);
+  color:var(--text-muted); font-size:11px; font-weight:800;
+  display:grid; place-items:center; cursor:help;
+}
+.tip .bubble, .tip-text{
+  position:absolute; bottom:130%; left:0; width:230px;
+  padding:11px 13px; border-radius:12px;
+  font-size:12px; line-height:1.5; color:var(--text);
+  background:var(--glassw);
+  -webkit-backdrop-filter:blur(12px) saturate(150%);
+  backdrop-filter:blur(12px) saturate(150%);
+  border:1px solid var(--glassw-bd);
+  box-shadow:0 12px 30px rgba(2,8,18,.5);
+  opacity:0; transform:translateY(4px);
+  pointer-events:none; transition:.2s; z-index:5;
+}
+.tip:hover .bubble, .tip:hover .tip-text,
+.tip:focus .bubble, .tip:focus .tip-text{ opacity:1; transform:translateY(0) }
+
+/* Tiles */
+.tiles{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px }
+.tile{
+  padding:14px 10px; text-align:center; border-radius:14px;
+  background:var(--tile-bg); border:1px solid var(--tile-bd);
+  box-shadow:inset 0 1px 0 var(--tile-spec);
+}
+.tile .l{ font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint) }
+.tile .v{ font-family:var(--font-num); font-size:18px; font-weight:800; margin-top:5px }
+.tile.equity{ background:var(--equity-bg); border-color:var(--equity-bd) }
+.tile.equity .v{ color:var(--equity) }
+
+/* Segmented + tabs + stepper */
+.seg{
+  display:inline-flex; padding:5px; gap:4px; border-radius:999px;
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  background:var(--glassw); border:1px solid var(--glassw-bd);
+  box-shadow:inset 0 1px 0 var(--glass-spec);
+}
+.seg .s{
+  border:none; background:transparent;
+  color:var(--text-muted); font:700 13.5px var(--font-ui);
+  padding:9px 18px; border-radius:999px; cursor:pointer;
+}
+.seg .s.on{
+  position:relative; color:var(--metal-ink);
+  background:var(--metal-grad);
+  box-shadow:0 6px 14px rgba(2,8,18,.4), inset 0 1.5px 1px rgba(255,255,255,.85), inset 0 0 0 1px rgba(255,255,255,.3);
+}
+[data-theme="dark"] .seg .s.on{ color:#fff; text-shadow:0 1px 2px rgba(2,12,28,.5) }
+
+.tabs{ display:flex; gap:4px; border-bottom:1px solid var(--hair) }
+.tabs .t{
+  border:none; background:transparent;
+  color:var(--text-muted); font:700 13.5px var(--font-ui);
+  padding:11px 15px; cursor:pointer; position:relative;
+  border-radius:10px 10px 0 0;
+}
+.tabs .t.on{ color:var(--text) }
+.tabs .t.on::after{
+  content:""; position:absolute; left:10px; right:10px; bottom:-1px;
+  height:2.5px; border-radius:3px; background:var(--metal-grad);
+}
+
+.stepper{ display:flex; align-items:center }
+.stepper .st{ display:flex; flex-direction:column; align-items:center; gap:7px; flex:none }
+.stepper .circle{
+  width:36px; height:36px; border-radius:50%;
+  display:grid; place-items:center;
+  font-family:var(--font-num); font-weight:800; font-size:14px;
+  background:var(--tile-bg); border:1px solid var(--tile-bd); color:var(--text-faint);
+}
+.stepper .st.done .circle, .stepper .st.active .circle{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--c-primary) 78%, white), var(--c-primary));
+  border-color:transparent; color:#fff;
+  box-shadow:0 0 16px -3px var(--c-primary);
+}
+.stepper .lab{ font-size:11px; font-weight:700; color:var(--text-faint) }
+.stepper .st.active .lab{ color:var(--text) }
+.stepper .line{
+  flex:1; height:2px; background:var(--hair);
+  margin:0 6px 24px; border-radius:2px;
+}
+.stepper .line.done{
+  background:linear-gradient(90deg, var(--c-primary), color-mix(in srgb, var(--c-primary) 60%, white));
+}
+
+/* Rate bar + gauge */
+.ratebar{ display:flex; align-items:center; gap:12px }
+.ratebar .bar{
+  flex:1; height:8px; border-radius:999px;
+  background:var(--tile-bg); overflow:hidden;
+  border:1px solid var(--tile-bd);
+}
+.ratebar .fill{
+  height:100%; border-radius:999px;
+  background:linear-gradient(90deg, var(--em), var(--em-hi));
+}
+.ratebar .n{
+  font-family:var(--font-num); font-weight:800; font-size:17px; color:var(--em);
+}
+[data-theme="dark"] .ratebar .n{ color:var(--em-hi) }
+
+.gauge{ text-align:center }
+.gauge svg{ width:84px; height:84px; transform:rotate(-90deg) }
+.gauge .tk{ fill:none; stroke:var(--tile-bg); stroke-width:8 }
+.gauge .rg{ fill:none; stroke:url(#pg); stroke-width:8; stroke-linecap:round }
+.gauge .val{
+  font-family:var(--font-num); font-size:15px; font-weight:800;
+  margin-top:-52px;
+}
+.gauge .lab{
+  font-size:9.5px; font-weight:700; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--text-faint); margin-top:34px;
+}
+
+/* Data table (frosted rows) */
+.tbl{ width:100%; border-collapse:collapse; font-size:13px; font-family:var(--font-num) }
+.tbl th{
+  text-align:left; font-family:var(--font-ui);
+  font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--text-faint); padding:10px 12px;
+  background:var(--tile-bg); border-bottom:1px solid var(--hair);
+}
+.tbl td{ padding:11px 12px; border-bottom:1px solid var(--hair) }
+.tbl tbody tr{ background:var(--frost) }
+.tbl tbody tr:hover{ background:var(--tile-bg) }
+.tbl .gain{ color:var(--gain); font-weight:700 }
+
+/* Toast */
+.toast{
+  display:flex; align-items:center; gap:11px;
+  padding:12px 15px; border-radius:13px;
+  font-size:13.5px; font-weight:600;
+  background:var(--glassw);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  backdrop-filter:blur(14px) saturate(150%);
+  border:1px solid var(--glassw-bd);
+  box-shadow:0 12px 30px rgba(2,8,18,.45);
+}
+.toast .ic{
+  width:24px; height:24px; border-radius:50%;
+  display:grid; place-items:center; flex:none;
+}
+.toast .ic svg{ width:14px; height:14px }
+.toast.success .ic{ background:var(--equity-bg); color:var(--gain); border:1px solid var(--equity-bd) }
+.toast.error .ic{ background:var(--rose-bg); color:var(--rose); border:1px solid var(--rose-bd) }
+.toast.info .ic{
+  background:color-mix(in srgb, var(--c-info) 15%, transparent);
+  color:var(--c-info);
+  border:1px solid color-mix(in srgb, var(--c-info) 30%, transparent);
+}
+.toast.warning .ic{
+  background:color-mix(in srgb, var(--warn) 30%, transparent);
+  color:var(--warn-ink);
+  border:1px solid color-mix(in srgb, var(--warn) 55%, transparent);
+}
+
+/* Empty + skeleton */
+.empty-state, .empty{
+  padding:30px 22px; text-align:center; border-radius:var(--r-md);
+}
+.empty-state .eic, .empty .eic{
+  width:52px; height:52px; border-radius:15px;
+  background:var(--tile-bg); border:1px solid var(--tile-bd);
+  display:grid; place-items:center; margin:0 auto 13px;
+  color:var(--text-faint);
+}
+.empty-state .eic svg, .empty .eic svg{ width:25px; height:25px }
+.empty-state h4, .empty h4{ font-family:var(--font-display); font-size:19px; font-weight:700 }
+.empty-state p, .empty p{ color:var(--text-muted); font-size:13px; margin:6px 0 14px }
+.skeleton, .skel{
+  border-radius:10px;
+  background:linear-gradient(100deg, var(--skel) 30%, var(--skel-hi) 50%, var(--skel) 70%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s linear infinite;
+}
+@keyframes shimmer{ to{ background-position:-200% 0 } }
+
+/* Modal */
+.modal-backdrop{
+  position:fixed; inset:0; z-index:var(--z-modal-backdrop);
+  background:var(--scrim);
+  -webkit-backdrop-filter:blur(var(--scrim-blur));
+  backdrop-filter:blur(var(--scrim-blur));
+  display:grid; place-items:center;
+}
+.modal-card{
+  position:relative;
+  max-width:380px; width:100%; padding:22px;
+  z-index:var(--z-modal);
+}
+.modal-card h3{ font-family:var(--font-display); font-size:21px; font-weight:700 }
+.modal-card p{ color:var(--text-muted); font-size:13px; margin-top:8px }
+.modal-card .mf{ display:flex; gap:10px; justify-content:flex-end; margin-top:18px }
+.modal-close-btn, .modal-close{
+  position:absolute; top:14px; right:14px;
+  width:32px; height:32px; border-radius:50%;
+  border:1px solid var(--glassw-bd);
+  background:var(--tile-bg);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  color:var(--text-muted); font-size:17px;
+  cursor:pointer; display:grid; place-items:center; line-height:1;
+}
+
+/* Navigation chrome shell — GAP-FIX A3: !important so glass beats per-page inline <style> */
+.investor-nav, .site-footer, .portal-footer, .portal-menu-footer{
+  background:var(--glassw) !important;
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
+  border-bottom:1px solid var(--glassw-bd);
+}
+/* Light-mode top-nav: banded blue so the nav reads against the white-bloom top of .s-light.
+   !important preserves the same "beats per-page inline .investor-nav { background: var(--navy) }"
+   justification as the base rule (verified: deal.html:53, marketplace.html:50). */
+[data-theme="light"] .investor-nav{
+  background:linear-gradient(180deg, rgba(38,98,128,.86), rgba(64,140,166,.76)) !important;
+  border-bottom:1px solid rgba(255,255,255,.18);
+  color:#fff;
+}
+[data-theme="light"] .investor-nav a,
+[data-theme="light"] .investor-nav .nav-link{
+  color:rgba(255,255,255,.92);
+}
+
+/* ============================================================================
+ v2.4.2 APPENDED RULES — !important justification
+ -------------------------------------------------------------------------
+ All rules below use !important. This is intentional and audit-safe:
+ every selector below targets an element whose page-local <style> block
+ OR inline style="" attribute bakes in a color/background literal that a
+ normal cascade rule cannot beat. Editing the source literals inline (per
+ §D/§E/§F below) removes SOME but not all of those overrides — the rules
+ here catch the residue defensively. When v2.4.4 (per-page inline sweep
+ for non-money pages) fully removes the underlying literals, these
+ !important rules can be softened. Until then, they stay.
+ ============================================================================ */
+
+/* Sub-header hero band + footer top edge read as floating panels */
+.page-hero{ border-radius:var(--r-lg); overflow:hidden; }
+.site-footer{
+  border-top-left-radius:var(--r-lg);
+  border-top-right-radius:var(--r-lg);
+  overflow:hidden;
+}
+
+.faq-item{
+  border-radius:var(--r-md) !important;
+  border:1px solid var(--glassw-bd) !important;
+  background:var(--glassw) !important;
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+  box-shadow:0 8px 22px rgba(3,9,20,.10), inset 0 1px 0 var(--glass-spec);
+}
+.faq-item.open{
+  border-color:color-mix(in srgb, var(--c-primary) 40%, transparent) !important;
+}
+.faq-chevron{ background:var(--surface-2); border:1px solid var(--glassw-bd); }
+.faq-item.open .faq-chevron{
+  background:color-mix(in srgb, var(--c-primary) 14%, transparent);
+}
+
+/* The CTA strip sits over the near-white scene floor in light — dark ink required. */
+[data-theme="light"] .investor-cta-strip h2,
+[data-theme="light"] .investor-cta-strip .section-heading{ color:var(--text) !important; }
+[data-theme="light"] .investor-cta-strip p,
+[data-theme="light"] .investor-cta-strip .section-sub{ color:var(--text-muted) !important; }
+
+.pin-menu-body{
+  background:var(--metal-grad) !important;
+  clip-path:polygon(50% 0%,100% 16%,100% 100%,0% 100%,0% 16%);
+  box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.5);
+}
+.pin-menu-shape{ filter:drop-shadow(0 24px 48px rgba(0,0,0,.5)) !important; }
+.pin-menu-dot{
+  background:linear-gradient(160deg,#16324a,#0c2237) !important;
+  box-shadow:0 0 0 7px rgba(255,255,255,.45), inset 0 1px 2px rgba(255,255,255,.3) !important;
+}
+.pin-menu-link{
+  color:var(--metal-ink) !important;
+  border-radius:0;
+  border-right-color:rgba(22,32,43,.10) !important;
+  border-bottom-color:rgba(22,32,43,.10) !important;
+}
+.pin-menu-link i, .pin-menu-link svg{ color:var(--text) !important; }
+.pin-menu-link.active{
+  background:linear-gradient(180deg,color-mix(in srgb, var(--c-primary) 22%, transparent),color-mix(in srgb, var(--c-primary) 10%, transparent)) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c-primary) 45%, transparent) !important;
+  color:#0E7A88 !important;
+}
+.pin-menu-link.active i{ color:#0E7A88 !important; }
+.pin-menu-signout, .pin-menu-signout i{ color:var(--rose) !important; }
+.pin-menu-close{
+  background:rgba(22,32,43,.08) !important;
+  border:1px solid rgba(22,32,43,.18) !important;
+  color:#5A6B78 !important;
+}
+.pin-menu-theme-label{ color:#5A6B78 !important; }
+.pin-menu-theme-switch{ background:var(--c-primary) !important; }
+
+/* v2.4.3 — menu + brand polish */
+.pin-menu-body{ padding-bottom:8px !important; }
+[data-theme="dark"] .pin-menu-link{
+ border-right-color:rgba(22,32,43,.28) !important;
+ border-bottom-color:rgba(22,32,43,.28) !important;
+}
+[data-theme="dark"] .pin-menu-bottom-row{ border-top-color:rgba(22,32,43,.28) !important; }
+[data-theme="light"] .pin-menu-dot{
+ box-shadow:0 0 0 4px rgba(22,32,43,.14), 0 0 0 8px color-mix(in srgb, var(--c-primary) 18%, transparent) !important;
+}
+.nav-brand{
+ padding:6px 14px;
+ border-radius:var(--r-lg);
+ background:linear-gradient(180deg, rgba(215,226,234,.22), rgba(174,192,205,.16));
+ border:1px solid rgba(255,255,255,.28);
+ box-shadow:inset 0 1px 0 var(--glass-spec), 0 6px 18px rgba(2,8,18,.18);
+ -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+ backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat));
+}
+
+/* ============================================================
+   v2.4.4 — Gulf Liquid Glass polish
+   ============================================================ */
+
+/* v2.4.4 §A — Light-mode footer text readable on white glass footer.
+   Dark mode inherits the base rules (which already read on the dark scene). */
+[data-theme="light"] .site-footer .footer-col h4{ color:var(--text-muted) !important; }
+[data-theme="light"] .site-footer .footer-col a{ color:var(--text) !important; }
+[data-theme="light"] .site-footer .footer-tagline{ color:var(--text-muted) !important; }
+[data-theme="light"] .site-footer .footer-social-link{ color:var(--text-muted) !important; }
+[data-theme="light"] .portal-footer p{ color:var(--text-muted) !important; }
+[data-theme="light"] .portal-footer .footer-links a{ color:var(--text-muted) !important; }
+
+/* v2.4.4 §C — FAQ heading shares the centered 800px column with .faq-list */
+.faq-section > h2,
+.faq-section > .section-heading{
+  max-width:800px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* v2.4.4 §D — Dark-mode pin menu: navy body + aqua-glow active squares.
+   Supersedes v2.4.3 dark-divider values. Light menu unchanged. */
+[data-theme="dark"] .pin-menu-body{
+  background:linear-gradient(180deg,#243456,#1a2744) !important;
+}
+[data-theme="dark"] .pin-menu-link{
+  border-right-color:rgba(255,255,255,.12) !important;
+  border-bottom-color:rgba(255,255,255,.12) !important;
+}
+[data-theme="dark"] .pin-menu-bottom-row{
+  border-top-color:rgba(255,255,255,.12) !important;
+}
+[data-theme="dark"] .pin-menu-link.active{
+  background:rgba(34,211,238,.18) !important;
+  box-shadow:inset 0 0 0 1px rgba(34,211,238,.55) !important;
+  color:#7FE9F5 !important;
+}
+[data-theme="dark"] .pin-menu-link.active i{ color:#7FE9F5 !important; }
+
+/* v2.4.4 §E — CTA strip: shorter, rounded floating card, theme-aware bg */
+.investor-cta-strip{
+  padding:56px 24px !important; /* was 96px */
+  max-width:1100px;
+  margin:32px auto !important;
+  border-radius:var(--r-lg);
+  overflow:hidden;
+}
+/* Dark-mode: replace the hardcoded near-white bg from investor.css:1911 with dark glass
+   so the floating card still reads in dark (transparent would kill the rounded/inset visual). */
+[data-theme="dark"] .investor-cta-strip{
+  background:var(--glassw) !important;
+  -webkit-backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
+  backdrop-filter:blur(var(--glassw-blur)) saturate(var(--glassw-sat)) !important;
+  border:1px solid var(--glassw-bd) !important;
+  border-top:none !important; /* neutralize the base #e2e8f0 top border from investor.css:1911 */
+}
+/* Light-mode: keep the near-white gradient (matches shallows) but soften edge */
+[data-theme="light"] .investor-cta-strip{
+  border-top:none !important; /* the base #e2e8f0 border reads as a hairline in the floating card — remove */
+}
+
+/* v2.4.5 §B3: hover state on menu tiles — mirrors .active look. Sign Out keeps rose. */
+.pin-menu-link{ transition: background .15s ease, color .15s ease, box-shadow .15s ease; }
+.pin-menu-link:not(.pin-menu-signout):hover{
+ background: color-mix(in srgb, var(--c-primary) 12%, transparent) !important;
+ color: #0E7A88 !important;
+}
+.pin-menu-link:not(.pin-menu-signout):hover i,
+.pin-menu-link:not(.pin-menu-signout):hover svg{ color: #0E7A88 !important; }
+[data-theme="dark"] .pin-menu-link:not(.pin-menu-signout):hover{
+ background: rgba(34,211,238,.18) !important;
+ box-shadow: inset 0 0 0 1px rgba(34,211,238,.55) !important;
+ color: #7FE9F5 !important;
+}
+[data-theme="dark"] .pin-menu-link:not(.pin-menu-signout):hover i,
+[data-theme="dark"] .pin-menu-link:not(.pin-menu-signout):hover svg{ color: #7FE9F5 !important; }
+
+/* v2.4.5 §D: platinum diamond sparkle twinkle */
+.play-diamond-sparkles .pd-spark{
+ transform-box: fill-box;
+ transform-origin: center;
+ opacity: 0;
+ animation: pdTwinkle 3.2s ease-in-out infinite;
+}
+.play-diamond-sparkles .pd-spark-1{ animation-delay: 0s; }
+.play-diamond-sparkles .pd-spark-2{ animation-delay: 1.1s; }
+.play-diamond-sparkles .pd-spark-3{ animation-delay: 2.0s; }
+@keyframes pdTwinkle{
+ 0% { opacity: 0; transform: scale(0.4); }
+ 15% { opacity: 0.95; transform: scale(1.15); }
+ 30% { opacity: 0.4; transform: scale(0.9); }
+ 45% { opacity: 0; transform: scale(0.4); }
+ 100% { opacity: 0; transform: scale(0.4); }
+}
+@media (prefers-reduced-motion: reduce){
+ .play-diamond-sparkles .pd-spark{ animation: none; opacity: 0.85; }
+}
+
+/* v2.4.8 §F: day-mode active menu tile reverts to aqua primary (was rose in v2.4.6 §C). Dark active unchanged (aqua-glow per v2.4.4). */
+[data-theme="light"] .pin-menu-link.active{
+ background: color-mix(in srgb, var(--c-primary) 16%, transparent) !important;
+ box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-primary) 55%, transparent) !important;
+ color: #0E7A88 !important;
+}
+[data-theme="light"] .pin-menu-link.active i,
+[data-theme="light"] .pin-menu-link.active svg{ color: #0E7A88 !important; }
+
+/* v2.4.6 §I: dark-mode CTA buttons colorful + safe hover pattern (retires the removed onmouseover/onmouseout handlers). */
+
+/* Get Investor Access — light keeps steel; dark = aqua fill */
+.cta-btn-invest:hover{ background: color-mix(in srgb, var(--c-metal) 88%, black) !important; } /* light hover — slightly darker steel */
+[data-theme="dark"] .cta-btn-invest{
+ background: var(--c-primary) !important;
+ color: #08131f !important;
+}
+[data-theme="dark"] .cta-btn-invest:hover{
+ background: color-mix(in srgb, var(--c-primary) 88%, black) !important;
+}
+
+/* Browse Deals (.cta-btn-outline) — dark = aqua outline + fill on hover */
+[data-theme="dark"] .cta-btn-outline{
+ border-color: var(--c-primary) !important;
+ color: var(--c-primary) !important;
+}
+[data-theme="dark"] .cta-btn-outline:hover{
+ background: var(--c-primary) !important;
+ border-color: var(--c-primary) !important;
+ color: #08131f !important;
+}
+
+/* v2.4.6 round-2 §D: profile dropdown opaque in dark (#domProfileMenu — distinct from .pin-menu-overlay).
+ Light-mode dropdown stays opaque white; dark inline style resolves to a 58%-opacity navy which
+ reads as translucent. Override the inline style at higher specificity with theme-scoped id selector. */
+[data-theme="dark"] #domProfileMenu{
+ background: #141c30 !important;
+ -webkit-backdrop-filter: none !important;
+ backdrop-filter: none !important;
+ border-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+/* v2.4.6 round-2 §F: map controls container light-blue in light mode.
+ Root cause: containers hardcoded #1a2744 navy with no light override, showing navy through light-mode scene.
+ 88% aqua + 12% white = readable light teal that still keeps the aqua brand identity.
+ Dark mode inherits the base navy — no override needed. */
+[data-theme="light"] .deal-map-controls-left,
+[data-theme="light"] .deal-map-controls-right,
+[data-theme="light"] .map-controls,
+[data-theme="light"] #desktopMapControls{
+ background: color-mix(in srgb, var(--c-primary) 88%, white) !important;
+ border-color: color-mix(in srgb, var(--c-primary) 60%, white) !important;
+}
+/* v2.4.6 round-3 §D: light-mode idle bg on BOTH map-button selectors.
+ .map-style-btn = marketplace inline navy at marketplace.html:263.
+ .deal-map-btn = deal inline navy at deal.html:992.
+ Buttons render slightly LIGHTER than their container (container = 88% aqua, buttons = 78% aqua)
+ so they layer visibly. Active state (aqua fill + navy ink) stays unchanged in both. */
+[data-theme="light"] .map-style-btn:not(.active),
+[data-theme="light"] .deal-map-btn:not(.active){
+ background: color-mix(in srgb, var(--c-primary) 78%, white) !important;
+ border-color: color-mix(in srgb, var(--c-primary) 45%, white) !important;
+ color: #08131f !important;
+}
+[data-theme="light"] .map-style-btn:not(.active):hover,
+[data-theme="light"] .deal-map-btn:not(.active):hover{
+ background: color-mix(in srgb, var(--c-primary) 55%, white) !important;
+ border-color: color-mix(in srgb, var(--c-primary) 65%, white) !important;
+ color: #08131f !important;
+}
+
+/* v2.4.8 §D: dark-mode map-style-btn idle text = moonlight white (was --c-metal gray). Active stays navy on aqua. */
+[data-theme="dark"] .map-style-btn:not(.active),
+[data-theme="dark"] .map-style-btn:not(.active):hover {
+ color: #EAF2F8 !important;
+}
+
+/* v2.4.8 §E: dark-mode filter-pill idle text = moonlight white (was --text-muted gray). Active stays navy on aqua fill for contrast. Zero-count pills muted regardless of theme. */
+[data-theme="dark"] .filter-pill:not(.active) {
+ color: #EAF2F8 !important;
+}
+[data-theme="dark"] .filter-pill:not(.active):hover {
+ color: #ffffff !important;
+}
+/* Empty-state muting: pills with data-count="0" and not the All-pill go muted. */
+.filter-pill[data-count="0"]:not([data-status="all"]) {
+ color: var(--text-muted) !important;
+ opacity: 0.55 !important;
+}
+
+/* v2.4.9 §G2: pin-menu dark guard — after platinum token unification, --metal-ink flips to #16202B in dark,
+   which is unreadable on the navy pin-menu body. Override tile labels + name to sea-foam. Active-state
+   teal ink at .pin-menu-link.active preserved via :not(.active). Icons already ride var(--text). */
+[data-theme="dark"] .pin-menu-link:not(.active) { color: #EAF2F8 !important; }
+[data-theme="dark"] .pin-menu-body div[style*="--metal-ink"] { color: #EAF2F8 !important; }

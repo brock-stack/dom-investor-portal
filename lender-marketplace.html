@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/investor.css">
+<link rel="stylesheet" href="/css/glass.css">
   <script>
   (function() {
     var saved = localStorage.getItem('dom_portal_theme');
@@ -304,7 +305,7 @@
     .lender-dir-location { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .preferred-badge {
       position: absolute; top: 14px; right: 14px;
-      background: linear-gradient(135deg, #f97316, #ea580c);
+      background: linear-gradient(135deg, var(--c-metal), #ea580c);
       color: #fff; font-size: 10px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.06em;
       padding: 3px 9px; border-radius: 20px;
@@ -468,6 +469,9 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
 </head>
 <body>
+<div class="scene s-dark"></div>
+<div class="scene s-light"></div>
+<div class="depth"></div>
     <nav id="investorNav" class="investor-nav">
     <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
@@ -555,17 +559,17 @@
 
         <div class="why-grid">
           <div class="why-card">
-            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-metal)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
             <div class="why-title">Investor-First Underwriting</div>
             <div class="why-desc">These lenders are experienced with as-is properties, assignment closings, and wholesale timelines — no friction, no surprises.</div>
           </div>
           <div class="why-card">
-            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-metal)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
             <div class="why-title">Pre-Vetted &amp; Reviewed</div>
             <div class="why-desc">DOM only recommends lenders who have funded real deals in our network. Every lender is reviewed for reliability, speed, and fair terms.</div>
           </div>
           <div class="why-card">
-            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+            <div class="why-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--c-metal)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
             <div class="why-title">Seamless Deal Integration</div>
             <div class="why-desc">When the lender marketplace launches, you'll be able to connect a lender directly to a deal you're working on — streamlining the entire process.</div>
           </div>
@@ -1011,5 +1015,11 @@
 
 
   </script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#F2F7FB"/>
+    <stop offset="1" stop-color="#7C8E9C"/>
+  </linearGradient>
+</defs></svg>
 </body>
 </html>

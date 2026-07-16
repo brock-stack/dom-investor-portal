@@ -8,9 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/investor.css">
+<link rel="stylesheet" href="/css/glass.css">
   <script>
   (function() {
-    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    var t = localStorage.getItem('dom_portal_theme') || 'light';
     document.documentElement.setAttribute('data-theme', t);
   })();
   </script>
@@ -56,7 +57,7 @@
     }
 
     /* 5. Starting Price color in light mode */
-    [data-theme="light"] .mini-card { --accent: #0284c7; }
+    
     [data-theme="light"] .mini-card .mini-price { color: #0284c7; }
 
     /* 6. DOM Difference cards — tighten gap on mobile */
@@ -70,13 +71,67 @@
       .testimonials-section { padding-top: 32px !important; }
     }
 
-    /* 11. FAQ — Normalize question color (remove any teal/blue overrides) */
-    .faq-q { color: var(--text) !important; }
+    /* 11. FAQ — styles now inline (see v2.4.6 §G3 block below) */
+    /* v2.4.6 §G3: FAQ pill styles ported from v2.4.5 faq.html (chevron pattern, retired-blue purged) */
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item.open { border-color: color-mix(in srgb, var(--c-primary) 35%, transparent); }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 22px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .faq-question-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--accent);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      background: color-mix(in srgb, var(--c-primary) 12%, transparent);
+    }
+    .faq-answer {
+      display: none;
+      padding: 0 22px 20px;
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.75;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-answer a { color: var(--accent); text-decoration: none; }
+    .faq-answer a:hover { text-decoration: underline; }
 
     /* 12. FAQ — Light mode visual break */
-    [data-theme="light"] .faq-section { background: #f8fafc; }
+    [data-theme="light"] .faq-section { background: transparent; }
     @media (max-width: 768px) {
-      [data-theme="light"] .faq-section { background: #f8fafc !important; border-top: 1px solid #e2e8f0 !important; }
+      [data-theme="light"] .faq-section { background: transparent !important; border-top: 1px solid var(--hair) !important; }
     }
 
     /* 13. Social icons — larger on mobile */
@@ -94,6 +149,9 @@
   </style>
 </head>
 <body>
+<div class="scene s-dark"></div>
+<div class="scene s-light"></div>
+<div class="depth"></div>
 
   <!-- Navigation -->
     <nav id="investorNav" class="investor-nav">
@@ -111,7 +169,7 @@
   <section class="hero" style="background: url('/img/hero-bg.jpg') center center / cover no-repeat;">
     <div class="hero-content">
 
-      <h1 style="margin-bottom:32px;"><span style="white-space:nowrap">Off-Market Investment Deals.</span><br><span style="color:#4fc3f7">Real estate investing made simple.</span></h1>
+      <h1 style="margin-bottom:32px;"><span style="white-space:nowrap">Off-Market Investment Deals.</span><br><span style="color:var(--c-metal)">Real estate investing made simple.</span></h1>
       <div class="hero-buttons">
         <a class='btn-white' href='/marketplace' style='font-size:16px;font-weight:700;padding:14px 28px;display:inline-flex;align-items:center;'>Browse Inventory</a>
         <a class='btn-primary' href='/signup' style='font-size:16px;font-weight:700;padding:14px 28px;display:inline-flex;align-items:center;'>Get Investor Access &rarr;</a>
@@ -120,7 +178,7 @@
   </section>
 
   <!-- Video + Featured Deals (combined) -->
-  <section id="introSection" style="background:#f8fafc;border-top:1px solid #e2e8f0;">
+  <section id="introSection" style="background:transparent;border-top:1px solid var(--hair);">
     <div style="max-width:1100px;margin:0 auto;padding:72px 24px;">
 
       <!-- TOP HALF: Two columns -->
@@ -129,34 +187,72 @@
         <!-- Left: Video placeholder -->
         <div class="intro-video-col" style="flex:0 0 40%;">
           <div data-youtube-url="" style="position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10);">
-            <div style="position:absolute;inset:0;background:#1a2744;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-              <img src="/img/dom-logo-white.png" alt="Direct Off Market" style="height:48px;opacity:0.5;margin-bottom:24px;">
-              <div style="width:64px;height:64px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0.9;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="#0f172a"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <div style="position:absolute;inset:0;background:var(--metal-grad);display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <div class="play-diamond-wrap" style="width:88px;height:88px;cursor:pointer;">
+               <svg viewBox="0 0 128 128" width="88" height="88" xmlns="http://www.w3.org/2000/svg" aria-label="Play video" class="play-diamond">
+               <defs>
+               <radialGradient id="pbChrome" cx="40%" cy="33%" r="72%">
+               <stop offset="0%" stop-color="#FFFFFF"/><stop offset="24%" stop-color="#EAF1F6"/>
+               <stop offset="52%" stop-color="#C2D0DB"/><stop offset="76%" stop-color="#97A9B7"/>
+               <stop offset="100%" stop-color="#75899B"/>
+               </radialGradient>
+               <linearGradient id="pbCrys" x1="0" y1="0" x2="1" y2="1">
+               <stop offset="0%" stop-color="#FFFFFF"/><stop offset="55%" stop-color="#E4EDF3"/>
+               <stop offset="100%" stop-color="#B9C8D4"/>
+               </linearGradient>
+               <clipPath id="pbClip"><circle cx="64" cy="64" r="60"/></clipPath>
+               </defs>
+               <circle cx="64" cy="64" r="60" fill="url(#pbChrome)"/>
+               <g clip-path="url(#pbClip)" opacity="0.9">
+               <polygon points="64,64 94,12 34,12" fill="#EDF3F7"/>
+               <polygon points="64,64 34,12 4,64" fill="#E0EAF1"/>
+               <polygon points="64,64 124,64 94,12" fill="#CBD8E2"/>
+               <polygon points="64,64 4,64 34,116" fill="#B7C6D2"/>
+               <polygon points="64,64 94,116 124,64" fill="#C2D0DB"/>
+               <polygon points="64,64 34,116 94,116" fill="#9DAFBC"/>
+               <g stroke="#8CA0AF" stroke-width="0.6" opacity="0.5">
+               <line x1="64" y1="64" x2="124" y2="64"/><line x1="64" y1="64" x2="94" y2="12"/>
+               <line x1="64" y1="64" x2="34" y2="12"/><line x1="64" y1="64" x2="4" y2="64"/>
+               <line x1="64" y1="64" x2="34" y2="116"/><line x1="64" y1="64" x2="94" y2="116"/>
+               </g>
+               </g>
+               <circle cx="64" cy="64" r="60" fill="none" stroke="#7E94A6" stroke-width="1.3"/>
+               <circle cx="64" cy="64" r="57" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.45"/>
+               <ellipse cx="42" cy="40" rx="13" ry="8" fill="#FFFFFF" opacity="0.6"/>
+               <polygon points="48,40 48,88 96,64" fill="url(#pbCrys)" stroke="#6E8091" stroke-width="1.1" stroke-linejoin="round"/>
+               <line x1="48" y1="40" x2="73" y2="64" stroke="#FFFFFF" stroke-width="0.8" opacity="0.7"/>
+               <line x1="48" y1="88" x2="73" y2="64" stroke="#9DAFBC" stroke-width="0.8" opacity="0.6"/>
+               <!-- Sparkles: three 4-point stars, positioned in the SVG's outer/corner negative space (NOT on the chrome facets themselves). Staggered @keyframes twinkle. -->
+               <g class="play-diamond-sparkles">
+               <path class="pd-spark pd-spark-1" d="M 108 18 L 110 24 L 116 26 L 110 28 L 108 34 L 106 28 L 100 26 L 106 24 Z" fill="#FFFFFF"/>
+               <path class="pd-spark pd-spark-2" d="M 18 100 L 19.5 104 L 23.5 105.5 L 19.5 107 L 18 111 L 16.5 107 L 12.5 105.5 L 16.5 104 Z" fill="#FFFFFF"/>
+               <path class="pd-spark pd-spark-3" d="M 116 108 L 117 111 L 120 112 L 117 113 L 116 116 L 115 113 L 112 112 L 115 111 Z" fill="#FFFFFF"/>
+               </g>
+               </svg>
               </div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:14px;font-weight:500;">Watch: Why Investors Choose DOM</div>
+              <div style="font-size:12px;color:var(--metal-ink);margin-top:14px;font-weight:500;">Watch me</div>
             </div>
           </div>
         </div>
 
         <!-- Right: Text content -->
         <div class="intro-text-col" style="flex:1;">
-          <div style="font-size:11px;font-weight:700;color:#3b82f6;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;">FROM THE FOUNDER</div>
-          <h2 style="font-size:clamp(24px,3vw,36px);font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:16px;">Real deals from a real investor.</h2>
-          <p style="font-size:15px;color:#475569;line-height:1.7;margin-bottom:16px;">I'm Brock Holliman — licensed Florida broker, builder of 600+ homes, and full-time real estate investor. Every property on this portal is a deal I'd put my own money into. This isn't a listing aggregator. This is a curated investment marketplace built by someone who actually does the work.</p>
-          <p style="font-size:15px;color:#475569;line-height:1.7;">I personally own and manage over 100 rental properties through my own property management company. When I say I know what makes a good investment, it's because I'm living it every day — not just selling it.</p>
+          <div style="font-size:14px;font-weight:700;color:#3b82f6;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:12px;">FROM THE FOUNDER</div>
+          <h2 style="font-size:clamp(34px,4vw,52px);font-weight:800;color:var(--text);line-height:1.2;margin-bottom:16px;">Real deals from a real investor.</h2>
+          <p style="font-size:15px;color:var(--text-muted);line-height:1.75;margin-bottom:16px;">I'm Brock Holliman — licensed Florida broker, builder of 600+ homes, and full-time real estate investor. Every property on this portal is a deal I'd put my own money into. This isn't a listing aggregator. This is a curated investment marketplace built by someone who actually does the work.</p>
+          <p style="font-size:15px;color:var(--text-muted);line-height:1.75;">I personally own and manage over 100 rental properties through my own property management company. When I say I know what makes a good investment, it's because I'm living it every day — not just selling it.</p>
         </div>
 
       </div>
 
       <!-- Divider -->
-      <hr style="margin:48px 0 40px;border:none;border-top:1px solid #e2e8f0;">
+      <hr style="margin:48px 0 40px;border:none;border-top:1px solid var(--hair);">
 
       <!-- BOTTOM HALF: Featured Deals -->
       <div>
 
-        <h2 style="font-size:20px;font-weight:700;color:#0f172a;margin-bottom:4px;">Featured Deals</h2>
-        <p style="font-size:14px;color:#64748b;margin-bottom:24px;">Hand-picked opportunities from our current inventory.</p>
+        <h2 style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;">Featured Deals</h2>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">Hand-picked opportunities from our current inventory.</p>
         <div class="featured-grid" id="featuredGrid">
           <div class="loading-state">
             <img src="/img/dom-icon.gif" style="width:64px;height:64px;object-fit:contain;margin-bottom:8px;">
@@ -179,7 +275,7 @@
 
         <div class="step-card" style="cursor:pointer;position:relative;z-index:1;" onclick="location.href='/signup.html'">
           <div class="step-num">01</div>
-          <div class="step-icon" style="color:#4fc3f7;">
+          <div class="step-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
           <h3>Create Your Account</h3>
@@ -188,7 +284,7 @@
 
         <div class="step-card" style="cursor:pointer;position:relative;z-index:1;" onclick="location.href='/marketplace.html'">
           <div class="step-num">02</div>
-          <div class="step-icon" style="color:#4fc3f7;">
+          <div class="step-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </div>
           <h3>Browse &amp; Analyze Deals</h3>
@@ -197,7 +293,7 @@
 
         <div class="step-card" style="cursor:pointer;position:relative;z-index:1;" onclick="location.href='/signup.html'">
           <div class="step-num">03</div>
-          <div class="step-icon" style="color:#4fc3f7;">
+          <div class="step-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </div>
           <h3>Submit Your Offer</h3>
@@ -218,48 +314,48 @@
       <p class="section-sub">Our team underwrites every property on this platform. As investors, we can affirm these deals make money.</p>
       <div class="benefit-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
           <h3>Curated Inventory</h3>
           <p>We turn down more deals than we publish. Only properties that meet our underwriting criteria make it to the portal.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
           </div>
           <h3>Interactive Pro Forma</h3>
           <p>Every listing includes an investor-grade pro forma calculator. Plug in your own numbers and see your returns in real time.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
           </div>
           <h3>Flood Zone &amp; Comp Maps</h3>
           <p>FEMA flood zone data and sold comps overlaid directly on the property map. Know your risk and your ARV before you commit.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </div>
           <h3>Instant Access</h3>
           <p>No waitlists. No approval queues. Sign up, sign the agreement, and you're browsing live deals within minutes.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <h3>Preferred Partners</h3>
           <p>Get connected with our vetted partners who we trust and rely on.</p>
         </div>
 
-        <div class="benefit-card" style="border-top:3px solid #f97316;">
-          <div class="benefit-icon" style="color:#f97316;">
+        <div class="benefit-card" style="border-top:3px solid var(--c-metal);">
+          <div class="benefit-icon" style="color:var(--c-metal);">
             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           </div>
           <h3>Open House Alerts</h3>
@@ -277,9 +373,9 @@
     <h2 class="section-heading">Recently Closed Deals</h2>
 
     <div class="closings-grid" id="recentClosings">
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Cape Coral, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$285,000</div></div></div>
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">North Port, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$219,000</div></div></div>
-      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Kissimmee, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$310,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="var(--c-metal)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-metal)"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Cape Coral, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$285,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="var(--c-metal)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-metal)"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">North Port, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$219,000</div></div></div>
+      <div class="closing-card"><div class="closing-photo" style="height:140px;background:var(--surface-2);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;position:relative;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="var(--c-metal)" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-metal)"/></svg><span style="position:absolute;top:10px;left:10px;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;">SOLD</span></div><div class="closing-content"><div class="closing-location">Kissimmee, FL</div><div class="closing-meta">Single Family</div><div class="closing-price">$310,000</div></div></div>
     </div>
   </div>
 </section>
@@ -290,13 +386,55 @@
     <h2 class="section-heading">Common Questions</h2>
     <p class="section-sub">Everything you need to know before you dive in.</p>
     <div class="faq-list">
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are these properties listed on the MLS? <span class="faq-icon">+</span></button><div class="faq-a">Some are, some aren't. Either way, when you work with us directly on our platform, you get first access — our deals move fast and we prioritize offers from our own members. Being in our network means you're not competing against the general public.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How much does it cost to access deals? <span class="faq-icon">+</span></button><div class="faq-a">A $1,495 marketplace service fee and a $450 document preparation fee apply to all closed transactions. No monthly subscription fees — access to the full deal feed is completely free.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I tour a property before making an offer? <span class="faq-icon">+</span></button><div class="faq-a">Most of our listings are not open for individual scheduled showings. Instead, we hold a one-day open house for each property where all interested buyers can walk through and submit their highest and best offer within 24 hours. Virtual walkthroughs can also be arranged for out-of-state investors.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How do I submit an offer? <span class="faq-icon">+</span></button><div class="faq-a">Once you create a free account and sign the investor agreement, you can submit offers directly from any deal page. Fill in your purchase price and terms — our team responds within 24 hours. You're also welcome to work with a buyer's agent, though working direct is the most efficient path since no commission comes out of the deal.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I use financing or hard money? <span class="faq-icon">+</span></button><div class="faq-a">Absolutely. We work with cash buyers, hard money lenders, DSCR loans, bridge financing, and private money. Our Lender Marketplace connects you with vetted investor-friendly lenders who know how to move fast. For qualifying properties, conventional financing, VA loans, and FHA loans may also be an option — just note that deals move quickly, so having your financing lined up in advance matters.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are deals only in Florida? <span class="faq-icon">+</span></button><div class="faq-a">Yes — we focus exclusively on Florida and cover the entire state. We source deals across Tampa Bay, Orlando, Sarasota, Fort Myers, Cape Coral, North Port, Kissimmee, Fort Lauderdale, Miami, Jacksonville, and more. No area of Florida is off limits.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What does off-market actually mean? <span class="faq-icon">+</span></button><div class="faq-a">Off-market means the property is not publicly listed on any platform (MLS, Zillow, Redfin). DOM sources deals through direct seller relationships.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <div class="faq-question-text">Are these properties listed on the MLS?</div>
+          <div class="faq-chevron">&#9660;</div>
+        </div>
+        <div class="faq-answer">Some are, some aren't. Either way, when you work with us directly on our platform, you get first access — our deals move fast and we prioritize offers from our own members. Being in our network means you're not competing against the general public.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <div class="faq-question-text">How much does it cost to access deals?</div>
+          <div class="faq-chevron">&#9660;</div>
+        </div>
+        <div class="faq-answer">No monthly subscription fees — access to the full deal feed is completely free.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <div class="faq-question-text">Can I tour a property before making an offer?</div>
+          <div class="faq-chevron">&#9660;</div>
+        </div>
+        <div class="faq-answer">Most of our listings are not open for individual scheduled showings. Instead, we hold a one-day open house for each property where all interested buyers can walk through and submit their highest and best offer within 24 hours. Virtual walkthroughs can also be arranged for out-of-state investors.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <div class="faq-question-text">How do I submit an offer?</div>
+          <div class="faq-chevron">&#9660;</div>
+        </div>
+        <div class="faq-answer">Once you create a free account and sign the investor agreement, you can submit offers directly from any deal page. Fill in your purchase price and terms — our team responds within 24 hours. You're also welcome to work with a buyer's agent, though working direct is the most efficient path since no commission comes out of the deal.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <div class="faq-question-text">Can I use financing or hard money?</div>
+          <div class="faq-chevron">&#9660;</div>
+        </div>
+        <div class="faq-answer">Absolutely. We work with cash buyers, hard money lenders, DSCR loans, bridge financing, and private money. Our Lender Marketplace connects you with vetted investor-friendly lenders who know how to move fast. For qualifying properties, conventional financing, VA loans, and FHA loans may also be an option — just note that deals move quickly, so having your financing lined up in advance matters.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <div class="faq-question-text">Are deals only in Florida?</div>
+          <div class="faq-chevron">&#9660;</div>
+        </div>
+        <div class="faq-answer">Yes — we focus exclusively on Florida and cover the entire state. We source deals across Tampa Bay, Orlando, Sarasota, Fort Myers, Cape Coral, North Port, Kissimmee, Fort Lauderdale, Miami, Jacksonville, and more. No area of Florida is off limits.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <div class="faq-question-text">What does off-market actually mean?</div>
+          <div class="faq-chevron">&#9660;</div>
+        </div>
+        <div class="faq-answer">Off-market means the property is not publicly listed on any platform (MLS, Zillow, Redfin). DOM sources deals through direct seller relationships.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -304,10 +442,10 @@
   <!-- Investor CTA Strip -->
   <section class="investor-cta-strip">
     <div class="section-container" style="text-align:center;">
-      <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:#0f172a;margin-bottom:12px;">Ready to browse the inventory?</h2>
-      <p style="color:#64748b;font-size:16px;margin-bottom:28px;">Get access to Florida's best off-market investment deals.</p>
+      <h2 style="font-size:clamp(24px,3vw,40px);font-weight:800;color:var(--text);margin-bottom:12px;">Ready to browse the inventory?</h2>
+      <p style="color:var(--text-muted);font-size:16px;margin-bottom:28px;">Get access to Florida's best off-market investment deals.</p>
       <div id="ctaButtons" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <a href='/signup' onmouseout='this.style.background=\'#4fc3f7\'' onmouseover='this.style.background=\'#38b2e8\'' style='background:#4fc3f7;color:#0f172a;padding:14px 36px;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;display:inline-block;transition:background .2s;'>Get Investor Access &rarr;</a>
+        <a class='cta-btn-invest' href='/signup' style='background:var(--c-metal);color:#0f172a;padding:14px 36px;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;display:inline-block;transition:background .2s;'>Get Investor Access &rarr;</a>
         <a class='cta-btn-outline' href='/marketplace'>Browse Deals</a>
       </div>
     </div>
@@ -472,7 +610,7 @@
 
       console.log('[loadFeatured] data:', data ? data.length : 'null', 'error:', error ? error.message : 'none');
       if ((!data || data.length === 0)) {
-        section.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p>Check back soon for featured deals.</p></div>';
+        section.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" style="fill:var(--c-primary);fill-opacity:0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" style="fill:var(--c-primary)"/></svg><p>Check back soon for featured deals.</p></div>';
         return;
       }
 
@@ -495,7 +633,7 @@
           : '<div style="width:100%;height:100%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><img src="/img/dom-logo-white.png" style="height:28px;opacity:0.18;"></div>';
         return '<div class="mini-card">' +
           '<div class="mini-photo hp-photo-zone" style="position:relative;">' + photoHtml +
-            '<span style="position:absolute;top:10px;left:10px;background:#f97316;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;">⭐ Featured</span>' +
+            '<span style="position:absolute;top:10px;left:10px;background:var(--metal-grad);color:var(--metal-ink);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.04em;text-transform:uppercase;">⭐ Featured</span>' +
           '</div>' +
           '<div class="mini-content">' +
             '<div class="mini-location">' + loc + '</div>' +
@@ -659,22 +797,19 @@
 
   setTimeout(function(){loadFeatured();loadHeroPreview();loadRecentClosings();},100);
 
-  function toggleFaq(btn) {
-    var item = btn.closest('.faq-item') || btn.parentElement;
-    var answer = btn.nextElementSibling;
-    var icon = btn.querySelector('.faq-icon');
-    var isOpen = item.classList.contains('open');
+  function toggleFaq(item) {
+    var wasOpen = item.classList.contains('open');
     // Close all
-    document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
-    document.querySelectorAll('.faq-a').forEach(function(a) { a.style.display = 'none'; });
-    document.querySelectorAll('.faq-icon').forEach(function(ic) { if(ic) ic.textContent = '+'; });
+    document.querySelectorAll('.faq-item').forEach(function(fi) { fi.classList.remove('open'); });
     // Open this one if it was closed
-    if (!isOpen) {
-      item.classList.add('open');
-      answer.style.display = 'block';
-      if (icon) icon.textContent = '×';
-    }
+    if (!wasOpen) item.classList.add('open');
   }
   </script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#F2F7FB"/>
+    <stop offset="1" stop-color="#7C8E9C"/>
+  </linearGradient>
+</defs></svg>
 </body>
 </html>

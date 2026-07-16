@@ -7,9 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/investor.css">
+<link rel="stylesheet" href="/css/glass.css">
   <script>
   (function() {
-    var t = localStorage.getItem('dom_portal_theme') || 'dark';
+    var t = localStorage.getItem('dom_portal_theme') || 'light';
     document.documentElement.setAttribute('data-theme', t);
   })();
   </script>
@@ -21,24 +22,22 @@
     body { font-family: 'Inter', sans-serif; background: var(--bg, #0f1a2e); color: var(--text, #e2e8f0); }
 
     :root {
-      --bg: #0f1a2e;
+      --bg: transparent; /* v2.4.9: let .s-dark scene show through, matching light */
       --navy: #1a2744;
-      --gold: #c9a84c;
-      --surface: #1a2744;
-      --surface-2: #243257;
+      
+      
       --border: #2d4070;
       --text: #e2e8f0;
       --text-muted: #8a9bbf;
       --green: #22c55e;
       --red: #ef4444;
-      --orange: #f97316;
     }
 
     [data-theme="light"] {
-      --bg: #f1f5f9;
+      --bg: transparent;
       --navy: #1a2744;
-      --surface: #ffffff;
-      --surface-2: #e8eef6;
+      
+      
       --border: #cbd5e1;
       --text: #0f172a;
       --text-muted: #64748b;
@@ -59,8 +58,8 @@
 
     .marketplace-layout {
       display: flex;
-      height: calc(100vh - 70px);
-      margin-top: 70px;
+      height: calc(100vh - 64px); /* v2.4.9 r3 §C3: match .investor-nav inline height (64px) so no scene bleeds through */
+      margin-top: 64px; /* v2.4.9 r3 §C3: close the nav/content gap — was 70px matching the stale investor.css nav height */
     }
 
     /* Mapbox conflict prevention: isolate map pointer events from panel */
@@ -87,13 +86,13 @@
       display: flex;
       flex-direction: column;
       background: var(--bg);
-      border-left: 1px solid var(--border);
+      border-left: none; /* v2.4.9 r2 §C2: kill the panel-left hairline Andrew saw on preview-112 both themes */
       overflow: hidden;
     }
 
     .panel-header {
       padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: none;
       background: var(--surface);
       flex-shrink: 0;
     }
@@ -118,8 +117,8 @@
       transition: all 0.15s;
     }
 
-    .filter-pill:hover { border-color: #4fc3f7; color: var(--text); }
-    .filter-pill.active { background: #4fc3f7; border-color: #4fc3f7; color: #1a2744; font-weight: 700; }
+    .filter-pill:hover { border-color: var(--c-metal); color: var(--text); }
+    .filter-pill.active { background: var(--c-primary); border-color: var(--c-metal); color: #1a2744; font-weight: 700; }
 
     .panel-title-row {
       display: flex;
@@ -145,8 +144,8 @@
       display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .view-btn:hover { border-color: #4fc3f7; color: #4fc3f7; }
-    .view-btn.active { background: var(--surface-2); border-color: #4fc3f7; color: #4fc3f7; }
+    .view-btn:hover { border-color: var(--c-metal); color: var(--c-metal); }
+    .view-btn.active { background: var(--surface-2); border-color: var(--c-metal); color: var(--c-metal); }
 
     .listings-panel {
       flex: 1;
@@ -217,8 +216,8 @@
       z-index: 1;
     }
     .card-wrapper:hover::after {
-      border-color: #4fc3f7;
-      box-shadow: 0 4px 20px rgba(79,195,247,0.18);
+      border-color: var(--c-metal);
+      box-shadow: 0 4px 20px color-mix(in srgb, var(--c-primary) 18%, transparent);
     }
 
     .card-photo {
@@ -237,10 +236,14 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
-    .badge-available { background: #22c55e; color: #fff; font-weight: 700; }
-    .badge-pending { background: #f97316; color: #fff; font-weight: 700; }
-    .badge-coming-soon { background: #4fc3f7; color: #1a2744; font-weight: 700; }
-    .badge-sold { background: #64748b; color: #fff; font-weight: 700; }
+    .badge-available { background: #22c55e; color: var(--text); font-weight: 700; }
+    [data-theme="light"] .badge-available { background: #22c55e !important; color: var(--text) !important; }
+    [data-theme="dark"] .badge-available { background: #22c55e !important; color: var(--text) !important; border: none !important; }
+    .badge-pending { background: var(--c-metal); color: #fff; font-weight: 700; }
+    .badge-coming-soon { background: var(--c-primary); color: #1a2744; font-weight: 700; }
+    .badge-sold { background: var(--metal-grad); color: var(--metal-ink); font-weight: 700; border: none; }
+    [data-theme="light"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; }
+    [data-theme="dark"] .badge-sold { background: var(--metal-grad) !important; color: #16202B !important; }
 
     /* Map controls */
     .map-controls {
@@ -253,24 +256,24 @@
       background: #1a2744;
       border-radius: 8px;
       padding: 4px;
-      border: 1px solid rgba(79,195,247,0.2);
+      border: 1px solid color-mix(in srgb, var(--c-primary) 20%, transparent);
       backdrop-filter: blur(8px);
     }
 
     .map-style-btn {
       padding: 5px 12px;
       border-radius: 5px;
-      border: 1px solid rgba(79,195,247,0.25);
+      border: 1px solid color-mix(in srgb, var(--c-primary) 25%, transparent);
       background: rgba(26,39,68,0.9);
-      color: #4fc3f7;
+      color: var(--c-metal);
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       transition: all 0.15s;
     }
-.map-style-btn:hover { background: rgba(79,195,247,0.12) !important; border-color: #4fc3f7 !important; color: #4fc3f7 !important; }
-    .map-style-btn.active { background: #4fc3f7; color: #1a2744; border-color: #4fc3f7; font-weight: 700; }
+.map-style-btn:hover { background: color-mix(in srgb, var(--c-primary) 12%, transparent) !important; border-color: var(--c-metal) !important; color: var(--c-metal) !important; }
+    .map-style-btn.active { background: var(--c-primary); color: #1a2744; border-color: var(--c-metal); font-weight: 700; }
 
     .map-legend {
       position: absolute;
@@ -278,7 +281,7 @@
       left: 12px;
       z-index: 10;
       background: #1a2744;
-      border: 1px solid rgba(79,195,247,0.2);
+      border: 1px solid color-mix(in srgb, var(--c-primary) 20%, transparent);
       border-radius: 8px;
       padding: 10px 12px;
       font-size: 12px;
@@ -286,7 +289,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      color: #4fc3f7;
+      color: var(--c-metal);
       font-weight: 600;
       box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
@@ -297,16 +300,16 @@
       border: 2px solid white;
       flex-shrink: 0;
     }
-    .legend-dot.orange { background: #4fc3f7; }
+    .legend-dot.orange { background: var(--c-metal); }
     .legend-dot.red { background: #ef4444; }
     .legend-dot.purple { background: #8b5cf6; }
 
     .map-reset-btn, .map-flood-btn {
       position: absolute;
       z-index: 10;
-      border: 1px solid rgba(79,195,247,0.25);
+      border: 1px solid color-mix(in srgb, var(--c-primary) 25%, transparent);
       background: #1a2744;
-      color: #4fc3f7;
+      color: var(--c-metal);
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 12px;
@@ -316,7 +319,7 @@
       backdrop-filter: blur(8px);
       transition: all 0.15s;
     }
-    .map-reset-btn:hover, .map-flood-btn:hover { background: rgba(79,195,247,0.15); border-color: #4fc3f7; }
+    .map-reset-btn:hover, .map-flood-btn:hover { background: color-mix(in srgb, var(--c-primary) 15%, transparent); border-color: var(--c-metal); }
     .map-reset-btn { }
     .map-flood-btn { }
 
@@ -324,7 +327,7 @@
     /* Mapbox NavigationControl - match site style */
     .mapboxgl-ctrl-group {
       background: #1a2744 !important;
-      border: 1px solid rgba(79,195,247,0.2) !important;
+      border: 1px solid color-mix(in srgb, var(--c-primary) 20%, transparent) !important;
       border-radius: 8px !important;
       box-shadow: none !important;
       backdrop-filter: blur(8px) !important;
@@ -333,13 +336,42 @@
     .mapboxgl-ctrl-group button {
       background-color: transparent !important;
       border: none !important;
-      border-bottom: 1px solid rgba(79,195,247,0.15) !important;
+      border-bottom: 1px solid color-mix(in srgb, var(--c-primary) 15%, transparent) !important;
       width: 30px !important;
       height: 30px !important;
     }
     .mapboxgl-ctrl-group button:last-child { border-bottom: none !important; }
-    .mapboxgl-ctrl-group button:hover { background: rgba(79,195,247,0.15) !important; }
-    .mapboxgl-ctrl-icon { filter: brightness(0) saturate(100%) invert(72%) sepia(47%) saturate(450%) hue-rotate(165deg) brightness(105%) contrast(93%) !important; }
+    .mapboxgl-ctrl-group button:hover { background: color-mix(in srgb, var(--c-primary) 15%, transparent) !important; }
+    /* v2.4.8 r2 §C1-fallback (2026-07-15): Mapbox GL 3.9.0 ships +/- as background-image SVG with fill='%23333' baked into the data URI — inline-svg fill:currentColor has no target because there is no <svg> element, only a <span> with background-image. Round-2 fix is dark-mode-only per Andrew's 15:26 EDT lock: mask-image swap paints the glyph #EAF2F8 (dark --text moonlight) on the navy control. Light mode preserves round-1 render (Mapbox default #333 glyph on aqua-tinted container) — no mask, no color override. Mask paths verified against live mapbox-gl-js/v3.9.0/mapbox-gl.css icon URIs. */
+    .mapboxgl-ctrl-icon { filter: none !important; }
+    [data-theme="light"] .mapboxgl-ctrl-group {
+      background: color-mix(in srgb, var(--c-primary) 22%, white) !important;
+      border-color: color-mix(in srgb, var(--c-primary) 55%, white) !important;
+    }
+
+    /* Dark-only mask paint: kill Mapbox's baked-in #333 background-image and paint the glyph in moonlight via mask-image + background-color. */
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon,
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon {
+      background-image: none !important;
+      background-color: #EAF2F8 !important;
+      -webkit-mask-repeat: no-repeat !important;
+      mask-repeat: no-repeat !important;
+      -webkit-mask-position: center !important;
+      mask-position: center !important;
+      -webkit-mask-size: 20px 20px !important;
+      mask-size: 20px 20px !important;
+    }
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon {
+      -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5z'/%3E%3C/svg%3E") !important;
+      mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5z'/%3E%3C/svg%3E") !important;
+    }
+    [data-theme="dark"] .mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon {
+      -webkit-mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E") !important;
+      mask-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E") !important;
+    }
+    /* Dark hover/disabled: dim the mask paint via opacity so state cues still read. */
+    [data-theme="dark"] .mapboxgl-ctrl-group button:not(:disabled):hover .mapboxgl-ctrl-icon { opacity: 0.85 !important; }
+    [data-theme="dark"] .mapboxgl-ctrl-group button:disabled .mapboxgl-ctrl-icon { opacity: 0.35 !important; }
 
     /* Mapbox popup */
     .mapboxgl-popup-content {
@@ -361,12 +393,12 @@
     .map-popup .popup-price-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; }
 .map-popup .popup-arv { font-size: 17px; font-weight: 800; color: #2d6a8f; }
     .map-popup .popup-arv-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8a9bbf; margin-bottom: 2px; white-space: nowrap; }
-.map-popup .popup-link { display: block; background: #1a2744; color: #4fc3f7; font-size: 13px; font-weight: 700; text-align: center; padding: 10px; text-decoration: none; transition: background 0.15s; }
+.map-popup .popup-link { display: block; background: #1a2744; color: var(--c-metal); font-size: 13px; font-weight: 700; text-align: center; padding: 10px; text-decoration: none; transition: background 0.15s; }
 .map-popup .popup-link:hover { background: #243560; }
     .popup-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-bottom: 6px; }
     .popup-status-published { background: #22c55e; color: #fff; }
-    .popup-status-pending { background: #f97316; color: #fff; }
-    .popup-status-coming_soon { background: #4fc3f7; color: #1a2744; }
+    .popup-status-pending { background: var(--c-metal); color: #fff; }
+    .popup-status-coming_soon { background: var(--c-primary); color: #1a2744; }
     .popup-status-sold { background: #64748b; color: #fff; }
 
     /* Empty state */
@@ -581,8 +613,8 @@
         transform: translateX(-50%);
         z-index: 300;
         background: #1a2744;
-        color: #4fc3f7;
-        border: 1.5px solid #4fc3f7;
+        color: var(--c-metal);
+        border: 1.5px solid var(--c-metal);
         border-radius: 24px;
         padding: 10px 22px;
         font-size: 14px;
@@ -595,7 +627,7 @@
       }
 
       .map-price-pin {
-        background: #f97316;
+        background: var(--c-metal);
         color: white;
         font-size: 11px;
         font-weight: 800;
@@ -612,7 +644,7 @@
       }
 
       .map-price-pin.active {
-        background: #4fc3f7;
+        background: var(--c-metal);
         color: #0f172a;
         transform: scale(1.15);
       }
@@ -639,6 +671,9 @@
   <link rel="apple-touch-icon" href="/img/favicon-32.png">
 </head>
 <body>
+<div class="scene s-dark"></div>
+<div class="scene s-light"></div>
+<div class="depth"></div>
     <nav id="investorNav" class="investor-nav">
     <button class="pin-menu-btn" onclick="Portal.openPinMenu()" aria-label="Site menu">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>
@@ -901,7 +936,7 @@
 
       var el = document.createElement('div');
       el.className = 'dom-map-marker';
-      el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (listing.status === 'sold' ? '#64748b' : '#4fc3f7') + ';border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
+      el.style.cssText = 'width:16px;height:16px;border-radius:50%;background:' + (listing.status === 'sold' ? '#64748b' : 'var(--c-primary)') + ';border:3px solid #1a2744;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4);will-change:transform;';
       el.dataset.id = listing.id;
 
       var popup = new mapboxgl.Popup({ offset: 25, closeButton: true })
@@ -1042,7 +1077,8 @@
         var s = pill.dataset.status;
         var count = counts[s] !== undefined ? counts[s] : 0;
         pill.textContent = labels[s] + ' (' + count + ')';
-        pill.style.opacity = (count === 0 && s !== 'all') ? '0.5' : '';
+        pill.dataset.count = String(count); /* v2.4.8: empty-state CSS hook */
+        pill.style.opacity = ''; /* v2.4.8: CSS now owns the muted state via [data-count="0"] */
       });
     }
 
@@ -1055,7 +1091,7 @@
 
       if (filtered.length === 0) {
         var filterLabel = currentFilter === 'all' ? 'active' : getStatusLabel(currentFilter, null).toLowerCase();
-        panel.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p style="margin-top:12px;color:var(--text-muted);">No ' + filterLabel + ' deals right now.<br>Check back soon.</p></div>';
+        panel.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" style="fill:var(--c-primary);fill-opacity:0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-primary)"/></svg><p style="margin-top:12px;color:var(--text-muted);">No ' + filterLabel + ' deals right now.<br>Check back soon.</p></div>';
         panel.style.cssText = '';
         return;
       }
@@ -1134,17 +1170,17 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
       modal.id = 'mktFavModal';
       modal.style.cssText = 'position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;pointer-events:none;';
       modal.innerHTML = added
-        ? '<div style="background:#1a2744;border:1px solid rgba(79,195,247,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
+        ? '<div style="background:#1a2744;border:1px solid color-mix(in srgb, var(--c-primary) 25%, transparent);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
           '<div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e8476a,#c0254a);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;">&#9829;</div>' +
           '<div style="font-size:18px;font-weight:800;color:#f0f4ff;margin-bottom:8px;">Added to Favorites</div>' +
           '<div style="font-size:13px;color:#8a9bbf;">Find this deal anytime in your Favorites tab.</div>' +
-          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#e8476a,#4fc3f7);margin-top:20px;width:100%;transform-origin:left;"></div>' +
+          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#e8476a,var(--c-primary));margin-top:20px;width:100%;transform-origin:left;"></div>' +
           '</div>'
-        : '<div style="background:#1a2744;border:1px solid rgba(79,195,247,0.25);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
+        : '<div style="background:#1a2744;border:1px solid color-mix(in srgb, var(--c-primary) 25%, transparent);border-radius:20px;padding:36px 40px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.5);max-width:340px;width:90%;pointer-events:auto;">' +
           '<div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.07);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#8a9bbf;">&#9825;</div>' +
           '<div style="font-size:18px;font-weight:800;color:#f0f4ff;margin-bottom:8px;">Removed from Favorites</div>' +
           '<div style="font-size:13px;color:#8a9bbf;">This deal has been removed from your saved list.</div>' +
-          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,#4fc3f7,#2563eb);margin-top:20px;width:100%;transform-origin:left;"></div>' +
+          '<div id="mktFavBar" style="height:3px;border-radius:2px;background:linear-gradient(90deg,var(--c-primary),#2563eb);margin-top:20px;width:100%;transform-origin:left;"></div>' +
           '</div>';
       document.body.appendChild(modal);
       // Animate countdown bar
@@ -1310,7 +1346,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
     }
 
     function showEmpty(msg) {
-      document.getElementById('listingsPanel').innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" fill="#4fc3f7" fill-opacity="0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg><p style="margin-top:12px;">' + msg + '</p></div>';
+      document.getElementById('listingsPanel').innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="10" style="fill:var(--c-primary);fill-opacity:0.12"/><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-primary)"/></svg><p style="margin-top:12px;">' + msg + '</p></div>';
       document.getElementById('listingCount').textContent = '0 listings';
     }
 
@@ -1331,7 +1367,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
       sheet.innerHTML =
         '<div id="sheetDragArea" style="cursor:pointer;padding:8px 0 12px;">' +
           '<div class="sheet-handle" id="sheetHandle"></div>' +
-          '<div class="sheet-count" id="sheetCount" style="color:#4fc3f7;font-weight:700;font-size:15px;text-align:center;">Loading deals...</div>' +
+          '<div class="sheet-count" id="sheetCount" style="color:var(--c-primary);font-weight:700;font-size:15px;text-align:center;">Loading deals...</div>' +
         '</div>' +
         '<div class="sheet-cards" id="sheetCards"></div>';
       document.body.appendChild(sheet);
@@ -1341,7 +1377,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
       if (!hamburgerExists) {
         var hamburger = document.createElement('button');
         hamburger.id = 'mapHamburger';
-        hamburger.style.cssText = 'position:fixed;top:12px;right:12px;z-index:300;background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);color:#4fc3f7;border:1.5px solid rgba(79,195,247,0.5);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.3);';
+        hamburger.style.cssText = 'position:fixed;top:12px;right:12px;z-index:300;background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);color:var(--c-primary);border:1.5px solid color-mix(in srgb, var(--c-primary) 50%, transparent);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.3);';
         hamburger.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect y="2" width="18" height="2" rx="1" fill="currentColor"/><rect y="8" width="18" height="2" rx="1" fill="currentColor"/><rect y="14" width="18" height="2" rx="1" fill="currentColor"/></svg>';
         hamburger.onclick = function() { Portal.openPinMenu(); };
         document.body.appendChild(hamburger);
@@ -1364,20 +1400,20 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         var wrap = document.createElement('div');
         wrap.style.cssText = 'position:relative;';
         var pill = document.createElement('div');
-        pill.style.cssText = 'background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);border:1.5px solid #4fc3f7;border-radius:20px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(0,0,0,0.3);white-space:nowrap;';
+        pill.style.cssText = 'background:rgba(26,39,68,0.88);backdrop-filter:blur(10px);border:1.5px solid var(--c-primary);border-radius:20px;padding:7px 12px;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(0,0,0,0.3);white-space:nowrap;';
         var lbl = document.createElement('span');
         lbl.textContent = labelText;
-        lbl.style.cssText = 'color:#4fc3f7;font-size:13px;font-weight:700;';
+        lbl.style.cssText = 'color:var(--c-primary);font-size:13px;font-weight:700;';
         var arr = document.createElement('span');
-        arr.innerHTML = '<svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 1L5 5L9 1" stroke="#4fc3f7" stroke-width="1.5" stroke-linecap="round"/></svg>';
+        arr.innerHTML = '<svg width="10" height="7" viewBox="0 0 10 7" fill="none"><path d="M1 1L5 5L9 1" style="stroke:var(--c-primary)" stroke-width="1.5" stroke-linecap="round"/></svg>';
         pill.appendChild(lbl); pill.appendChild(arr);
         var menu = document.createElement('div');
-        menu.style.cssText = 'display:none;position:absolute;top:44px;left:0;background:#1a2744;border:1px solid rgba(79,195,247,0.3);border-radius:12px;overflow:hidden;min-width:150px;box-shadow:0 4px 24px rgba(0,0,0,0.5);z-index:100;';
+        menu.style.cssText = 'display:none;position:absolute;top:44px;left:0;background:#1a2744;border:1px solid color-mix(in srgb, var(--c-primary) 30%, transparent);border-radius:12px;overflow:hidden;min-width:150px;box-shadow:0 4px 24px rgba(0,0,0,0.5);z-index:100;';
         options.forEach(function(opt) {
           var item = document.createElement('div');
           item.style.cssText = 'padding:12px 16px;color:#f0f4ff;font-size:14px;font-weight:600;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);';
           item.textContent = opt.label;
-          item.addEventListener('touchstart', function(){item.style.background='rgba(79,195,247,0.15)';},{passive:true});
+          item.addEventListener('touchstart', function(){item.style.background='color-mix(in srgb, var(--c-primary) 15%, transparent)';},{passive:true});
           item.addEventListener('touchend', function(){item.style.background='';},{passive:true});
           item.onclick = function(e) { e.stopPropagation(); lbl.textContent = opt.label; menu.style.display = 'none'; onChange(opt.value); };
           menu.appendChild(item);
@@ -1425,18 +1461,18 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           s.style.maxHeight = peekHeight;
           s.style.transition = 'height 0.25s cubic-bezier(0.32,0.72,0,1), max-height 0.25s cubic-bezier(0.32,0.72,0,1)';
           if (f) f.style.display = 'none';
-          var ce2 = document.getElementById('sheetCount'); if (ce2 && window._mobileDealsLabel) { ce2.textContent = window._mobileDealsLabel; ce2.style.color = '#4fc3f7'; }
+          var ce2 = document.getElementById('sheetCount'); if (ce2 && window._mobileDealsLabel) { ce2.textContent = window._mobileDealsLabel; ce2.style.color = 'var(--c-primary)'; }
         } else if (state === 'half') {
           s.style.height = 'auto';
           s.style.maxHeight = '65vh';
           if (f) f.style.display = 'none';
-          var ceH = document.getElementById('sheetCount'); if (ceH) { ceH.textContent = 'View Map'; ceH.style.color = '#4fc3f7'; }
+          var ceH = document.getElementById('sheetCount'); if (ceH) { ceH.textContent = 'View Map'; ceH.style.color = 'var(--c-primary)'; }
         } else if (state === 'full') {
           // Redirect full to half — only two states allowed
           s.style.height = 'auto';
           s.style.maxHeight = '65vh';
           if (f) f.style.display = 'none';
-          var ce = document.getElementById('sheetCount'); if (ce) { ce.textContent = 'View Map'; ce.style.color = '#4fc3f7'; }
+          var ce = document.getElementById('sheetCount'); if (ce) { ce.textContent = 'View Map'; ce.style.color = 'var(--c-primary)'; }
         }
       }
 
@@ -1518,7 +1554,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         renderMobileCards();
         // Correct label: deals are showing, so button = View Map
         var countEl = document.getElementById('sheetCount');
-        if (countEl) { countEl.textContent = 'View Map'; countEl.style.color = '#4fc3f7'; }
+        if (countEl) { countEl.textContent = 'View Map'; countEl.style.color = 'var(--c-primary)'; }
       }, 500);
     }
 
@@ -1568,7 +1604,7 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         : allListings.filter(function(l) { return l.status === currentFilter; });
 
       window._mobileDealsLabel = 'View Deals';
-      if (countEl) { countEl.textContent = 'View Deals'; countEl.style.color = '#4fc3f7'; countEl.style.fontWeight = '700'; countEl.style.fontSize = '15px'; }
+      if (countEl) { countEl.textContent = 'View Deals'; countEl.style.color = 'var(--c-primary)'; countEl.style.fontWeight = '700'; countEl.style.fontSize = '15px'; }
 
       if (filtered.length === 0) {
         container.innerHTML = '<div style="text-align:center;padding:32px 16px;color:var(--text-muted);">No deals match this filter.<br>Check back soon.</div>';
@@ -1587,8 +1623,8 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
         ].filter(Boolean).join(' | ');
         var photo = l._photo
           ? '<img src="' + l._photo + '" alt="property" loading="lazy">'
-          : '<div style="position:absolute;inset:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="#4fc3f7"/></svg></div>';
-        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? '#f97316' : (l.status === 'sold' ? '#64748b' : '#4fc3f7'));
+          : '<div style="position:absolute;inset:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;"><svg width="32" height="32" viewBox="0 0 48 48" fill="none"><path d="M24 10C18.477 10 14 14.477 14 20c0 7 10 18 10 18s10-11 10-18c0-5.523-4.477-10-10-10zm0 13.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="var(--c-primary)"/></svg></div>';
+        var statusColor = l.status === 'published' ? '#22c55e' : (l.status === 'pending' ? 'var(--c-metal)' : (l.status === 'sold' ? '#64748b' : 'var(--c-primary)'));
         var statusLabel = getStatusLabel(l.status, l.closed_at).toUpperCase();
         var isFav = (JSON.parse(localStorage.getItem('dom_portal_favorites') || '[]')).some(function(f){return f.id === l.id;});
 
@@ -1596,8 +1632,8 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
           '<div class="mobile-card-photo-wrap">' +
             photo +
             '<span style="position:absolute;top:10px;left:10px;background:' + statusColor + ';color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;">' + statusLabel + '</span>' +
-            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:#f97316;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
-            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:#f97316;color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
+            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:var(--metal-grad);color:var(--metal-ink);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
+            (l.open_house_date ? '<span style="position:absolute;bottom:10px;left:10px;background:var(--metal-grad);color:var(--metal-ink);font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.3);">Open House: ' + new Date(l.open_house_date).toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'}) + '</span>' : '') +
             '<button class="mobile-card-heart" style="' + (isFav ? 'color:#e8476a;' : '') + '" onclick="event.stopPropagation();toggleMobileFav(this,\'' + l.id + '\')">' + (isFav ? '♥' : '♡') + '</button>' +
           '</div>' +
           '<div class="mobile-card-body">' +
@@ -1607,11 +1643,11 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
               (l.status === 'sold'
                 ? '<div style="flex:1;min-width:80px;">' +
                     '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Sold Price</div>' +
-                    '<div style="font-size:16px;font-weight:800;color:#4fc3f7;">$' + (l.sold_price != null ? Math.round(l.sold_price).toLocaleString('en-US') : '—') + '</div>' +
+                    '<div style="font-size:16px;font-weight:800;color:var(--c-primary);">$' + (l.sold_price != null ? Math.round(l.sold_price).toLocaleString('en-US') : '—') + '</div>' +
                   '</div>'
                 : '<div style="flex:1;min-width:80px;">' +
                     '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Starting Price</div>' +
-                    '<div style="font-size:16px;font-weight:800;color:#4fc3f7;">$' + (l.asking_price ? Math.round(l.asking_price).toLocaleString('en-US') : '—') + '</div>' +
+                    '<div style="font-size:16px;font-weight:800;color:var(--c-primary);">$' + (l.asking_price ? Math.round(l.asking_price).toLocaleString('en-US') : '—') + '</div>' +
                   '</div>' +
                   (p.estimated_arv ? '<div style="flex:1;min-width:80px;">' +
                     '<div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">ARV</div>' +
@@ -1744,5 +1780,11 @@ panel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;paddi
 
     init();
   </script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="pg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#F2F7FB"/>
+    <stop offset="1" stop-color="#7C8E9C"/>
+  </linearGradient>
+</defs></svg>
 </body>
 </html>
