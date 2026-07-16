@@ -1069,6 +1069,16 @@
     <h2 class="section-heading">Settings</h2>
     <p class="section-sub">Manage your profile, address, buying entity, and notification preferences.</p>
 
+    <!-- v2.4.10: Buying Entity completion nudge — hidden when all 6 business fields are filled -->
+    <div id="bizEntityNudge" style="display:none;align-items:center;gap:14px;background:color-mix(in srgb,var(--c-primary) 10%,transparent);border:1px solid color-mix(in srgb,var(--c-primary) 35%,transparent);border-radius:12px;padding:14px 18px;margin-bottom:20px;">
+      <span style="font-size:22px;">🏢</span>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;">Complete your Buying Entity</div>
+        <div style="font-size:12px;color:var(--text-muted);">Add your business contact &amp; address so we can prepare offer documents — takes 60 seconds.</div>
+      </div>
+      <a href="#bizSection" onclick="document.getElementById('bizSection').scrollIntoView({behavior:'smooth'});" style="font-size:13px;font-weight:700;color:var(--c-primary);white-space:nowrap;text-decoration:none;">Fill in →</a>
+    </div>
+
     <!-- Section 1: Personal Info -->
     <div class="form-section full-width" style="padding:24px;margin-bottom:20px;">
       <div class="form-section-title" style="margin-bottom:16px;">Personal Info</div>
@@ -1150,7 +1160,7 @@
 
 
     <!-- Section 3: Buying Entity -->
-    <div class="form-section full-width" style="padding:24px;margin-bottom:20px;">
+    <div id="bizSection" class="form-section full-width" style="padding:24px;margin-bottom:20px;">
       <div class="form-section-title" style="margin-bottom:16px;">Buying Entity</div>
       <div style="margin-bottom:14px;">
         <label class="form-label">Company or Entity Name</label>
@@ -2811,6 +2821,10 @@
       _set('st_bizCity', pu.business_city);
       _set('st_bizState', pu.business_state);
       _set('st_bizZip', pu.business_zip);
+      // v2.4.10: buying entity nudge — show when any of the 6 business fields are empty
+      var bizComplete = pu.business_phone && pu.business_email && pu.business_street && pu.business_city && pu.business_state && pu.business_zip;
+      var nudgeEl = document.getElementById('bizEntityNudge');
+      if (nudgeEl) nudgeEl.style.display = bizComplete ? 'none' : 'flex';
       // Realtor
       var wtr = pu.working_with_realtor;
       var rr = document.querySelector('input[name="st_realtor"][value="'+(wtr||'no')+'"]');
