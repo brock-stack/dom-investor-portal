@@ -148,46 +148,144 @@
     .hp-closing-photo { transition: filter 0.2s; }
   </style>
   <style>
-  /* v2.5.2 — light-mode CTA scheme, homepage only. Dark mode unchanged. */
+  /* v2.5.3 — light-mode CTA scheme, homepage only. Dark mode unchanged. */
 
-  /* Hero: Browse Inventory (was white) → Aqua */
+  /* --- Hero: Browse Inventory → platinum liquid glass (dark ink) --- */
   [data-theme="light"] .hero-buttons a.btn-white {
-    background: var(--c-primary) !important;
-    color: var(--text) !important;
+    /* Geometry preserved: radius 8px, padding 14px 28px (inline override), font 16px/700 */
+    padding: 14px 28px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #16202B !important;
+    text-shadow: none !important;
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+    background:
+      radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.6), transparent 62%),
+      linear-gradient(180deg, #FBFDFF, #D7E2EA 32%, #AEC0CD 56%, #E6EEF4 78%, #BCCBD6) !important;
+    -webkit-backdrop-filter: blur(11px) saturate(165%);
+    backdrop-filter: blur(11px) saturate(165%);
+    box-shadow:
+      0 12px 24px rgba(40,90,120,.30),
+      0 0 24px -6px rgba(220,235,245,.7),
+      inset 0 1.5px 1px rgba(255,255,255,1),
+      inset 0 -11px 15px rgba(140,170,190,.34),
+      inset 0 0 0 1px rgba(255,255,255,.6) !important;
+    transition: transform .18s var(--ease);
   }
   [data-theme="light"] .hero-buttons a.btn-white:hover {
-    background: color-mix(in srgb, var(--c-primary) 88%, black) !important;
+    transform: translateY(-2px);
   }
 
-  /* Hero: Get Investor Access (was Aqua via --accent) → Sky Blue */
+  /* --- Hero: Get Investor Access → Aqua liquid glass --- */
   [data-theme="light"] .hero-buttons a.btn-primary {
-    background: var(--c-info) !important;
+    --c: var(--c-primary);
+    padding: 14px 28px !important;
+    border-radius: 6px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
     color: var(--text) !important;
+    text-shadow: none !important;
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.66), transparent 60%),
+      linear-gradient(180deg, color-mix(in srgb, var(--c) 56%, white), var(--c) 50%, color-mix(in srgb, var(--c) 54%, black)) !important;
+    -webkit-backdrop-filter: blur(11px) saturate(165%);
+    backdrop-filter: blur(11px) saturate(165%);
+    box-shadow:
+      0 9px 20px rgba(40,90,120,.20),
+      0 0 22px -7px var(--c),
+      inset 0 1.5px 1px rgba(255,255,255,.95),
+      inset 0 -9px 13px color-mix(in srgb, var(--c) 26%, black),
+      inset 0 0 0 1px rgba(255,255,255,.55) !important;
+    transition: transform .18s var(--ease);
   }
   [data-theme="light"] .hero-buttons a.btn-primary:hover {
-    background: color-mix(in srgb, var(--c-info) 88%, black) !important;
-    box-shadow: 0 4px 20px color-mix(in srgb, var(--c-info) 40%, transparent) !important;
+    transform: translateY(-2px);
+  }
+  [data-theme="light"] .hero-buttons a.btn-primary::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.4px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.92), color-mix(in srgb, var(--c-primary) 35%, white) 33%, transparent 58%, color-mix(in srgb, var(--c-primary) 45%, white));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  [data-theme="light"] .hero-buttons a.btn-primary::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+    background: radial-gradient(118% 86% at 50% 46%, transparent 34%, color-mix(in srgb, var(--c-primary) 48%, transparent) 72%, color-mix(in srgb, var(--c-primary) 26%, white) 100%);
+    mix-blend-mode: screen;
   }
 
-  /* Bottom CTA: Get Investor Access (was --c-metal grey) → Sky Blue */
+  /* --- Bottom CTA: Get Investor Access → Aqua liquid glass --- */
   [data-theme="light"] .investor-cta-strip a.cta-btn-invest {
-    background: var(--c-info) !important;
+    --c: var(--c-primary);
+    padding: 14px 36px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
     color: var(--text) !important;
+    text-shadow: none !important;
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.66), transparent 60%),
+      linear-gradient(180deg, color-mix(in srgb, var(--c) 56%, white), var(--c) 50%, color-mix(in srgb, var(--c) 54%, black)) !important;
+    -webkit-backdrop-filter: blur(11px) saturate(165%);
+    backdrop-filter: blur(11px) saturate(165%);
+    box-shadow:
+      0 9px 20px rgba(40,90,120,.20),
+      0 0 22px -7px var(--c),
+      inset 0 1.5px 1px rgba(255,255,255,.95),
+      inset 0 -9px 13px color-mix(in srgb, var(--c) 26%, black),
+      inset 0 0 0 1px rgba(255,255,255,.55) !important;
+    transition: transform .18s var(--ease);
   }
   [data-theme="light"] .investor-cta-strip a.cta-btn-invest:hover {
-    background: color-mix(in srgb, var(--c-info) 88%, black) !important;
+    transform: translateY(-2px);
+  }
+  [data-theme="light"] .investor-cta-strip a.cta-btn-invest::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.4px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.92), color-mix(in srgb, var(--c-primary) 35%, white) 33%, transparent 58%, color-mix(in srgb, var(--c-primary) 45%, white));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  [data-theme="light"] .investor-cta-strip a.cta-btn-invest::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+    background: radial-gradient(118% 86% at 50% 46%, transparent 34%, color-mix(in srgb, var(--c-primary) 48%, transparent) 72%, color-mix(in srgb, var(--c-primary) 26%, white) 100%);
+    mix-blend-mode: screen;
   }
 
-  /* Bottom CTA: Browse Deals (was white outline) → Aqua filled */
+  /* --- Bottom CTA: Browse Deals → platinum liquid glass (dark ink) --- */
   [data-theme="light"] .investor-cta-strip a.cta-btn-outline {
-    background: var(--c-primary) !important;
-    border-color: var(--c-primary) !important;
-    color: var(--text) !important;
+    padding: 14px 36px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #16202B !important;
+    text-shadow: none !important;
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+    border: none !important;
+    background:
+      radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.6), transparent 62%),
+      linear-gradient(180deg, #FBFDFF, #D7E2EA 32%, #AEC0CD 56%, #E6EEF4 78%, #BCCBD6) !important;
+    -webkit-backdrop-filter: blur(11px) saturate(165%);
+    backdrop-filter: blur(11px) saturate(165%);
+    box-shadow:
+      0 12px 24px rgba(40,90,120,.30),
+      0 0 24px -6px rgba(220,235,245,.7),
+      inset 0 1.5px 1px rgba(255,255,255,1),
+      inset 0 -11px 15px rgba(140,170,190,.34),
+      inset 0 0 0 1px rgba(255,255,255,.6) !important;
+    transition: transform .18s var(--ease);
   }
   [data-theme="light"] .investor-cta-strip a.cta-btn-outline:hover {
-    background: color-mix(in srgb, var(--c-primary) 88%, black) !important;
-    border-color: color-mix(in srgb, var(--c-primary) 88%, black) !important;
-    color: var(--text) !important;
+    transform: translateY(-2px);
   }
   </style>
 </head>
