@@ -2306,3 +2306,12 @@ body {
  border-color: rgba(139,92,246,.50) !important;
  color: #B79BFF !important;
 }
+
+/* v2.5.2 — Nav "Get Access" → Sky Blue in light mode (applies to all pages with investorNav: homepage, marketplace, deal, dashboard) */
+[data-theme="light"] #investorNav a[href="/signup.html"] {
+  background: var(--c-info) !important;
+  color: var(--text) !important; /* dark ink on Sky Blue — AA verified */
+}
+[data-theme="light"] #investorNav a[href="/signup.html"]:hover {
+  background: color-mix(in srgb, var(--c-info) 88%, black) !important;
+}
