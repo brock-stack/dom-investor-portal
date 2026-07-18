@@ -2307,51 +2307,38 @@ body {
  color: #B79BFF !important;
 }
 
-/* v2.5.3 — Nav liquid glass (light only; applies to all pages with investorNav: homepage, marketplace, deal, dashboard) */
-/* Get Access — Sky Blue liquid glass */
+/* v2.5.3 REV2 — Nav buttons, light only (applies to all pages with investorNav: homepage, marketplace, deal, dashboard) */
+
+/* Get Access — Rose outline ghost.
+   AA note: Rose #F4889E ink on composited nav backdrop (~#2a637d) = 2.79:1 FAIL.
+   var(--text) light #103A45 on same backdrop = 1.86:1 FAIL.
+   Nav base rule (glass.css:782) already sets color:rgba(255,255,255,.92) on all .investor-nav a in light mode.
+   Shipped ink: rgba(255,255,255,.92) = 6.61:1 PASS (AA local fix per spec §Ask3 authority). */
 [data-theme="light"] #investorNav a[href="/signup.html"] {
-  --c: var(--c-info);
-  /* Geometry preserved: radius 8px, padding 7px 16px, font 13px/700 */
+  --c: var(--c-accent); /* light Rose #F4889E per glass.css:123 */
+  /* Geometry preserved: nav radius 8px, padding 7px 16px, font 13px/700 */
   padding: 7px 16px !important;
   border-radius: 8px !important;
   font-size: 13px !important;
   font-weight: 700 !important;
-  color: #1a2744 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
   text-shadow: none !important;
-  text-decoration: none;
   position: relative;
-  isolation: isolate;
-  overflow: visible;
-  background:
-    radial-gradient(82% 56% at 50% -12%, rgba(255,255,255,.66), transparent 60%),
-    linear-gradient(180deg, color-mix(in srgb, var(--c) 56%, white), var(--c) 50%, color-mix(in srgb, var(--c) 54%, black)) !important;
-  -webkit-backdrop-filter: blur(11px) saturate(165%);
-  backdrop-filter: blur(11px) saturate(165%);
+  color: rgba(255,255,255,.92) !important; /* AA fix: white 6.61:1 PASS; Rose 2.79:1 FAIL, var(--text) light 1.86:1 FAIL */
+  background: transparent !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow:
-    0 9px 20px rgba(40,90,120,.20),
-    0 0 22px -7px var(--c),
-    inset 0 1.5px 1px rgba(255,255,255,.95),
-    inset 0 -9px 13px color-mix(in srgb, var(--c) 26%, black),
-    inset 0 0 0 1px rgba(255,255,255,.55) !important;
+    inset 0 0 0 1.6px color-mix(in srgb, var(--c) 70%, transparent),
+    0 0 12px -8px var(--c) !important;
   transition: transform .18s var(--ease);
 }
 [data-theme="light"] #investorNav a[href="/signup.html"]:hover {
   transform: translateY(-2px);
 }
-[data-theme="light"] #investorNav a[href="/signup.html"]::before {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.4px;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255,255,255,.92), color-mix(in srgb, var(--c-info) 35%, white) 33%, transparent 58%, color-mix(in srgb, var(--c-info) 45%, white));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-}
-[data-theme="light"] #investorNav a[href="/signup.html"]::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
-  background: radial-gradient(118% 86% at 50% 46%, transparent 34%, color-mix(in srgb, var(--c-info) 48%, transparent) 72%, color-mix(in srgb, var(--c-info) 26%, white) 100%);
-  mix-blend-mode: screen;
-}
 
-/* Sign In — glass ghost, Sky Blue rim (family match with Get Access) */
+/* Sign In — glass ghost, Sky Blue rim (carried unchanged from REV1) */
 /* border-radius omitted — inherits .btn-secondary (greped: 6px) */
 [data-theme="light"] #investorNav a[href="/login.html"] {
   --c: var(--c-info);
