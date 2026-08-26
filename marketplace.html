@@ -742,7 +742,7 @@
       'light-v11': 'mapbox://styles/mapbox/light-v11'
     };
 
-    let map, allListings = [], markers = {}, currentFilter = 'all', currentView = 'tile', floodVisible = false;
+    let map, allListings = [], markers = {}, pricePinMarkers = {}, currentFilter = 'all', currentView = 'tile', floodVisible = false;
 
     async function init() {
       const session = await Portal.requireAuth();
@@ -791,6 +791,14 @@
         });
       }
 
+      // Centralized marker cleanup — clears dots AND price pins before every re-render
+      function clearAllMarkers() {
+        Object.values(markers).forEach(function(m) { m.remove(); });
+        markers = {};
+        Object.values(pricePinMarkers).forEach(function(m) { m.remove(); });
+        pricePinMarkers = {};
+      }
+
       // Style buttons
       document.querySelectorAll('.map-style-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -799,6 +807,7 @@
           var styleKey = btn.dataset.style;
           map.setStyle(STYLE_MAP[styleKey] || CUSTOM_STYLE);
           map.once('styledata', function() {
+            clearAllMarkers();
             allListings.forEach(function(l) { addMarker(l); });
             if (floodVisible) toggleFloodLayer(true);
           });
@@ -814,9 +823,7 @@
         if (map.getStyle() && map.getStyle().sprite && map.getStyle().sprite.indexOf(isDark ? 'satellite' : 'brockchain8') !== -1) return; // already correct style
         map.setStyle(newStyle);
         map.once('styledata', function() {
-          // Clear existing markers before re-adding
-          Object.values(markers).forEach(function(m) { m.remove(); });
-          markers = {};
+          clearAllMarkers();
           allListings.forEach(function(l) { addMarker(l); });
           if (floodVisible) toggleFloodLayer(true);
         });
@@ -836,6 +843,7 @@
         var style = STYLE_MAP[styleKey] || CUSTOM_STYLE;
         map.setStyle(style);
         map.once('styledata', function() {
+          clearAllMarkers();
           allListings.forEach(function(l) { addMarker(l); });
           if (floodVisible) toggleFloodLayer(true);
         });
@@ -912,6 +920,7 @@
           }
         }
 
+        clearAllMarkers();
         allListings.forEach(function(l) { addMarker(l); });
         renderListings();
         _initMktFavs();
@@ -963,6 +972,7 @@
       markers[listing.id] = marker;
 
       // Mobile price pins
+      if (pricePinMarkers[listing.id]) { pricePinMarkers[listing.id].remove(); }
       if (window.innerWidth <= 768 && listing.asking_price) {
         var pinEl = document.createElement('div');
         pinEl.className = 'map-price-pin';
@@ -1041,7 +1051,7 @@
             }
           });
         })(listing.id);
-        new mapboxgl.Marker({element: pinEl, anchor: 'bottom'}).setLngLat([p.lng, p.lat]).addTo(map);
+        pricePinMarkers[listing.id] = new mapboxgl.Marker({element: pinEl, anchor: 'bottom'}).setLngLat([p.lng, p.lat]).addTo(map);
       }
     }
 
